@@ -1,23 +1,12 @@
 image: haxe:4.0-stretch
 
 stages:
-- build-test
+- test
 - deploy
 
-build-cs:
-  stage: build-test
-  variables:
-    HXML: hxml/build-cs.hxml
-  script:
-  # Install Mono
-  - apt-get update
-  - apt-get install -yqq --no-install-recommends apt-transport-https ca-certificates mono-complete
-
-  - haxelib install $HXML --always --quiet
-  - haxe $HXML
 
 test-neko:
-  stage: build-test
+  stage: test
   retry: 2
   variables:
     HXML: test-neko.hxml
@@ -25,8 +14,9 @@ test-neko:
   - haxelib install $HXML --always --quiet
   - haxe $HXML
 
+
 test-cpp:
-  stage: build-test
+  stage: test
   retry: 2
   cache:
     key: cpp-build
@@ -41,6 +31,7 @@ test-cpp:
   
   - haxelib install $HXML --always --quiet
   - haxe $HXML
+
 
 deploy:
   stage: deploy
