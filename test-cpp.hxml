@@ -1,0 +1,6 @@
+
+hxml/test.hxml
+
+--next
+-cpp build/cpp
+-cmd ./build/cpp/TestMain

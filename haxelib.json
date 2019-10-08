@@ -1,0 +1,13 @@
+{
+  "name": "quadtree",
+  "url" : "https://gitlab.com/haath/quadtree",
+  "license": "MIT",
+  "tags": ["quadtree", "quad", "tree", "collision", "detection"],
+  "description": "Quadtree implementation for collision detection.",
+  "version": "0.0.0",
+  "classPath": "src",
+  "releasenote": "Initial release.",
+  "contributors": [ "Haath" ],
+  "dependencies": {
+  }
+}

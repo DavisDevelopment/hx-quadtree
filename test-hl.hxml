@@ -1,0 +1,6 @@
+
+hxml/test.hxml
+
+--next
+-hl build/hl/test.hl
+-cmd hl build/hl/test.hl

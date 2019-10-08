@@ -1,0 +1,63 @@
+image: haxe:4.0-stretch
+
+stages:
+- build-test
+- deploy
+
+build-cs:
+  stage: build-test
+  variables:
+    HXML: hxml/build-cs.hxml
+  script:
+  # Install Mono
+  - apt-get update
+  - apt-get install -yqq --no-install-recommends apt-transport-https ca-certificates mono-complete
+
+  - haxelib install $HXML --always --quiet
+  - haxe $HXML
+
+test-neko:
+  stage: build-test
+  retry: 2
+  variables:
+    HXML: test-neko.hxml
+  script:
+  - haxelib install $HXML --always --quiet
+  - haxe $HXML
+
+test-cpp:
+  stage: build-test
+  retry: 2
+  cache:
+    key: cpp-build
+    paths:
+    - build/cpp/obj
+  variables:
+    HXML: test-cpp.hxml
+  script:
+  # Install C++ build tools
+  - apt-get update
+  - apt-get install -yqq build-essential g++
+  
+  - haxelib install $HXML --always --quiet
+  - haxe $HXML
+
+deploy:
+  stage: deploy
+  only:
+  - /^v\d+.\d+.\d+$/
+  before_script:
+  - apt-get update
+  - apt-get install -yqq zip jq
+  script:
+  # Patch version number in haxelib.json
+  - export TMP=$(mktemp)
+  - export VERSION=$(echo $CI_COMMIT_TAG | cut -d 'v' -f 2)
+  - echo $VERSION
+  - jq ".version = \"$VERSION\"" haxelib.json > "$TMP"
+  - mv "$TMP" haxelib.json
+  # Make zip
+  - mkdir -p build
+  - zip -r build/quadtree.zip -@ < haxelib.lst
+  # Publish
+  - haxelib submit build/quadtree.zip "$HAXELIB_PASSWORD"

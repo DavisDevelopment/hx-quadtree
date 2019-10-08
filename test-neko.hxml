@@ -1,0 +1,6 @@
+
+hxml/test.hxml
+
+--next
+-neko build/neko/test.n
+-cmd neko build/neko/test.n
