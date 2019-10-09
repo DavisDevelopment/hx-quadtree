@@ -3,7 +3,7 @@ package quadtree;
 
 class RectangleUtils
 {
-    public static inline function contains(rect: Rectangle, other: Rectangle): Bool
+    public static inline function contains(rect: Area, other: Area): Bool
     {
         return other != null
             && rect.x <= other.x

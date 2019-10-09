@@ -2,13 +2,14 @@ package tests;
 
 import utest.Assert;
 import utest.ITest;
-import quadtree.Rectangle;
-import tests.models.Box;
+import quadtree.Area;
+import quadtree.areas.BoundingBox;
+import quadtree.areas.Rectangle;
 
-using quadtree.RectangleUtils;
+using quadtree.AreaUtils;
 
 
-class TestRectangle implements ITest
+class TestArea implements ITest
 {
     public function new()
     {
@@ -18,11 +19,19 @@ class TestRectangle implements ITest
 
     function testContains()
     {
-        var rect: Rectangle = new Box(100, 100, 200, 200);
+        var rect: Rectangle = new BoundingBox(100, 100, 200, 200);
 
         var testCases = [
             {
-                other: new Box(150, 150),
+                other: new BoundingBox(150, 150),
+                expected: true
+            },
+            {
+                other: new BoundingBox(150, 150, 200, 200),
+                expected: false
+            },
+            {
+                other: new BoundingBox(150, 150, 50, 50),
                 expected: true
             }
         ];

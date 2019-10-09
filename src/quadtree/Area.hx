@@ -1,7 +1,7 @@
 package quadtree;
 
 
-interface Rectangle
+interface Area
 {
     /** The x-coordinate of the top-left position of the area. **/
     public var x(default, never): Int;

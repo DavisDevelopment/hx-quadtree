@@ -1,9 +1,10 @@
-package tests.models;
+package quadtree.areas;
 
-import quadtree.Rectangle;
+import quadtree.areas.Rectangle;
+import quadtree.Area;
 
 
-class Box implements Rectangle
+class BoundingBox implements Rectangle
 {
     public var x: Int;
     public var y: Int;
