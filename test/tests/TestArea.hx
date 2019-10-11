@@ -1,5 +1,6 @@
 package tests;
 
+import tests.models.Point;
 import utest.Assert;
 import utest.ITest;
 import quadtree.Area;
@@ -17,7 +18,7 @@ class TestArea implements ITest
     }
 
 
-    function testContains()
+    function testContainsArea()
     {
         var rect: Rectangle = new BoundingBox(100, 100, 200, 200);
 
@@ -36,16 +37,51 @@ class TestArea implements ITest
             }
         ];
 
-        doBoolTestCases(rect.contains, testCases);
+        doAreaBoolTestCases(rect.containsAreaInArea, testCases);
     }
 
 
-    function doBoolTestCases(method: (Rectangle) -> Bool, testCases: Array<Dynamic>)
+    function testContainsPoint()
+    {
+        var rect: Rectangle = new BoundingBox(100, 100, 200, 200);
+
+        var testCases = [
+            {
+                other: new Point(150, 150),
+                expected: true
+            },
+            {
+                other: new Point(50, 50),
+                expected: false
+            },
+            {
+                other: new Point(555, 555),
+                expected: false
+            }
+        ];
+
+        doPointBoolTestCases(rect.containsPointInArea, testCases);
+    }
+
+
+    function doAreaBoolTestCases(method: Area -> Bool, testCases: Array<Dynamic>)
     {
         for (testCase in testCases)
         {
-            var other: Rectangle            = cast testCase.other;
-            var expected: Bool              = cast testCase.expected;
+            var other: Area             = cast testCase.other;
+            var expected: Bool          = cast testCase.expected;
+
+            Assert.equals(expected, method(other));
+        }
+    }
+
+
+    function doPointBoolTestCases(method: Point -> Bool, testCases: Array<Dynamic>)
+    {
+        for (testCase in testCases)
+        {
+            var other: Point            = cast testCase.other;
+            var expected: Bool          = cast testCase.expected;
 
             Assert.equals(expected, method(other));
         }

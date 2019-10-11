@@ -1,13 +1,18 @@
 package quadtree;
 
 
-interface Area
+@:enum
+abstract AreaType(Int) 
 {
-    /** The x-coordinate of the top-left position of the area. **/
-    public var x(default, never): Int;
-    
-    /** The y-coordinate of the top-left position of the area. **/
-    public var y(default, never): Int;
+    var Rectangle = 0;
+    var Circle    = 1;
+}
+
+
+interface Area extends Point
+{
+    /** The width of the area. **/
+    public var areaType(default, never): AreaType;
 
     /** The width of the area. **/
     public var width(default, never): Int;

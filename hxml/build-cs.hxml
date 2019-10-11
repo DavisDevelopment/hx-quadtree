@@ -1,0 +1,8 @@
+
+-cp src
+
+-D dll
+
+-cs build/cs/QuadTree.hx
+
+quadtree
