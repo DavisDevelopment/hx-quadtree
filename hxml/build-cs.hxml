@@ -1,6 +1,7 @@
 
 -cp src
 
+-dce no
 -D dll
 
 -cs build/cs/QuadTree.hx

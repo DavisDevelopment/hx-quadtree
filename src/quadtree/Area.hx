@@ -12,11 +12,11 @@ abstract AreaType(Int)
 interface Area extends Point
 {
     /** The width of the area. **/
-    public var areaType(default, never): AreaType;
+    public var areaType: AreaType;
 
     /** The width of the area. **/
-    public var width(default, never): Int;
+    public var width: Int;
     
     /** The height of the area. **/
-    public var height(default, never): Int;
+    public var height: Int;
 }

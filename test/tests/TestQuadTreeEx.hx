@@ -1,5 +1,6 @@
 package tests;
 
+import quadtree.QuadTree;
 import tests.models.Point;
 import utest.Assert;
 import utest.ITest;
@@ -7,10 +8,10 @@ import quadtree.Area;
 import quadtree.areas.BoundingBox;
 import quadtree.areas.Rectangle;
 
-using quadtree.AreaUtils;
+using quadtree.QuadTreeEx;
 
 
-class TestArea implements ITest
+class TestQuadTreeEx implements ITest
 {
     public function new()
     {
@@ -21,6 +22,7 @@ class TestArea implements ITest
     function testContainsArea()
     {
         var rect: Rectangle = new BoundingBox(100, 100, 200, 200);
+        var qt: QuadTree = new QuadTree(rect);
 
         var testCases = [
             {
@@ -37,13 +39,14 @@ class TestArea implements ITest
             }
         ];
 
-        doAreaBoolTestCases(rect.containsAreaInArea, testCases);
+        doAreaBoolTestCases(qt.containsArea, testCases);
     }
 
 
     function testContainsPoint()
     {
         var rect: Rectangle = new BoundingBox(100, 100, 200, 200);
+        var qt: QuadTree = new QuadTree(rect);
 
         var testCases = [
             {
@@ -60,18 +63,23 @@ class TestArea implements ITest
             }
         ];
 
-        doPointBoolTestCases(rect.containsPointInArea, testCases);
+        doPointBoolTestCases(qt.containsPoint, testCases);
     }
 
 
-    function doAreaBoolTestCases(method: Area -> Bool, testCases: Array<Dynamic>)
+    function doAreaBoolTestCases(method: (Int, Int, Int, Int) -> Bool, testCases: Array<Dynamic>)
     {
         for (testCase in testCases)
         {
             var other: Area             = cast testCase.other;
             var expected: Bool          = cast testCase.expected;
+            
+            var objLeftEdge: Int = other.x;
+            var objTopEdge: Int = other.y;
+            var objRightEdge: Int = other.x + other.width;
+            var objBottomEdge: Int = other.y + other.height;
 
-            Assert.equals(expected, method(other));
+            Assert.equals(expected, method(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge));
         }
     }
 
