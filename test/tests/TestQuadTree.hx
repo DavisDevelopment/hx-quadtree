@@ -1,6 +1,6 @@
 package tests;
 
-import quadtree.Point;
+import tests.models.Point;
 import utest.Assert;
 import tests.models.BoundingBox;
 import quadtree.Area;
@@ -104,7 +104,9 @@ class TestQuadTree extends QuadTree implements ITest
         Assert.equals(botLeft, traverseTree(qt -> qt.botLeftTree));
         
         var botRight: Area = new BoundingBox(990, 990, 9, 9);
+        var botRight2: Area = new BoundingBox(990, 990, 9, 10);
         add(botRight);
+        add(botRight2);
         Assert.notNull(botRightTree);
         Assert.equals(botRight, traverseTree(qt -> qt.botRightTree));
 
@@ -146,7 +148,35 @@ class TestQuadTree extends QuadTree implements ITest
     }
 
 
-    function traverseTree(next: QuadTree->QuadTree, index: Int = 0): Point
+    function testAddPoint()
+    {
+        var topRight: Point = new Point(990, 10);
+        add(topRight);
+        Assert.notNull(topRightTree);
+        Assert.equals(topRight, traverseTree(qt -> qt.topRightTree));
+
+        var topLeft: Point = new Point(10, 10);
+        add(topLeft);
+        Assert.notNull(topLeftTree);
+        Assert.equals(topLeft, traverseTree(qt -> qt.topLeftTree));
+        
+        var botLeft: Point = new Point(10, 990);
+        add(botLeft);
+        Assert.notNull(botLeftTree);
+        Assert.equals(botLeft, traverseTree(qt -> qt.botLeftTree));
+        
+        var botRight: Point = new Point(990, 990);
+        add(botRight);
+        Assert.notNull(botRightTree);
+        Assert.equals(botRight, traverseTree(qt -> qt.botRightTree));
+
+        // Should not have been added here.
+        Assert.equals(0, objects0.length);
+        Assert.equals(0, objects1.length);
+    }
+
+
+    function traverseTree(next: QuadTree->QuadTree, index: Int = 0): quadtree.Point
     {
         var cur: QuadTree = this;
         do

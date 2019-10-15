@@ -92,7 +92,7 @@ class QuadTree
                 addToTopLeft(area, list);
                 return;
             }
-            if (objTopEdge > midpointY && objBottomEdge < objBottomEdge)
+            if (objTopEdge > midpointY && objBottomEdge < botEdge)
             {
                 addToBotLeft(area, list);
                 return;
@@ -156,12 +156,10 @@ class QuadTree
             if (point.y < midpointY)
             {
                 addToTopRight(point, list);
-                return;
             }
             else
             {
                 addToBotRight(point, list);
-                return;
             }
         }
     }
