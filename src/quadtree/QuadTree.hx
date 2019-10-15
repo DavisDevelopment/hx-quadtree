@@ -2,7 +2,6 @@ package quadtree;
 
 import quadtree.areas.Rectangle;
 import quadtree.Point;
-import quadtree.areas.BoundingBox;
 
 using quadtree.QuadTreeEx;
 
@@ -12,10 +11,10 @@ class QuadTree
     var objects0: Array<Point>;
     var objects1: Array<Point>;
 
-    var topLeft: QuadTree;
-    var topRight: QuadTree;
-    var botLeft: QuadTree;
-    var botRight: QuadTree;
+    var topLeftTree: QuadTree;
+    var topRightTree: QuadTree;
+    var botLeftTree: QuadTree;
+    var botRightTree: QuadTree;
 
     var leftEdge: Int;
     var topEdge: Int;
@@ -26,62 +25,110 @@ class QuadTree
     var midpointX: Int;
     var midpointY: Int;
 
-    var depth: Int;
+    var maxDepth: Int;
 
 
-    public function new(?boundaries: Rectangle)
+    public inline function new(x: Int, y: Int, width: Int, height: Int, maxDepth: Int = 5)
     {
-        reset(boundaries);
+        reset(x, y, width, height, maxDepth);
     }
 
 
-    function reset(?boundaries: Rectangle)
+    function reset(x: Int, y: Int, width: Int, height: Int, maxDepth: Int)
     {
-        boundaries = boundaries != null ? boundaries : BoundingBox.Max;
-
         objects0 = new Array<Point>();
         objects1 = new Array<Point>();
 
-        leftEdge = boundaries.x;
-        topEdge = boundaries.y;
-        rightEdge = boundaries.x + boundaries.width;
-        botEdge = boundaries.y + boundaries.height;
-        halfWidth = Std.int(boundaries.width / 2);
-        halfHeight = Std.int(boundaries.height / 2);
+        topLeftTree = null;
+        topRightTree = null;
+        botLeftTree = null;
+        botRightTree = null;
+
+        leftEdge = x;
+        topEdge = y;
+        rightEdge = x + width;
+        botEdge = y + height;
+        halfWidth = Std.int(width / 2);
+        halfHeight = Std.int(height / 2);
         midpointX = leftEdge + halfWidth;
         midpointY = topEdge + halfHeight;
 
-        depth = 0;
+        this.maxDepth = maxDepth;
     }
 
 
     public function add(object: Point, list: Int = 0)
     {
-        if (Std.is(object, Point))
+        if (Std.is(object, Area))
         {
-            addPoint(cast(object, Point), list);
+            addArea(cast(object, Area), list);
         }
         else
         {
-            addArea(cast(object, Area), list);
+            addPoint(cast(object, Point), list);
         }
     }
 
 
-    function addArea(area: Area, list: Int = 0): Bool
+    function addArea(area: Area, list: Int = 0)
     {
-        var objLeftEdge: Int = area.x;
-        var objTopEdge: Int = area.y;
-        var objRightEdge: Int = area.x + area.width;
-        var objBottomEdge: Int = area.y + area.height;
+        final objLeftEdge: Int = area.x;
+        final objTopEdge: Int = area.y;
+        final objRightEdge: Int = area.x + area.width;
+        final objBottomEdge: Int = area.y + area.height;
 
-        if (this.containsArea(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
+        // Check if the entire node fits inside the object.
+        if (!canSubdivide() || this.isContainedInArea(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
         {
             addToList(area, list);
-            return true;
+            return;
         }
 
-        return false;        
+        // Check if the object fits completely inside one of the quadrants.
+        if (objLeftEdge > leftEdge && objRightEdge < midpointX)
+        {
+            if (objTopEdge > topEdge && objBottomEdge < midpointY)
+            {
+                addToTopLeft(area, list);
+                return;
+            }
+            if (objTopEdge > midpointY && objBottomEdge < objBottomEdge)
+            {
+                addToBotLeft(area, list);
+                return;
+            }
+        }
+        if (objLeftEdge > midpointX && objRightEdge < rightEdge)
+        {
+            if (objTopEdge > topEdge && objBottomEdge < midpointY)
+            {
+                addToTopRight(area, list);
+                return;
+            }
+            if (objTopEdge > midpointY && objBottomEdge < objBottomEdge)
+            {
+                addToBotRight(area, list);
+                return;
+            }
+        }
+
+        // Object didn't completely fit in any quadrant, check for partial overlaps.
+        if (this.intersectsTopLeft(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
+        {
+            addToTopLeft(area, list);
+        }
+        if (this.intersectsTopRight(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
+        {
+            addToTopRight(area, list);
+        }
+        if (this.intersectsBotRight(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
+        {
+            addToBotRight(area, list);
+        }
+        if (this.intersectsBotLeft(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
+        {
+            addToBotLeft(area, list);
+        }
     }
 
 
@@ -100,6 +147,60 @@ class QuadTree
 
             case 1:
                 objects1.push(object);
+
+            case _:
+                throw "Invalid list";
         }
+
+        if (!canSubdivide())
+        {
+            return;
+        }
+    }
+
+
+    inline function canSubdivide(): Bool
+    {
+        return maxDepth > 0;
+    }
+
+
+    inline function addToTopLeft(area: Area, list: Int = 0)
+    {
+        if (topLeftTree == null)
+        {
+            topLeftTree = new QuadTree(leftEdge, topEdge, halfWidth, halfHeight, maxDepth - 1);
+        }
+        topLeftTree.addArea(area, list);
+    }
+
+
+    inline function addToTopRight(area: Area, list: Int = 0)
+    {
+        if (topRightTree == null)
+        {
+            topRightTree = new QuadTree(midpointX, topEdge, halfWidth, halfHeight, maxDepth - 1);
+        }
+        topRightTree.addArea(area, list);
+    }
+
+
+    inline function addToBotRight(area: Area, list: Int = 0)
+    {
+        if (botRightTree == null)
+        {
+            botRightTree = new QuadTree(midpointX, midpointY, halfWidth, halfHeight, maxDepth - 1);
+        }
+        botRightTree.addArea(area, list);
+    }
+
+
+    inline function addToBotLeft(area: Area, list: Int = 0)
+    {
+        if (botLeftTree == null)
+        {
+            botLeftTree = new QuadTree(leftEdge, midpointY, halfWidth, halfHeight, maxDepth - 1);
+        }
+        botLeftTree.addArea(area, list);
     }
 }

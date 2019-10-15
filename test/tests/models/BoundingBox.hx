@@ -1,4 +1,4 @@
-package quadtree.areas;
+package tests.models;
 
 import quadtree.areas.Rectangle;
 import quadtree.Area;
@@ -27,9 +27,9 @@ class BoundingBox implements Rectangle
     }
 
 
-    @IgnoreCover
     static function get_Max(): BoundingBox
     {
         return new BoundingBox(0, 0, Ints.MAX, Ints.MAX);
     }
 }
+

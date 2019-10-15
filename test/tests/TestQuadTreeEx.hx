@@ -2,10 +2,10 @@ package tests;
 
 import quadtree.QuadTree;
 import tests.models.Point;
+import tests.models.BoundingBox;
 import utest.Assert;
 import utest.ITest;
 import quadtree.Area;
-import quadtree.areas.BoundingBox;
 import quadtree.areas.Rectangle;
 
 using quadtree.QuadTreeEx;
@@ -21,8 +21,7 @@ class TestQuadTreeEx implements ITest
 
     function testContainsArea()
     {
-        var rect: Rectangle = new BoundingBox(100, 100, 200, 200);
-        var qt: QuadTree = new QuadTree(rect);
+        var qt: QuadTree = new QuadTree(100, 100, 200, 200);
 
         var testCases = [
             {
@@ -43,10 +42,44 @@ class TestQuadTreeEx implements ITest
     }
 
 
+    function testIsContainedInArea()
+    {
+        var qt: QuadTree = new QuadTree(100, 100, 200, 200);
+
+        var testCases = [
+            {
+                other: new BoundingBox(150, 150),
+                expected: false
+            },
+            {
+                other: new BoundingBox(150, 150, 200, 200),
+                expected: false
+            },
+            {
+                other: new BoundingBox(150, 150, 50, 50),
+                expected: false
+            },
+            {
+                other: new BoundingBox(50, 50, 150, 150),
+                expected: false
+            },
+            {
+                other: new BoundingBox(50, 50, 300, 300),
+                expected: true
+            },
+            {
+                other: new BoundingBox(100, 100, 200, 200),
+                expected: true
+            }
+        ];
+
+        doAreaBoolTestCases(qt.isContainedInArea, testCases);
+    }
+
+
     function testContainsPoint()
     {
-        var rect: Rectangle = new BoundingBox(100, 100, 200, 200);
-        var qt: QuadTree = new QuadTree(rect);
+        var qt: QuadTree = new QuadTree(100, 100, 200, 200);
 
         var testCases = [
             {
