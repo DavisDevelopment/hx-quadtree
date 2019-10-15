@@ -70,6 +70,10 @@ class TestQuadTreeEx implements ITest
             {
                 other: new BoundingBox(100, 100, 200, 200),
                 expected: true
+            },
+            {
+                other: new BoundingBox(1, 1, 199, 199),
+                expected: false
             }
         ];
 

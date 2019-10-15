@@ -56,16 +56,6 @@ class QuadTreeEx
             && botEdge > qt.midpointY
             && topEdge < qt.botEdge;
     }
-    
-
-    public static inline function intersectsWithArea(qt: QuadTree, other: Area): Bool
-    {
-        return other != null
-            && qt.rightEdge > other.x
-            && qt.botEdge > other.y
-            && qt.leftEdge < other.x + other.width
-            && qt.topEdge < other.y + other.height;
-    }
 
 
     public static inline function containsPoint(qt: QuadTree, other: Point): Bool

@@ -105,7 +105,7 @@ class QuadTree
                 addToTopRight(area, list);
                 return;
             }
-            if (objTopEdge > midpointY && objBottomEdge < objBottomEdge)
+            if (objTopEdge > midpointY && objBottomEdge < botEdge)
             {
                 addToBotRight(area, list);
                 return;
@@ -134,7 +134,36 @@ class QuadTree
 
     function addPoint(point: Point, list: Int = 0)
     {
-        
+        if (!canSubdivide() && this.containsPoint(point))
+        {
+            addToList(point, list);
+            return;
+        }
+
+        if (point.x < midpointX)
+        {
+            if (point.y < midpointY)
+            {
+                addToTopLeft(point, list);
+            }
+            else
+            {
+                addToBotLeft(point, list);
+            }
+        }
+        else
+        {
+            if (point.y < midpointY)
+            {
+                addToTopRight(point, list);
+                return;
+            }
+            else
+            {
+                addToBotRight(point, list);
+                return;
+            }
+        }
     }
 
 
@@ -151,11 +180,6 @@ class QuadTree
             case _:
                 throw "Invalid list";
         }
-
-        if (!canSubdivide())
-        {
-            return;
-        }
     }
 
 
@@ -165,42 +189,71 @@ class QuadTree
     }
 
 
-    inline function addToTopLeft(area: Area, list: Int = 0)
+    inline function addToTopLeft(point: Point, list: Int = 0)
     {
         if (topLeftTree == null)
         {
             topLeftTree = new QuadTree(leftEdge, topEdge, halfWidth, halfHeight, maxDepth - 1);
         }
-        topLeftTree.addArea(area, list);
+        topLeftTree.add(point, list);
     }
 
 
-    inline function addToTopRight(area: Area, list: Int = 0)
+    inline function addToTopRight(point: Point, list: Int = 0)
     {
         if (topRightTree == null)
         {
             topRightTree = new QuadTree(midpointX, topEdge, halfWidth, halfHeight, maxDepth - 1);
         }
-        topRightTree.addArea(area, list);
+        topRightTree.add(point, list);
     }
 
 
-    inline function addToBotRight(area: Area, list: Int = 0)
+    inline function addToBotRight(point: Point, list: Int = 0)
     {
         if (botRightTree == null)
         {
             botRightTree = new QuadTree(midpointX, midpointY, halfWidth, halfHeight, maxDepth - 1);
         }
-        botRightTree.addArea(area, list);
+        botRightTree.add(point, list);
     }
 
 
-    inline function addToBotLeft(area: Area, list: Int = 0)
+    inline function addToBotLeft(point: Point, list: Int = 0)
     {
         if (botLeftTree == null)
         {
             botLeftTree = new QuadTree(leftEdge, midpointY, halfWidth, halfHeight, maxDepth - 1);
         }
-        botLeftTree.addArea(area, list);
+        botLeftTree.add(point, list);
+    }
+
+
+    @IgnoreCover
+    public function visualize(buf: StringBuf, space: String = "")
+    {
+        buf.add('${space}[$leftEdge, $topEdge, $rightEdge, $botEdge]\n');
+        buf.add('${space}objects0: [${objects0.length}]\n');
+        buf.add('${space}objects1: [${objects1.length}]\n');
+        if (topLeftTree != null)
+        {
+            buf.add('${space}topLeftTree:\n');
+            topLeftTree.visualize(buf, space + "    ");
+        }
+        if (topRightTree != null)
+        {
+            buf.add('${space}topRightTree:\n');
+            topRightTree.visualize(buf, space + "    ");
+        }
+        if (botLeftTree != null)
+        {
+            buf.add('${space}botLeftTree:\n');
+            botLeftTree.visualize(buf, space + "    ");
+        }
+        if (botRightTree != null)
+        {
+            buf.add('${space}botRightTree:\n');
+            botRightTree.visualize(buf, space + "    ");
+        }
     }
 }
