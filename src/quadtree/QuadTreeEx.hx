@@ -1,5 +1,7 @@
 package quadtree;
 
+import quadtree.types.Point;
+
 
 @:access(quadtree.QuadTree)
 class QuadTreeEx

@@ -1,7 +1,7 @@
 package quadtree;
 
-import quadtree.areas.Rectangle;
-import quadtree.Point;
+import quadtree.types.Point;
+import quadtree.types.Rectangle;
 
 using quadtree.QuadTreeEx;
 
@@ -65,7 +65,7 @@ class QuadTree
                 addPoint(cast(object, Point), list);
 
             case CollisionAreaType.Rectangle:
-                addRectangle(cast(object, Area), list);
+                addRectangle(cast(object, Rectangle), list);
 
             case _:
                 throw "Must specify an areaType";
@@ -73,17 +73,48 @@ class QuadTree
     }
 
 
-    function addRectangle(area: Area, list: Int = 0)
+    public function execute()
     {
-        final objLeftEdge: Int = area.x;
-        final objTopEdge: Int = area.y;
-        final objRightEdge: Int = area.x + area.width;
-        final objBottomEdge: Int = area.y + area.height;
+        if (canSubdivide())
+        {
+            // Leaf node, check for collisions here.
+            collisionCheckHere();
+        }
+        else
+        {
+            // Internal node, recursively check on children.
+
+            if (topLeftTree != null)
+            {
+                topLeftTree.execute();
+            }
+            if (topRightTree != null)
+            {
+                topRightTree.execute();
+            }
+            if (botLeftTree != null)
+            {
+                botLeftTree.execute();
+            }
+            if (botRightTree != null)
+            {
+                botRightTree.execute();
+            }
+        }
+    }
+
+
+    function addRectangle(rect: Rectangle, list: Int = 0)
+    {
+        final objLeftEdge: Int = rect.x;
+        final objTopEdge: Int = rect.y;
+        final objRightEdge: Int = rect.x + rect.width;
+        final objBottomEdge: Int = rect.y + rect.height;
 
         // Check if the entire node fits inside the object.
         if (!canSubdivide() || this.isContainedInArea(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
         {
-            addToList(area, list);
+            addHere(rect, list);
             return;
         }
 
@@ -92,12 +123,12 @@ class QuadTree
         {
             if (objTopEdge > topEdge && objBottomEdge < midpointY)
             {
-                addToTopLeft(area, list);
+                addToTopLeft(rect, list);
                 return;
             }
             if (objTopEdge > midpointY && objBottomEdge < botEdge)
             {
-                addToBotLeft(area, list);
+                addToBotLeft(rect, list);
                 return;
             }
         }
@@ -105,12 +136,12 @@ class QuadTree
         {
             if (objTopEdge > topEdge && objBottomEdge < midpointY)
             {
-                addToTopRight(area, list);
+                addToTopRight(rect, list);
                 return;
             }
             if (objTopEdge > midpointY && objBottomEdge < botEdge)
             {
-                addToBotRight(area, list);
+                addToBotRight(rect, list);
                 return;
             }
         }
@@ -118,19 +149,19 @@ class QuadTree
         // Object didn't completely fit in any quadrant, check for partial overlaps.
         if (this.intersectsTopLeft(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
         {
-            addToTopLeft(area, list);
+            addToTopLeft(rect, list);
         }
         if (this.intersectsTopRight(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
         {
-            addToTopRight(area, list);
+            addToTopRight(rect, list);
         }
         if (this.intersectsBotRight(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
         {
-            addToBotRight(area, list);
+            addToBotRight(rect, list);
         }
         if (this.intersectsBotLeft(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
         {
-            addToBotLeft(area, list);
+            addToBotLeft(rect, list);
         }
     }
 
@@ -139,7 +170,7 @@ class QuadTree
     {
         if (!canSubdivide() && this.containsPoint(point))
         {
-            addToList(point, list);
+            addHere(point, list);
             return;
         }
 
@@ -168,18 +199,49 @@ class QuadTree
     }
 
 
-    function addToList(object: Point, list: Int = 0) 
+    function addHere(object: Point, list: Int = 0) 
     {
-        switch list
+        if (canSubdivide())
         {
-            case 0:
-                objects0.push(object);
+            addToTopLeft(object, list);
+            addToTopRight(object, list);
+            addToBotLeft(object, list);
+            addToBotRight(object, list);
+        }
+        else
+        { 
+            switch list
+            {
+                case 0:
+                    objects0.push(object);
 
-            case 1:
-                objects1.push(object);
+                case 1:
+                    objects1.push(object);
 
-            case _:
-                throw "Invalid list";
+                case _:
+                    throw "Invalid list";
+            }
+        }
+    }
+
+
+    function collisionCheckHere()
+    {
+        final useBothLists: Bool = objects1.length > 0;
+
+        for (i0 in 0...objects0.length)
+        {
+            var obj0: Point = objects0[i0];
+
+            var otherList: Array<Point> = useBothLists ? objects1 : objects1;
+            var firstIndex: Int = useBothLists ? 0 : i0 + 1;
+
+            for (i1 in firstIndex...otherList.length)
+            {
+                var obj1: Point = otherList[i1];
+
+
+            }
         }
     }
 

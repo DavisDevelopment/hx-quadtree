@@ -1,4 +1,4 @@
-package quadtree;
+package quadtree.types;
 
 
 @:enum
@@ -13,11 +13,11 @@ abstract CollisionAreaType(Int)
 interface Point
 {
     /** The width of the area. **/
-    public var areaType: CollisionAreaType;
+    public var areaType(default, never): CollisionAreaType;
 
     /** The x-coordinate of the point. **/
-    public var x: Int;
+    public var x(default, never): Int;
     
     /** The y-coordinate of the point. **/
-    public var y: Int;
+    public var y(default, never): Int;
 }

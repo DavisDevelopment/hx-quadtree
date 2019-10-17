@@ -5,8 +5,7 @@ import tests.models.Point;
 import tests.models.BoundingBox;
 import utest.Assert;
 import utest.ITest;
-import quadtree.Area;
-import quadtree.areas.Rectangle;
+import quadtree.types.Rectangle;
 
 using quadtree.QuadTreeEx;
 
@@ -108,7 +107,7 @@ class TestQuadTreeEx implements ITest
     {
         for (testCase in testCases)
         {
-            var other: Area             = cast testCase.other;
+            var other: Rectangle        = cast testCase.other;
             var expected: Bool          = cast testCase.expected;
             
             var objLeftEdge: Int = other.x;
