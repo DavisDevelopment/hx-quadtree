@@ -1,9 +1,13 @@
 package quadtree;
 
+import quadtree.types.MovingRectangle;
 import quadtree.types.Point;
 import quadtree.types.Rectangle;
 
 using quadtree.QuadTreeEx;
+using quadtree.extensions.PointEx;
+using quadtree.extensions.RectangleEx;
+using quadtree.extensions.MovingRectangleEx;
 
 
 class QuadTree
@@ -57,14 +61,30 @@ class QuadTree
     }
 
 
+    public function load(objectGroup: Array<Point>, ?otherObjectGroup: Array<Point> = null)
+    {
+        for (obj in objectGroup)
+        {
+            add(obj, 0);
+        }
+        if (otherObjectGroup != null)
+        {
+            for (obj in otherObjectGroup)
+            {
+                add(obj, 1);
+            }
+        }
+    }
+
+
     public function add(object: Point, list: Int = 0)
     {
         switch object.areaType
         {
-            case CollisionAreaType.Point:
+            case CollisionAreaType.Point | CollisionAreaType.MovingPoint:
                 addPoint(cast(object, Point), list);
 
-            case CollisionAreaType.Rectangle:
+            case CollisionAreaType.Rectangle | CollisionAreaType.MovingRectangle:
                 addRectangle(cast(object, Rectangle), list);
 
             case _:
@@ -78,6 +98,7 @@ class QuadTree
         if (canSubdivide())
         {
             // Leaf node, check for collisions here.
+
             collisionCheckHere();
         }
         else
@@ -227,22 +248,29 @@ class QuadTree
 
     function collisionCheckHere()
     {
-        final useBothLists: Bool = objects1.length > 0;
-
         for (i0 in 0...objects0.length)
         {
-            var obj0: Point = objects0[i0];
-
-            var otherList: Array<Point> = useBothLists ? objects1 : objects1;
-            var firstIndex: Int = useBothLists ? 0 : i0 + 1;
-
-            for (i1 in firstIndex...otherList.length)
+            switch objects0[0].areaType
             {
-                var obj1: Point = otherList[i1];
+                case CollisionAreaType.Point:
+                    collisionCheckPoint(i0);
 
+                case CollisionAreaType.Rectangle:
+                    collisionCheckRectangle(i0);
 
+                case CollisionAreaType.MovingRectangle:
+                    collisionCheckMovingRectangle(i0);
+                
+                case _: 
+                    throw "Not implemented";
             }
         }
+    }
+
+
+    function onDetectedCollision(obj0: Point, obj1: Point)
+    {
+
     }
 
 
@@ -251,6 +279,84 @@ class QuadTree
         return maxDepth > 0;
     }
 
+
+    inline function useBothLists(): Bool
+    {
+        return objects1.length > 0;
+    }
+
+    // =============================================================================
+    //
+    //                       TYPE-SPECIFIC COLLISION CHECKS
+    //
+    // =============================================================================
+
+    function collisionCheckPoint(index: Int) 
+    {
+        var point: Point = objects0[index];
+
+        var otherList: Array<Point> = useBothLists() ? objects1 : objects1;
+        var firstIndex: Int = useBothLists() ? 0 : index + 1;
+
+        for (i1 in firstIndex...otherList.length)
+        {
+            var other: Point = otherList[i1];
+
+            if (point.intersectsWith(other))
+            {
+                onDetectedCollision(point, other);
+            }
+        }
+    }
+
+
+    function collisionCheckRectangle(index: Int)
+    {
+        var rect: Rectangle = cast(objects0[index], Rectangle);
+
+        var otherList: Array<Point> = useBothLists() ? objects1 : objects1;
+        var firstIndex: Int = useBothLists() ? 0 : index + 1;
+
+        for (i1 in firstIndex...otherList.length)
+        {
+            var other: Point = otherList[i1];
+
+            if (rect.intersectsWith(other))
+            {
+                onDetectedCollision(rect, other);
+            }
+        }
+    }
+
+
+    function collisionCheckMovingRectangle(index: Int)
+    {
+        var rect: MovingRectangle = cast(objects0[index], MovingRectangle);
+        var hullX: Float = rect.hullX();
+        var hullY: Float = rect.hullY();
+        var hullWidth: Float = rect.hullWidth();
+        var hullHeight: Float = rect.hullHeight();
+
+        var otherList: Array<Point> = useBothLists() ? objects1 : objects1;
+        var firstIndex: Int = useBothLists() ? 0 : index + 1;
+
+        for (i1 in firstIndex...otherList.length)
+        {
+            var other: Point = otherList[i1];
+
+            if (MovingRectangleEx.intersectsWith(hullX, hullY, hullWidth, hullHeight, other))
+            {
+                onDetectedCollision(rect, other);
+            }
+        }
+    }
+
+
+    // =============================================================================
+    //
+    //                             HELPER FUNCTIONS
+    //
+    // =============================================================================
 
     inline function addToTopLeft(point: Point, list: Int = 0)
     {

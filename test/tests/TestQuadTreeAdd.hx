@@ -4,14 +4,14 @@ import utest.Assert;
 import utest.ITest;
 import quadtree.types.Rectangle;
 import quadtree.QuadTree;
-import quadtree.types.Point.CollisionAreaType;
+import quadtree.CollisionAreaType;
 import tests.models.Point;
 import tests.models.BoundingBox;
 
 using quadtree.QuadTreeEx;
 
 
-class TestQuadTree extends QuadTree implements ITest
+class TestQuadTreeAdd extends QuadTree implements ITest
 {
     public function new()
     {
@@ -103,35 +103,31 @@ class TestQuadTree extends QuadTree implements ITest
     {
         var topRight: BoundingBox = new BoundingBox(990, 10, 9, 9);
         var topRight2: BoundingBox = new BoundingBox(990, 10, 9, 9);
-        add(topRight);
-        add(topRight2);
+        load([topRight, topRight2]);
         Assert.notNull(topRightTree);
         Assert.equals(topRight, traverseTree(qt -> qt.topRightTree));
         Assert.equals(topRight2, traverseTree(qt -> qt.topRightTree, 1));
 
         var topLeft: BoundingBox = new BoundingBox(10, 10, 9, 9);
         var topLeft2: BoundingBox = new BoundingBox(10, 10, 9, 9);
-        add(topLeft);
-        add(topLeft2);
+        load([topLeft, topLeft2]);
         Assert.notNull(topLeftTree);
         Assert.equals(topLeft, traverseTree(qt -> qt.topLeftTree));
         Assert.equals(topLeft2, traverseTree(qt -> qt.topLeftTree, 1));
         
         var botLeft: BoundingBox = new BoundingBox(10, 990, 9, 9);
         var botLeft2: BoundingBox = new BoundingBox(10, 990, 9, 9);
-        add(botLeft);
-        add(botLeft2);
+        load([botLeft, botLeft2]);
         Assert.notNull(botLeftTree);
         Assert.equals(botLeft, traverseTree(qt -> qt.botLeftTree));
         Assert.equals(botLeft2, traverseTree(qt -> qt.botLeftTree, 1));
         
         var botRight: BoundingBox = new BoundingBox(990, 990, 9, 9);
         var botRight2: BoundingBox = new BoundingBox(990, 990, 9, 10);
-        add(botRight);
-        add(botRight2);
+        load([], [botRight, botRight2]);
         Assert.notNull(botRightTree);
-        Assert.equals(botRight, traverseTree(qt -> qt.botRightTree));
-        Assert.equals(botRight2, traverseTree(qt -> qt.botRightTree, 1));
+        Assert.equals(botRight, traverseTree(qt -> qt.botRightTree, qt -> qt.objects1));
+        Assert.equals(botRight2, traverseTree(qt -> qt.botRightTree, qt -> qt.objects1, 1));
 
         // Should not have been added here.
         Assert.equals(0, objects0.length);
@@ -167,7 +163,8 @@ class TestQuadTree extends QuadTree implements ITest
         };
 
         traverseAllRecursive(this, check);
-        trace(timesChecked);
+        
+        Assert.equals(16, timesChecked);
     }
 
 
@@ -199,7 +196,7 @@ class TestQuadTree extends QuadTree implements ITest
     }
 
 
-    function traverseTree(next: QuadTree->QuadTree, index: Int = 0): quadtree.types.Point
+    function traverseTree(next: QuadTree->QuadTree, ?objList: QuadTree->Array<quadtree.types.Point> = null, ?index: Int = 0): quadtree.types.Point
     {
         var cur: QuadTree = this;
         do
@@ -208,7 +205,7 @@ class TestQuadTree extends QuadTree implements ITest
 
             if (cur.maxDepth == 0)
             {
-                return cur.objects0[index];
+                return objList == null ? cur.objects0[index] : objList(cur)[index];
             }
         }
         while (next(cur) != null);

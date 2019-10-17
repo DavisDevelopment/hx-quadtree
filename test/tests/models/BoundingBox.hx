@@ -1,6 +1,6 @@
 package tests.models;
 
-import quadtree.types.Point.CollisionAreaType;
+import quadtree.CollisionAreaType;
 import quadtree.types.Rectangle;
 import quadtree.Constants.Ints;
 
