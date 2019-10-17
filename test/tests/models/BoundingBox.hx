@@ -1,5 +1,6 @@
 package tests.models;
 
+import quadtree.Point.CollisionAreaType;
 import quadtree.areas.Rectangle;
 import quadtree.Area;
 import quadtree.Constants.Ints;
@@ -10,7 +11,7 @@ class BoundingBox implements Rectangle
     /** Returns a bounding box with its top left corner on (0, 0) and the maximum size. **/
     public static var Max(get, never): BoundingBox;
 
-    public var areaType: AreaType = AreaType.Rectangle;
+    public var areaType: CollisionAreaType = CollisionAreaType.Rectangle;
     
     public var x: Int;
     public var y: Int;

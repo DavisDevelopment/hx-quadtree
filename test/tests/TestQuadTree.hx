@@ -1,11 +1,12 @@
 package tests;
 
-import tests.models.Point;
 import utest.Assert;
-import tests.models.BoundingBox;
+import utest.ITest;
 import quadtree.Area;
 import quadtree.QuadTree;
-import utest.ITest;
+import quadtree.Point.CollisionAreaType;
+import tests.models.Point;
+import tests.models.BoundingBox;
 
 using quadtree.QuadTreeEx;
 
@@ -34,6 +35,15 @@ class TestQuadTree extends QuadTree implements ITest
         var area: Area = new BoundingBox(0, 0, 1000, 1000);
 
         Assert.raises(() -> addToList(area, -1), String);
+    }
+
+
+    function testAddInvalidAreaType()
+    {
+        var area: Area = new BoundingBox(0, 0, 1000, 1000);
+        area.areaType = cast(-1, CollisionAreaType);
+
+        Assert.raises(() -> add(area, 0), String);
     }
 
 

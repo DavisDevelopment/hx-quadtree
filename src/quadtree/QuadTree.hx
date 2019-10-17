@@ -59,18 +59,21 @@ class QuadTree
 
     public function add(object: Point, list: Int = 0)
     {
-        if (Std.is(object, Area))
+        switch object.areaType
         {
-            addArea(cast(object, Area), list);
-        }
-        else
-        {
-            addPoint(cast(object, Point), list);
+            case CollisionAreaType.Point:
+                addPoint(cast(object, Point), list);
+
+            case CollisionAreaType.Rectangle:
+                addRectangle(cast(object, Area), list);
+
+            case _:
+                throw "Must specify an areaType";
         }
     }
 
 
-    function addArea(area: Area, list: Int = 0)
+    function addRectangle(area: Area, list: Int = 0)
     {
         final objLeftEdge: Int = area.x;
         final objTopEdge: Int = area.y;

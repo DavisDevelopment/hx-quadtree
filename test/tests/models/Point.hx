@@ -1,8 +1,12 @@
 package tests.models;
 
+import quadtree.Point.CollisionAreaType;
+
 
 class Point implements quadtree.Point
 {
+    public var areaType: CollisionAreaType = CollisionAreaType.Point;
+    
     public var x: Int;
     public var y: Int;
 
