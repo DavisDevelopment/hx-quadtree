@@ -27,6 +27,9 @@ class BoundingBox implements Rectangle
     }
 
 
+    public function onOverlap(other: quadtree.types.Point): Void { }
+    
+
     static function get_Max(): BoundingBox
     {
         return new BoundingBox(0, 0, Ints.MAX, Ints.MAX);

@@ -31,6 +31,8 @@ class QuadTree
 
     var maxDepth: Int;
 
+    var overlapProcessCallback: (Dynamic, Dynamic) -> Bool;
+
 
     public inline function new(x: Int, y: Int, width: Int, height: Int, maxDepth: Int = 5)
     {
@@ -38,7 +40,7 @@ class QuadTree
     }
 
 
-    function reset(x: Int, y: Int, width: Int, height: Int, maxDepth: Int)
+    function reset(?x: Int, ?y: Int, ?width: Int, ?height: Int, ?maxDepth: Int)
     {
         objects0 = new Array<Point>();
         objects1 = new Array<Point>();
@@ -48,6 +50,13 @@ class QuadTree
         botLeftTree = null;
         botRightTree = null;
 
+        // Apply defaults.
+        x = x != null ? x : leftEdge;
+        y = y != null ? y : topEdge;
+        width = width != null ? width : rightEdge - x;
+        height = height != null ? height : botEdge - x;
+
+        // Update boundaries.
         leftEdge = x;
         topEdge = y;
         rightEdge = x + width;
@@ -57,10 +66,23 @@ class QuadTree
         midpointX = leftEdge + halfWidth;
         midpointY = topEdge + halfHeight;
 
-        this.maxDepth = maxDepth;
+        this.maxDepth = maxDepth != null ? maxDepth : this.maxDepth;
     }
 
 
+    /**
+        Load objects into the quad tree.
+
+        On collisions, objects in `objectGroup` will have their `onOverlap()` method called before
+        the respective object in `otherObjectGroup`. When not using the second list and collisions
+        are only checked between objects in the first, `onOverlap()` will be called in an undefined order.
+
+        @param objectGroup A list of objects that should be checked for collisions.
+                           If `otherObjectGroup` is not provided, then objects in this group will
+                           be checked against each other.
+        @param otherObjectGroup An optional second group of objects to check for collisions
+                                against the ones in `objectGroup`.
+    **/
     public function load(objectGroup: Array<Point>, ?otherObjectGroup: Array<Point> = null)
     {
         for (obj in objectGroup)
@@ -77,22 +99,30 @@ class QuadTree
     }
 
 
-    public function add(object: Point, list: Int = 0)
+    /**
+        Sets a callback method for processing collisions.
+
+        The given function, if set, will be called when two objects intersect, with the objects as arguments.
+        If it is set, then `onOverlap()` will be called on the overlapping objects only if the processing
+        callback returns `true`.
+
+        This can be used to handle special overlap cases not covered by this library, or in general choosing
+        when two objects should be notified of their collisions.
+
+        The separation of the two overlapping objects in a physics system could also take place inside this callback.
+
+        **Note:** When using two groups, the first argument passed to the callback function will always be the object
+        from the first group.
+    **/
+    public inline function setOverlapProcessCallback(overlapProcessCallback: (Dynamic, Dynamic) -> Bool)
     {
-        switch object.areaType
-        {
-            case CollisionAreaType.Point | CollisionAreaType.MovingPoint:
-                addPoint(cast(object, Point), list);
-
-            case CollisionAreaType.Rectangle | CollisionAreaType.MovingRectangle:
-                addRectangle(cast(object, Rectangle), list);
-
-            case _:
-                throw "Must specify an areaType";
-        }
+        this.overlapProcessCallback = overlapProcessCallback;
     }
 
 
+    /**
+
+    **/
     public function execute()
     {
         if (canSubdivide())
@@ -125,7 +155,23 @@ class QuadTree
     }
 
 
-    function addRectangle(rect: Rectangle, list: Int = 0)
+    function add(object: Point, group: Int = 0)
+    {
+        switch object.areaType
+        {
+            case CollisionAreaType.Point | CollisionAreaType.MovingPoint:
+                addPoint(cast(object, Point), group);
+
+            case CollisionAreaType.Rectangle | CollisionAreaType.MovingRectangle:
+                addRectangle(cast(object, Rectangle), group);
+
+            case _:
+                throw "Must specify an areaType";
+        }
+    }
+
+
+    function addRectangle(rect: Rectangle, group: Int = 0)
     {
         final objLeftEdge: Int = rect.x;
         final objTopEdge: Int = rect.y;
@@ -135,7 +181,7 @@ class QuadTree
         // Check if the entire node fits inside the object.
         if (!canSubdivide() || this.isContainedInArea(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
         {
-            addHere(rect, list);
+            addHere(rect, group);
             return;
         }
 
@@ -144,12 +190,12 @@ class QuadTree
         {
             if (objTopEdge > topEdge && objBottomEdge < midpointY)
             {
-                addToTopLeft(rect, list);
+                addToTopLeft(rect, group);
                 return;
             }
             if (objTopEdge > midpointY && objBottomEdge < botEdge)
             {
-                addToBotLeft(rect, list);
+                addToBotLeft(rect, group);
                 return;
             }
         }
@@ -157,12 +203,12 @@ class QuadTree
         {
             if (objTopEdge > topEdge && objBottomEdge < midpointY)
             {
-                addToTopRight(rect, list);
+                addToTopRight(rect, group);
                 return;
             }
             if (objTopEdge > midpointY && objBottomEdge < botEdge)
             {
-                addToBotRight(rect, list);
+                addToBotRight(rect, group);
                 return;
             }
         }
@@ -170,28 +216,28 @@ class QuadTree
         // Object didn't completely fit in any quadrant, check for partial overlaps.
         if (this.intersectsTopLeft(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
         {
-            addToTopLeft(rect, list);
+            addToTopLeft(rect, group);
         }
         if (this.intersectsTopRight(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
         {
-            addToTopRight(rect, list);
+            addToTopRight(rect, group);
         }
         if (this.intersectsBotRight(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
         {
-            addToBotRight(rect, list);
+            addToBotRight(rect, group);
         }
         if (this.intersectsBotLeft(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
         {
-            addToBotLeft(rect, list);
+            addToBotLeft(rect, group);
         }
     }
 
 
-    function addPoint(point: Point, list: Int = 0)
+    function addPoint(point: Point, group: Int = 0)
     {
         if (!canSubdivide() && this.containsPoint(point))
         {
-            addHere(point, list);
+            addHere(point, group);
             return;
         }
 
@@ -199,39 +245,39 @@ class QuadTree
         {
             if (point.y < midpointY)
             {
-                addToTopLeft(point, list);
+                addToTopLeft(point, group);
             }
             else
             {
-                addToBotLeft(point, list);
+                addToBotLeft(point, group);
             }
         }
         else
         {
             if (point.y < midpointY)
             {
-                addToTopRight(point, list);
+                addToTopRight(point, group);
             }
             else
             {
-                addToBotRight(point, list);
+                addToBotRight(point, group);
             }
         }
     }
 
 
-    function addHere(object: Point, list: Int = 0) 
+    function addHere(object: Point, group: Int = 0) 
     {
         if (canSubdivide())
         {
-            addToTopLeft(object, list);
-            addToTopRight(object, list);
-            addToBotLeft(object, list);
-            addToBotRight(object, list);
+            addToTopLeft(object, group);
+            addToTopRight(object, group);
+            addToBotLeft(object, group);
+            addToBotRight(object, group);
         }
         else
         { 
-            switch list
+            switch group
             {
                 case 0:
                     objects0.push(object);
@@ -240,7 +286,7 @@ class QuadTree
                     objects1.push(object);
 
                 case _:
-                    throw "Invalid list";
+                    throw "Invalid group.";
             }
         }
     }
@@ -270,7 +316,11 @@ class QuadTree
 
     function onDetectedCollision(obj0: Point, obj1: Point)
     {
-
+        if (overlapProcessCallback == null || overlapProcessCallback(obj0, obj1))
+        {
+            obj0.onOverlap(obj1);
+            obj1.onOverlap(obj0);
+        }
     }
 
 
@@ -358,43 +408,43 @@ class QuadTree
     //
     // =============================================================================
 
-    inline function addToTopLeft(point: Point, list: Int = 0)
+    inline function addToTopLeft(point: Point, group: Int = 0)
     {
         if (topLeftTree == null)
         {
             topLeftTree = new QuadTree(leftEdge, topEdge, halfWidth, halfHeight, maxDepth - 1);
         }
-        topLeftTree.add(point, list);
+        topLeftTree.add(point, group);
     }
 
 
-    inline function addToTopRight(point: Point, list: Int = 0)
+    inline function addToTopRight(point: Point, group: Int = 0)
     {
         if (topRightTree == null)
         {
             topRightTree = new QuadTree(midpointX, topEdge, halfWidth, halfHeight, maxDepth - 1);
         }
-        topRightTree.add(point, list);
+        topRightTree.add(point, group);
     }
 
 
-    inline function addToBotRight(point: Point, list: Int = 0)
+    inline function addToBotRight(point: Point, group: Int = 0)
     {
         if (botRightTree == null)
         {
             botRightTree = new QuadTree(midpointX, midpointY, halfWidth, halfHeight, maxDepth - 1);
         }
-        botRightTree.add(point, list);
+        botRightTree.add(point, group);
     }
 
 
-    inline function addToBotLeft(point: Point, list: Int = 0)
+    inline function addToBotLeft(point: Point, group: Int = 0)
     {
         if (botLeftTree == null)
         {
             botLeftTree = new QuadTree(leftEdge, midpointY, halfWidth, halfHeight, maxDepth - 1);
         }
-        botLeftTree.add(point, list);
+        botLeftTree.add(point, group);
     }
 
 

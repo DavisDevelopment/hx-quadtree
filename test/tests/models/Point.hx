@@ -14,6 +14,9 @@ class Point implements quadtree.types.Point
     public function new(x: Int, y: Int) 
     {
         this.x = x;
-        this.y = y;        
+        this.y = y;
     }
+
+
+    public function onOverlap(other: quadtree.types.Point): Void { }
 }
