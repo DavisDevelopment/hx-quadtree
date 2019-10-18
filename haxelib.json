@@ -6,7 +6,7 @@
   "description": "Quadtree implementation for collision detection.",
   "version": "0.0.0",
   "classPath": "src",
-  "releasenote": "Initial release.",
+  "releasenote": "Initial unstable release to reserve the name.",
   "contributors": [ "Haath" ],
   "dependencies": {
   }
