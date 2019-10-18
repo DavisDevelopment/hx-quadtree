@@ -6,7 +6,7 @@ import quadtree.types.Rectangle;
 import quadtree.QuadTree;
 import quadtree.CollisionAreaType;
 import tests.models.Point;
-import tests.models.BoundingBox;
+import tests.models.Box;
 
 using quadtree.QuadTreeEx;
 
@@ -33,7 +33,7 @@ class TestQuadTreeAdd extends QuadTree implements ITest
     function testAddHere()
     {
         maxDepth = 0;
-        var area: BoundingBox = new BoundingBox(0, 0, 1000, 1000);
+        var area: Box = new Box(0, 0, 1000, 1000);
         addHere(area, 0);
         addHere(area, 1);
 
@@ -44,7 +44,7 @@ class TestQuadTreeAdd extends QuadTree implements ITest
 
     function testAddToWrongList()
     {
-        var area: Rectangle = new BoundingBox(0, 0, 1000, 1000);
+        var area: Rectangle = new Box(0, 0, 1000, 1000);
 
         Assert.raises(() -> addHere(area, -1), String);
     }
@@ -52,7 +52,7 @@ class TestQuadTreeAdd extends QuadTree implements ITest
 
     function testAddInvalidAreaType()
     {
-        var area: BoundingBox = new BoundingBox(0, 0, 1000, 1000);
+        var area: Box = new Box(0, 0, 1000, 1000);
         area.areaType = cast(-1, CollisionAreaType);
 
         Assert.raises(() -> add(area, 0), String);
@@ -63,7 +63,7 @@ class TestQuadTreeAdd extends QuadTree implements ITest
     {
         maxDepth = 5;
 
-        var area: BoundingBox = new BoundingBox(0, 0, 1000, 1000);
+        var area: Box = new Box(0, 0, 1000, 1000);
 
         addToTopLeft(area);
         Assert.equals(0, topLeftTree.leftEdge);
@@ -101,29 +101,29 @@ class TestQuadTreeAdd extends QuadTree implements ITest
 
     function testAddToQuadrants()
     {
-        var topRight: BoundingBox = new BoundingBox(990, 10, 9, 9);
-        var topRight2: BoundingBox = new BoundingBox(990, 10, 9, 9);
+        var topRight: Box = new Box(990, 10, 9, 9);
+        var topRight2: Box = new Box(990, 10, 9, 9);
         load([topRight, topRight2]);
         Assert.notNull(topRightTree);
         Assert.equals(topRight, traverseTree(qt -> qt.topRightTree));
         Assert.equals(topRight2, traverseTree(qt -> qt.topRightTree, 1));
 
-        var topLeft: BoundingBox = new BoundingBox(10, 10, 9, 9);
-        var topLeft2: BoundingBox = new BoundingBox(10, 10, 9, 9);
+        var topLeft: Box = new Box(10, 10, 9, 9);
+        var topLeft2: Box = new Box(10, 10, 9, 9);
         load([topLeft, topLeft2]);
         Assert.notNull(topLeftTree);
         Assert.equals(topLeft, traverseTree(qt -> qt.topLeftTree));
         Assert.equals(topLeft2, traverseTree(qt -> qt.topLeftTree, 1));
         
-        var botLeft: BoundingBox = new BoundingBox(10, 990, 9, 9);
-        var botLeft2: BoundingBox = new BoundingBox(10, 990, 9, 9);
+        var botLeft: Box = new Box(10, 990, 9, 9);
+        var botLeft2: Box = new Box(10, 990, 9, 9);
         load([botLeft, botLeft2]);
         Assert.notNull(botLeftTree);
         Assert.equals(botLeft, traverseTree(qt -> qt.botLeftTree));
         Assert.equals(botLeft2, traverseTree(qt -> qt.botLeftTree, 1));
         
-        var botRight: BoundingBox = new BoundingBox(990, 990, 9, 9);
-        var botRight2: BoundingBox = new BoundingBox(990, 990, 9, 10);
+        var botRight: Box = new Box(990, 990, 9, 9);
+        var botRight2: Box = new Box(990, 990, 9, 10);
         load([], [botRight, botRight2]);
         Assert.notNull(botRightTree);
         Assert.equals(botRight, traverseTree(qt -> qt.botRightTree, qt -> qt.objects1));
@@ -139,7 +139,7 @@ class TestQuadTreeAdd extends QuadTree implements ITest
     {
         maxDepth = 2;
 
-        var area: BoundingBox = new BoundingBox(1, 1, 998, 998);
+        var area: Box = new Box(1, 1, 998, 998);
 
         Assert.isTrue(this.intersectsTopLeft(area.x, area.y, area.x + area.width, area.y + area.height));
         Assert.isTrue(this.intersectsTopRight(area.x, area.y, area.x + area.width, area.y + area.height));

@@ -2,7 +2,7 @@ package tests;
 
 import quadtree.QuadTree;
 import tests.models.Point;
-import tests.models.BoundingBox;
+import tests.models.Box;
 import utest.Assert;
 import utest.ITest;
 import quadtree.types.Rectangle;
@@ -24,15 +24,15 @@ class TestQuadTreeEx implements ITest
 
         var testCases = [
             {
-                other: new BoundingBox(150, 150),
+                other: new Box(150, 150),
                 expected: true
             },
             {
-                other: new BoundingBox(150, 150, 200, 200),
+                other: new Box(150, 150, 200, 200),
                 expected: false
             },
             {
-                other: new BoundingBox(150, 150, 50, 50),
+                other: new Box(150, 150, 50, 50),
                 expected: true
             }
         ];
@@ -47,31 +47,31 @@ class TestQuadTreeEx implements ITest
 
         var testCases = [
             {
-                other: new BoundingBox(150, 150),
+                other: new Box(150, 150),
                 expected: false
             },
             {
-                other: new BoundingBox(150, 150, 200, 200),
+                other: new Box(150, 150, 200, 200),
                 expected: false
             },
             {
-                other: new BoundingBox(150, 150, 50, 50),
+                other: new Box(150, 150, 50, 50),
                 expected: false
             },
             {
-                other: new BoundingBox(50, 50, 150, 150),
+                other: new Box(50, 50, 150, 150),
                 expected: false
             },
             {
-                other: new BoundingBox(50, 50, 300, 300),
+                other: new Box(50, 50, 300, 300),
                 expected: true
             },
             {
-                other: new BoundingBox(100, 100, 200, 200),
+                other: new Box(100, 100, 200, 200),
                 expected: true
             },
             {
-                other: new BoundingBox(1, 1, 199, 199),
+                other: new Box(1, 1, 199, 199),
                 expected: false
             }
         ];

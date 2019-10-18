@@ -14,6 +14,7 @@ class QuadTree
 {
     var objects0: Array<Point>;
     var objects1: Array<Point>;
+    var parent: QuadTree;
 
     var topLeftTree: QuadTree;
     var topRightTree: QuadTree;
@@ -55,6 +56,7 @@ class QuadTree
         y = y != null ? y : topEdge;
         width = width != null ? width : rightEdge - x;
         height = height != null ? height : botEdge - x;
+        this.maxDepth = maxDepth != null ? maxDepth : this.maxDepth;
 
         // Update boundaries.
         leftEdge = x;
@@ -65,8 +67,6 @@ class QuadTree
         halfHeight = Std.int(height / 2);
         midpointX = leftEdge + halfWidth;
         midpointY = topEdge + halfHeight;
-
-        this.maxDepth = maxDepth != null ? maxDepth : this.maxDepth;
     }
 
 
@@ -121,17 +121,12 @@ class QuadTree
 
 
     /**
-
+        The quad tree's main method.
+        Traverses the tree and checks for overlapping objects.
     **/
     public function execute()
     {
         if (canSubdivide())
-        {
-            // Leaf node, check for collisions here.
-
-            collisionCheckHere();
-        }
-        else
         {
             // Internal node, recursively check on children.
 
@@ -151,6 +146,12 @@ class QuadTree
             {
                 botRightTree.execute();
             }
+        }
+        else
+        {
+            // Leaf node, check for collisions here.
+
+            collisionCheckHere();
         }
     }
 
@@ -296,7 +297,7 @@ class QuadTree
     {
         for (i0 in 0...objects0.length)
         {
-            switch objects0[0].areaType
+            switch objects0[i0].areaType
             {
                 case CollisionAreaType.Point:
                     collisionCheckPoint(i0);
@@ -316,10 +317,21 @@ class QuadTree
 
     function onDetectedCollision(obj0: Point, obj1: Point)
     {
-        if (overlapProcessCallback == null || overlapProcessCallback(obj0, obj1))
+        if (parent == null)
         {
-            obj0.onOverlap(obj1);
-            obj1.onOverlap(obj0);
+            // Root node, process collision here.
+
+            if (overlapProcessCallback == null || overlapProcessCallback(obj0, obj1))
+            {
+                obj0.onOverlap(obj1);
+                obj1.onOverlap(obj0);
+            }
+        }
+        else
+        {
+            // Leaf or internal node, process collision on the parent.
+
+            parent.onDetectedCollision(obj0, obj1);
         }
     }
 
@@ -413,6 +425,7 @@ class QuadTree
         if (topLeftTree == null)
         {
             topLeftTree = new QuadTree(leftEdge, topEdge, halfWidth, halfHeight, maxDepth - 1);
+            topLeftTree.parent = this;
         }
         topLeftTree.add(point, group);
     }
@@ -423,6 +436,7 @@ class QuadTree
         if (topRightTree == null)
         {
             topRightTree = new QuadTree(midpointX, topEdge, halfWidth, halfHeight, maxDepth - 1);
+            topRightTree.parent = this;
         }
         topRightTree.add(point, group);
     }
@@ -433,6 +447,7 @@ class QuadTree
         if (botRightTree == null)
         {
             botRightTree = new QuadTree(midpointX, midpointY, halfWidth, halfHeight, maxDepth - 1);
+            botRightTree.parent = this;
         }
         botRightTree.add(point, group);
     }
@@ -443,6 +458,7 @@ class QuadTree
         if (botLeftTree == null)
         {
             botLeftTree = new QuadTree(leftEdge, midpointY, halfWidth, halfHeight, maxDepth - 1);
+            botLeftTree.parent = this;
         }
         botLeftTree.add(point, group);
     }
