@@ -8,11 +8,11 @@ interface Point
 
 
     /** The x-coordinate of the point. **/
-    public var x(default, never): Int;
+    public var x(default, never): Float;
     
 
     /** The y-coordinate of the point. **/
-    public var y(default, never): Int;
+    public var y(default, never): Float;
 
 
     /** Function called from the quad tree when the object is overlapping with another. **/

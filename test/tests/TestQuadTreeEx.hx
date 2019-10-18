@@ -103,17 +103,17 @@ class TestQuadTreeEx implements ITest
     }
 
 
-    function doAreaBoolTestCases(method: (Int, Int, Int, Int) -> Bool, testCases: Array<Dynamic>)
+    function doAreaBoolTestCases(method: (Float, Float, Float, Float) -> Bool, testCases: Array<Dynamic>)
     {
         for (testCase in testCases)
         {
             var other: Rectangle        = cast testCase.other;
             var expected: Bool          = cast testCase.expected;
             
-            var objLeftEdge: Int = other.x;
-            var objTopEdge: Int = other.y;
-            var objRightEdge: Int = other.x + other.width;
-            var objBottomEdge: Int = other.y + other.height;
+            var objLeftEdge: Float = other.x;
+            var objTopEdge: Float = other.y;
+            var objRightEdge: Float = other.x + other.width;
+            var objBottomEdge: Float = other.y + other.height;
 
             Assert.equals(expected, method(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge));
         }

@@ -21,27 +21,27 @@ class QuadTree
     var botLeftTree: QuadTree;
     var botRightTree: QuadTree;
 
-    var leftEdge: Int;
-    var topEdge: Int;
-    var rightEdge: Int;
-    var botEdge: Int;
-    var halfWidth: Int;
-    var halfHeight: Int;
-    var midpointX: Int;
-    var midpointY: Int;
+    var leftEdge: Float;
+    var topEdge: Float;
+    var rightEdge: Float;
+    var botEdge: Float;
+    var halfWidth: Float;
+    var halfHeight: Float;
+    var midpointX: Float;
+    var midpointY: Float;
 
     var maxDepth: Int;
 
     var overlapProcessCallback: (Dynamic, Dynamic) -> Bool;
 
 
-    public inline function new(x: Int, y: Int, width: Int, height: Int, maxDepth: Int = 5)
+    public inline function new(x: Float, y: Float, width: Float, height: Float, maxDepth: Int = 5)
     {
         reset(x, y, width, height, maxDepth);
     }
 
 
-    function reset(?x: Int, ?y: Int, ?width: Int, ?height: Int, ?maxDepth: Int)
+    function reset(?x: Float, ?y: Float, ?width: Float, ?height: Float, ?maxDepth: Int)
     {
         objects0 = new Array<Point>();
         objects1 = new Array<Point>();
@@ -174,10 +174,10 @@ class QuadTree
 
     function addRectangle(rect: Rectangle, group: Int = 0)
     {
-        final objLeftEdge: Int = rect.x;
-        final objTopEdge: Int = rect.y;
-        final objRightEdge: Int = rect.x + rect.width;
-        final objBottomEdge: Int = rect.y + rect.height;
+        final objLeftEdge: Float = rect.x;
+        final objTopEdge: Float = rect.y;
+        final objRightEdge: Float = rect.x + rect.width;
+        final objBottomEdge: Float = rect.y + rect.height;
 
         // Check if the entire node fits inside the object.
         if (!canSubdivide() || this.isContainedInArea(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))

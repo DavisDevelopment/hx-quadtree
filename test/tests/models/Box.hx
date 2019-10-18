@@ -17,7 +17,7 @@ class Box implements Rectangle
     public var width: Int;
     public var height: Int;
 
-    public var collisionDetected: Bool = false;
+    public var collisionsDetected: Int = 0;
 
 
     public function new(x: Int, y: Int, width: Int = 0, height: Int = 0)
@@ -31,7 +31,7 @@ class Box implements Rectangle
 
     public function onOverlap(other: quadtree.types.Point): Void
     {
-        collisionDetected = true;
+        collisionsDetected++;
     }
 
 

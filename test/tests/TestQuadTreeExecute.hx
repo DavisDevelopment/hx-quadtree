@@ -51,7 +51,7 @@ class TestQuadTreeExecute extends QuadTree implements ITest
         execute();
 
         Assert.equals(2, timesCalled);
-        Assert.isTrue(box.collisionDetected);
+        Assert.isTrue(box.collisionsDetected > 0);
     }
 
 
@@ -66,8 +66,8 @@ class TestQuadTreeExecute extends QuadTree implements ITest
         });
 
         execute();
-
-        Assert.isFalse(box.collisionDetected);
+        
+        Assert.equals(0, box.collisionsDetected);
     }
 
 
@@ -78,19 +78,13 @@ class TestQuadTreeExecute extends QuadTree implements ITest
         var b3: Box = new Box(1, 990, 1, 1);
         var b4: Box = new Box(990, 990, 1, 1);
         load([b1, b2, b3, b4]);
-        
-        var timesCalled: Int = 0;
-
-        setOverlapProcessCallback((b1, b2) -> {
-
-            timesCalled++;
-
-            return true;
-        });
 
         execute();
 
-        Assert.equals(0, timesCalled);
+        Assert.equals(0, b1.collisionsDetected);
+        Assert.equals(0, b2.collisionsDetected);
+        Assert.equals(0, b3.collisionsDetected);
+        Assert.equals(0, b4.collisionsDetected);
     }
 
 
