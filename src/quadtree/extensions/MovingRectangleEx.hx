@@ -1,5 +1,6 @@
 package quadtree.extensions;
 
+import quadtree.types.MovingPoint;
 import quadtree.types.Point;
 import quadtree.types.Rectangle;
 import quadtree.types.MovingRectangle;
@@ -13,7 +14,9 @@ class MovingRectangleEx
     {
         return switch other.areaType
         {
-            case CollisionAreaType.Point: intersectsWithPoint(hullX, hullY, hullWidth, hullHeight, other);
+            case CollisionAreaType.Point: intersectsWithPoint(hullX, hullY, hullWidth, hullHeight, other.x, other.y);
+
+            case CollisionAreaType.MovingPoint: intersectsWithMovingPoint(hullX, hullY, hullWidth, hullHeight, cast(other, MovingPoint));
 
             case CollisionAreaType.Rectangle: intersectsWithRectangle(hullX, hullY, hullWidth, hullHeight, cast(other, MovingRectangle));
 
@@ -24,12 +27,19 @@ class MovingRectangleEx
     }
 
 
-    public static inline function intersectsWithPoint(hullX: Float, hullY: Float, hullWidth: Float, hullHeight: Float, point: Point): Bool
+    public static inline function intersectsWithPoint(hullX: Float, hullY: Float, hullWidth: Float, hullHeight: Float, pointX: Float, pointY: Float): Bool
     {
-        return point.x > hullX
-            && point.y > hullY
-            && point.x < hullWidth
-            && point.y < hullHeight;
+        return pointX > hullX
+            && pointY > hullY
+            && pointY < hullWidth
+            && pointY < hullHeight;
+    }
+
+
+    public static inline function intersectsWithMovingPoint(hullX: Float, hullY: Float, hullWidth: Float, hullHeight: Float, point: MovingPoint): Bool
+    {
+        return intersectsWithPoint(hullX, hullY, hullWidth, hullHeight, point.x, point.y)
+            || intersectsWithPoint(hullX, hullY, hullWidth, hullHeight, point.lastX, point.lastY);
     }
 
 

@@ -4,20 +4,20 @@ import quadtree.CollisionAreaType;
 import quadtree.types.MovingRectangle;
 
 
-class MovingBox extends Box implements MovingRectangle
+class MovingPoint extends Point implements quadtree.types.MovingPoint
 {
     public var lastX: Float;
     public var lastY: Float;
 
 
-    public function new(x: Float, y: Float, width: Float = 0, height: Float = 0)
+    public function new(x: Float, y: Float)
     {
-        super(x, y, width, height);
+        super(x, y);
 
         lastX = this.x;
         lastY = this.y;
 
-        areaType = CollisionAreaType.MovingRectangle;
+        areaType = CollisionAreaType.MovingPoint;
     }
 
 

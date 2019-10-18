@@ -12,15 +12,15 @@ class Box implements Rectangle
 
     public var areaType: CollisionAreaType = CollisionAreaType.Rectangle;
     
-    public var x: Int;
-    public var y: Int;
-    public var width: Int;
-    public var height: Int;
+    public var x: Float;
+    public var y: Float;
+    public var width: Float;
+    public var height: Float;
 
-    public var collisionsDetected: Int = 0;
+    public var collisionsDetected: Float = 0;
 
 
-    public function new(x: Int, y: Int, width: Int = 0, height: Int = 0)
+    public function new(x: Float, y: Float, width: Float = 0, height: Float = 0)
     {
         this.x = x;
         this.y = y;

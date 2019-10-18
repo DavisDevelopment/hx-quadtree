@@ -1,5 +1,6 @@
 package quadtree;
 
+import quadtree.types.MovingPoint;
 import quadtree.types.MovingRectangle;
 import quadtree.types.Point;
 import quadtree.types.Rectangle;
@@ -7,6 +8,7 @@ import quadtree.types.Rectangle;
 using quadtree.QuadTreeEx;
 using quadtree.extensions.PointEx;
 using quadtree.extensions.RectangleEx;
+using quadtree.extensions.MovingPointEx;
 using quadtree.extensions.MovingRectangleEx;
 
 
@@ -302,6 +304,9 @@ class QuadTree
                 case CollisionAreaType.Point:
                     collisionCheckPoint(i0);
 
+                case CollisionAreaType.MovingPoint:
+                    collisionCheckMovingPoint(i0);
+
                 case CollisionAreaType.Rectangle:
                     collisionCheckRectangle(i0);
 
@@ -353,11 +358,11 @@ class QuadTree
     //
     // =============================================================================
 
-    function collisionCheckPoint(index: Int) 
+    function collisionCheckPoint(index: Int)
     {
         var point: Point = objects0[index];
 
-        var otherList: Array<Point> = useBothLists() ? objects1 : objects1;
+        var otherList: Array<Point> = useBothLists() ? objects1 : objects0;
         var firstIndex: Int = useBothLists() ? 0 : index + 1;
 
         for (i1 in firstIndex...otherList.length)
@@ -372,11 +377,30 @@ class QuadTree
     }
 
 
+    function collisionCheckMovingPoint(index: Int)
+    {
+        var movingPoint: MovingPoint = cast(objects0[index], MovingPoint);
+
+        var otherList: Array<Point> = useBothLists() ? objects1 : objects0;
+        var firstIndex: Int = useBothLists() ? 0 : index + 1;
+
+        for (i1 in firstIndex...otherList.length)
+        {
+            var other: Point = otherList[i1];
+
+            if (movingPoint.intersectsWith(other))
+            {
+                onDetectedCollision(movingPoint, other);
+            }
+        }
+    }
+
+
     function collisionCheckRectangle(index: Int)
     {
         var rect: Rectangle = cast(objects0[index], Rectangle);
 
-        var otherList: Array<Point> = useBothLists() ? objects1 : objects1;
+        var otherList: Array<Point> = useBothLists() ? objects1 : objects0;
         var firstIndex: Int = useBothLists() ? 0 : index + 1;
 
         for (i1 in firstIndex...otherList.length)
@@ -399,7 +423,7 @@ class QuadTree
         var hullWidth: Float = rect.hullWidth();
         var hullHeight: Float = rect.hullHeight();
 
-        var otherList: Array<Point> = useBothLists() ? objects1 : objects1;
+        var otherList: Array<Point> = useBothLists() ? objects1 : objects0;
         var firstIndex: Int = useBothLists() ? 0 : index + 1;
 
         for (i1 in firstIndex...otherList.length)

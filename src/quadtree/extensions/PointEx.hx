@@ -1,5 +1,6 @@
 package quadtree.extensions;
 
+import quadtree.types.MovingPoint;
 import quadtree.types.Point;
 import quadtree.types.Rectangle;
 import quadtree.types.MovingRectangle;
@@ -15,7 +16,9 @@ class PointEx
         {
             case CollisionAreaType.Point: intersectsWithPoint(point, other);
 
-            case CollisionAreaType.Rectangle: intersectsWithRectangle(point, cast(other, Rectangle));
+            case CollisionAreaType.MovingPoint: intersectsWithMovingPoint(point, cast(other, MovingPoint));
+
+            case CollisionAreaType.Rectangle: intersectsWithRectangle(point.x, point.y, cast(other, Rectangle));
 
             case CollisionAreaType.MovingRectangle: intersectsWithMovingRectangle(point, cast(other, MovingRectangle));
 
@@ -30,17 +33,23 @@ class PointEx
     }
 
 
-    public static inline function intersectsWithRectangle(point: Point, other: Rectangle): Bool
+    public static inline function intersectsWithMovingPoint(point: Point, other: MovingPoint): Bool
     {
-        return point.x > other.x
-            && point.y > other.y
-            && point.x < other.x + other.width
-            && point.y < other.y + other.height;
+        return false;
+    }
+
+
+    public static inline function intersectsWithRectangle(pointX: Float, pointY: Float, other: Rectangle): Bool
+    {
+        return pointX > other.x
+            && pointY > other.y
+            && pointX < other.x + other.width
+            && pointY < other.y + other.height;
     }
 
 
     public static inline function intersectsWithMovingRectangle(point: Point, other: MovingRectangle): Bool
     {
-        return MovingRectangleEx.intersectsWithPoint(other.hullX(), other.hullY(), other.hullWidth(), other.hullHeight(), point);
+        return MovingRectangleEx.intersectsWithPoint(other.hullX(), other.hullY(), other.hullWidth(), other.hullHeight(), point.x, point.y);
     }
 }

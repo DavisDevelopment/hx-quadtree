@@ -7,16 +7,21 @@ class Point implements quadtree.types.Point
 {
     public var areaType: CollisionAreaType = CollisionAreaType.Point;
     
-    public var x: Int;
-    public var y: Int;
+    public var x: Float;
+    public var y: Float;
+
+    public var collisionsDetected: Float = 0;
 
 
-    public function new(x: Int, y: Int) 
+    public function new(x: Float, y: Float) 
     {
         this.x = x;
         this.y = y;
     }
 
 
-    public function onOverlap(other: quadtree.types.Point): Void { }
+    public function onOverlap(other: quadtree.types.Point): Void
+    {
+        collisionsDetected++;
+    }
 }
