@@ -31,8 +31,8 @@ class MovingRectangleEx
     {
         return pointX > hullX
             && pointY > hullY
-            && pointY < hullWidth
-            && pointY < hullHeight;
+            && pointY < hullX + hullWidth
+            && pointY < hullY + hullHeight;
     }
 
 

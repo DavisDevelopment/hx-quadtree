@@ -48,7 +48,6 @@ class MovingPointEx
 
     public static inline function intersectsWithMovingRectangle(point: MovingPoint, other: MovingRectangle): Bool
     {
-        return MovingRectangleEx.intersectsWithPoint(other.hullX(), other.hullY(), other.hullWidth(), other.hullHeight(), point.x, point.y)
-            || MovingRectangleEx.intersectsWithPoint(other.hullX(), other.hullY(), other.hullWidth(), other.hullHeight(), point.lastX, point.lastY);
+        return MovingRectangleEx.intersectsWithMovingPoint(other.hullX(), other.hullY(), other.hullWidth(), other.hullHeight(), point);
     }
 }

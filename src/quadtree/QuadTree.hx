@@ -346,12 +346,6 @@ class QuadTree
         return maxDepth > 0;
     }
 
-
-    inline function useBothLists(): Bool
-    {
-        return objects1.length > 0;
-    }
-
     // =============================================================================
     //
     //                       TYPE-SPECIFIC COLLISION CHECKS
@@ -362,13 +356,13 @@ class QuadTree
     {
         var point: Point = objects0[index];
 
-        var otherList: Array<Point> = useBothLists() ? objects1 : objects0;
-        var firstIndex: Int = useBothLists() ? 0 : index + 1;
+        var otherList = listToCheck();
+        var firstIndex: Int = listToCheckFirstIndex(index);
 
         for (i1 in firstIndex...otherList.length)
         {
             var other: Point = otherList[i1];
-
+            
             if (point.intersectsWith(other))
             {
                 onDetectedCollision(point, other);
@@ -381,8 +375,8 @@ class QuadTree
     {
         var movingPoint: MovingPoint = cast(objects0[index], MovingPoint);
 
-        var otherList: Array<Point> = useBothLists() ? objects1 : objects0;
-        var firstIndex: Int = useBothLists() ? 0 : index + 1;
+        var otherList = listToCheck();
+        var firstIndex: Int = listToCheckFirstIndex(index);
 
         for (i1 in firstIndex...otherList.length)
         {
@@ -400,8 +394,8 @@ class QuadTree
     {
         var rect: Rectangle = cast(objects0[index], Rectangle);
 
-        var otherList: Array<Point> = useBothLists() ? objects1 : objects0;
-        var firstIndex: Int = useBothLists() ? 0 : index + 1;
+        var otherList = listToCheck();
+        var firstIndex: Int = listToCheckFirstIndex(index);
 
         for (i1 in firstIndex...otherList.length)
         {
@@ -423,8 +417,8 @@ class QuadTree
         var hullWidth: Float = rect.hullWidth();
         var hullHeight: Float = rect.hullHeight();
 
-        var otherList: Array<Point> = useBothLists() ? objects1 : objects0;
-        var firstIndex: Int = useBothLists() ? 0 : index + 1;
+        var otherList: Array<Point> = listToCheck();
+        var firstIndex: Int = listToCheckFirstIndex(index);
 
         for (i1 in firstIndex...otherList.length)
         {
@@ -443,6 +437,24 @@ class QuadTree
     //                             HELPER FUNCTIONS
     //
     // =============================================================================
+
+    inline function useBothLists(): Bool
+    {
+        return objects1.length > 0;
+    }
+
+
+    inline function listToCheck(): Array<Point>
+    {
+        return useBothLists() ? objects1 : objects0;
+    }
+
+
+    inline function listToCheckFirstIndex(objBeingCheckedIndex: Int) : Int
+    {
+        return useBothLists() ? 0 : objBeingCheckedIndex + 1;
+    }
+
 
     inline function addToTopLeft(point: Point, group: Int = 0)
     {

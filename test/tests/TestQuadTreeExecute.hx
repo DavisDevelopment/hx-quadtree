@@ -99,8 +99,11 @@ class TestQuadTreeExecute extends QuadTree implements ITest
         p3.moveTo(150, 150);
         var p4: MovingPoint = new MovingPoint(101, 101);
         p4.moveTo(99, 99);
+        var p5: Point = new Point(99, 99);
+        var p6: Point = new Point(101, 101);
+        var p7: Point = new Point(99, 99);
 
-        load([p3, b1, p2, p1, p4]);
+        load([p5, p6, p3, b1, p2, p1, p4, p7]);
 
         execute();
 
@@ -108,14 +111,30 @@ class TestQuadTreeExecute extends QuadTree implements ITest
         Assert.equals(0, p2.collisionsDetected);
         Assert.equals(1, p3.collisionsDetected);
         Assert.equals(1, p4.collisionsDetected);
-        Assert.equals(3, b1.collisionsDetected);
+        Assert.equals(0, p5.collisionsDetected);
+        Assert.equals(1, p6.collisionsDetected);
+        Assert.equals(0, p7.collisionsDetected);
+        Assert.equals(4, b1.collisionsDetected);
     }
 
 
     function testMovingRectangleCollisions()
     {
         var b1: MovingBox = new MovingBox(100, 100, 100, 100);
+        var b2: MovingBox = new MovingBox(190, 190, 10, 10);
+        b2.moveTo(200, 200);
+        var b3: MovingBox = new MovingBox(201, 201, 99, 99);
+        var p1: MovingPoint = new MovingPoint(199, 199);
+        p1.moveTo(202, 202);
 
+        load([b1, p1], [b2, b3]);
+
+        execute();
+
+        Assert.equals(1, b1.collisionsDetected);
+        Assert.equals(2, b2.collisionsDetected);
+        Assert.equals(1, b3.collisionsDetected);
+        Assert.equals(2, p1.collisionsDetected);
     }
 
 
