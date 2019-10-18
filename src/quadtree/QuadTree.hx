@@ -299,6 +299,9 @@ class QuadTree
     {
         for (i0 in 0...objects0.length)
         {
+            if (!objects0[i0].collisionsEnabled)
+                continue;
+
             switch objects0[i0].areaType
             {
                 case CollisionAreaType.Point:
@@ -362,6 +365,9 @@ class QuadTree
         for (i1 in firstIndex...otherList.length)
         {
             var other: Point = otherList[i1];
+
+            if (!other.collisionsEnabled)
+                continue;
             
             if (point.intersectsWith(other))
             {
@@ -382,6 +388,9 @@ class QuadTree
         {
             var other: Point = otherList[i1];
 
+            if (!other.collisionsEnabled)
+                continue;
+
             if (movingPoint.intersectsWith(other))
             {
                 onDetectedCollision(movingPoint, other);
@@ -400,6 +409,9 @@ class QuadTree
         for (i1 in firstIndex...otherList.length)
         {
             var other: Point = otherList[i1];
+
+            if (!other.collisionsEnabled)
+                continue;
 
             if (rect.intersectsWith(other))
             {
@@ -423,6 +435,9 @@ class QuadTree
         for (i1 in firstIndex...otherList.length)
         {
             var other: Point = otherList[i1];
+
+            if (!other.collisionsEnabled)
+                continue;
 
             if (MovingRectangleEx.intersectsWith(hullX, hullY, hullWidth, hullHeight, other))
             {

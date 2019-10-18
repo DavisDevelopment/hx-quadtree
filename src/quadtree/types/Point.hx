@@ -7,6 +7,10 @@ interface Point
     public var areaType(default, never): CollisionAreaType;
 
 
+    /** Whether or not the object can participate in collisions. **/
+    public var collisionsEnabled(default, never): Bool;
+
+
     /** The x-coordinate of the point. **/
     public var x(default, never): Float;
     

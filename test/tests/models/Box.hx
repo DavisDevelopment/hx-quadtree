@@ -11,6 +11,7 @@ class Box implements Rectangle
     public static var Max(get, never): Box;
 
     public var areaType: CollisionAreaType = CollisionAreaType.Rectangle;
+    public var collisionsEnabled: Bool = true;
     
     public var x: Float;
     public var y: Float;
