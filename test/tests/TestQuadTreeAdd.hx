@@ -1,5 +1,6 @@
 package tests;
 
+import quadtree.types.Collider;
 import utest.Assert;
 import utest.ITest;
 import quadtree.types.Rectangle;
@@ -196,7 +197,7 @@ class TestQuadTreeAdd extends QuadTree implements ITest
     }
 
 
-    function traverseTree(next: QuadTree->QuadTree, ?objList: QuadTree->Array<quadtree.types.Point> = null, ?index: Int = 0): quadtree.types.Point
+    function traverseTree(next: QuadTree->QuadTree, ?objList: QuadTree->Array<Collider> = null, ?index: Int = 0): Collider
     {
         var cur: QuadTree = this;
         do

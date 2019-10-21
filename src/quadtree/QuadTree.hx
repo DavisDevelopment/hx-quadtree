@@ -1,5 +1,6 @@
 package quadtree;
 
+import quadtree.types.Collider;
 import quadtree.types.MovingPoint;
 import quadtree.types.MovingRectangle;
 import quadtree.types.Point;
@@ -14,8 +15,8 @@ using quadtree.extensions.MovingRectangleEx;
 
 class QuadTree
 {
-    var objects0: Array<Point>;
-    var objects1: Array<Point>;
+    var objects0: Array<Collider>;
+    var objects1: Array<Collider>;
     var parent: QuadTree;
 
     var topLeftTree: QuadTree;
@@ -45,8 +46,8 @@ class QuadTree
 
     function reset(?x: Float, ?y: Float, ?width: Float, ?height: Float, ?maxDepth: Int)
     {
-        objects0 = new Array<Point>();
-        objects1 = new Array<Point>();
+        objects0 = new Array<Collider>();
+        objects1 = new Array<Collider>();
 
         topLeftTree = null;
         topRightTree = null;
@@ -85,7 +86,7 @@ class QuadTree
         @param otherObjectGroup An optional second group of objects to check for collisions
                                 against the ones in `objectGroup`.
     **/
-    public function load(objectGroup: Array<Point>, ?otherObjectGroup: Array<Point> = null)
+    public function load(objectGroup: Array<Collider>, ?otherObjectGroup: Array<Collider> = null)
     {
         for (obj in objectGroup)
         {
@@ -158,7 +159,7 @@ class QuadTree
     }
 
 
-    function add(object: Point, group: Int = 0)
+    function add(object: Collider, group: Int = 0)
     {
         switch object.areaType
         {
@@ -269,7 +270,7 @@ class QuadTree
     }
 
 
-    function addHere(object: Point, group: Int = 0) 
+    function addHere(object: Collider, group: Int = 0) 
     {
         if (canSubdivide())
         {
@@ -323,7 +324,7 @@ class QuadTree
     }
 
 
-    function onDetectedCollision(obj0: Point, obj1: Point)
+    function onDetectedCollision(obj0: Collider, obj1: Collider)
     {
         if (parent == null)
         {
@@ -357,14 +358,14 @@ class QuadTree
 
     function collisionCheckPoint(index: Int)
     {
-        var point: Point = objects0[index];
+        var point: Point = cast(objects0[index], Point);
 
-        var otherList = listToCheck();
+        var otherList: Array<Collider> = listToCheck();
         var firstIndex: Int = listToCheckFirstIndex(index);
 
         for (i1 in firstIndex...otherList.length)
         {
-            var other: Point = otherList[i1];
+            var other: Collider = otherList[i1];
 
             if (!other.collisionsEnabled)
                 continue;
@@ -381,12 +382,12 @@ class QuadTree
     {
         var movingPoint: MovingPoint = cast(objects0[index], MovingPoint);
 
-        var otherList = listToCheck();
+        var otherList: Array<Collider> = listToCheck();
         var firstIndex: Int = listToCheckFirstIndex(index);
 
         for (i1 in firstIndex...otherList.length)
         {
-            var other: Point = otherList[i1];
+            var other: Collider = otherList[i1];
 
             if (!other.collisionsEnabled)
                 continue;
@@ -403,12 +404,12 @@ class QuadTree
     {
         var rect: Rectangle = cast(objects0[index], Rectangle);
 
-        var otherList = listToCheck();
+        var otherList: Array<Collider> = listToCheck();
         var firstIndex: Int = listToCheckFirstIndex(index);
 
         for (i1 in firstIndex...otherList.length)
         {
-            var other: Point = otherList[i1];
+            var other: Collider = otherList[i1];
 
             if (!other.collisionsEnabled)
                 continue;
@@ -429,12 +430,12 @@ class QuadTree
         var hullWidth: Float = rect.hullWidth();
         var hullHeight: Float = rect.hullHeight();
 
-        var otherList: Array<Point> = listToCheck();
+        var otherList: Array<Collider> = listToCheck();
         var firstIndex: Int = listToCheckFirstIndex(index);
 
         for (i1 in firstIndex...otherList.length)
         {
-            var other: Point = otherList[i1];
+            var other: Collider = otherList[i1];
 
             if (!other.collisionsEnabled)
                 continue;
@@ -459,7 +460,7 @@ class QuadTree
     }
 
 
-    inline function listToCheck(): Array<Point>
+    inline function listToCheck(): Array<Collider>
     {
         return useBothLists() ? objects1 : objects0;
     }
@@ -471,47 +472,47 @@ class QuadTree
     }
 
 
-    inline function addToTopLeft(point: Point, group: Int = 0)
+    inline function addToTopLeft(collider: Collider, group: Int = 0)
     {
         if (topLeftTree == null)
         {
             topLeftTree = new QuadTree(leftEdge, topEdge, halfWidth, halfHeight, maxDepth - 1);
             topLeftTree.parent = this;
         }
-        topLeftTree.add(point, group);
+        topLeftTree.add(collider, group);
     }
 
 
-    inline function addToTopRight(point: Point, group: Int = 0)
+    inline function addToTopRight(collider: Collider, group: Int = 0)
     {
         if (topRightTree == null)
         {
             topRightTree = new QuadTree(midpointX, topEdge, halfWidth, halfHeight, maxDepth - 1);
             topRightTree.parent = this;
         }
-        topRightTree.add(point, group);
+        topRightTree.add(collider, group);
     }
 
 
-    inline function addToBotRight(point: Point, group: Int = 0)
+    inline function addToBotRight(collider: Collider, group: Int = 0)
     {
         if (botRightTree == null)
         {
             botRightTree = new QuadTree(midpointX, midpointY, halfWidth, halfHeight, maxDepth - 1);
             botRightTree.parent = this;
         }
-        botRightTree.add(point, group);
+        botRightTree.add(collider, group);
     }
 
 
-    inline function addToBotLeft(point: Point, group: Int = 0)
+    inline function addToBotLeft(collider: Collider, group: Int = 0)
     {
         if (botLeftTree == null)
         {
             botLeftTree = new QuadTree(leftEdge, midpointY, halfWidth, halfHeight, maxDepth - 1);
             botLeftTree.parent = this;
         }
-        botLeftTree.add(point, group);
+        botLeftTree.add(collider, group);
     }
 
 

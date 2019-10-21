@@ -1,5 +1,6 @@
 package quadtree.extensions;
 
+import quadtree.types.Collider;
 import quadtree.types.MovingPoint;
 import quadtree.types.Point;
 import quadtree.types.Rectangle;
@@ -10,11 +11,11 @@ using quadtree.extensions.MovingRectangleEx;
 
 class PointEx
 {
-    public static inline function intersectsWith(point: Point, other: Point): Bool
+    public static inline function intersectsWith(point: Point, other: Collider): Bool
     {
         return switch other.areaType
         {
-            case CollisionAreaType.Point: intersectsWithPoint(point, other);
+            case CollisionAreaType.Point: intersectsWithPoint(point, cast(other, Point));
 
             case CollisionAreaType.MovingPoint: intersectsWithMovingPoint(point, cast(other, MovingPoint));
 

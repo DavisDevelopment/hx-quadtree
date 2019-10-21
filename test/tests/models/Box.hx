@@ -1,5 +1,6 @@
 package tests.models;
 
+import quadtree.types.Collider;
 import quadtree.CollisionAreaType;
 import quadtree.types.Rectangle;
 import quadtree.Constants.Ints;
@@ -30,7 +31,7 @@ class Box implements Rectangle
     }
 
 
-    public function onOverlap(other: quadtree.types.Point): Void
+    public function onOverlap(other: Collider): Void
     {
         collisionsDetected++;
     }

@@ -26,6 +26,7 @@ Objects that will be checked for collisions, should implement one of the followi
 
 ```haxe
 import quadtree.CollisionAreaType;
+import quadtree.types.Collider;
 import quadtree.types.Rectangle;
 
 class Box implements Rectangle
@@ -43,7 +44,7 @@ class Box implements Rectangle
     public var width: Float = 100;
     public var height: Float = 100;
 
-    public function onOverlap(other: Point)
+    public function onOverlap(other: Collider)
     {
         // Called when this object overlaps with another.
     }
