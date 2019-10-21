@@ -9,4 +9,5 @@ abstract CollisionAreaType(Int)
     var Rectangle       = 2;
     var MovingRectangle = 3;
     var Circle          = 4;
+    var Polygon         = 5;
 }
