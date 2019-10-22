@@ -71,8 +71,8 @@ class Vector
     }
 
 
-    public inline function copy(): Vector
+    public function copy(): Vector
     {
-        return new Vector(x, y);
+        return new VectorLinkedList(x, y);
     }
 }

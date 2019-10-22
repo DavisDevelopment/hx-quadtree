@@ -25,15 +25,17 @@ class Gjk
         var direction: Vector = recycleVector(0, 1);
 
         // Get the first support point and add it to the simplex.
-        var initSupportPoint: Vector = getSupportVector(a, b, direction);
-        simplex.push(initSupportPoint);
+        var supportPoint: Vector = getSupportVector(a, b, direction);
+        simplex.push(supportPoint);
 
         // Flip the direction for the next support point.
         direction.invert();
 
+        var COUNT = 0;
+
         while (direction != null)
         {
-            var supportPoint: Vector = getSupportVector(a, b, direction);
+            supportPoint = getSupportVector(a, b, direction);
 
             // If the support point did not reach as far as the origin,
             // the simplex must not contain the origin and therefore there is no
@@ -41,15 +43,22 @@ class Gjk
             if (supportPoint.dotVector(direction) <= 0) 
             {
                 // No intersection
+                destroyVector(supportPoint);
+                destroyVector(direction);
+                simplex.destroy(this);
                 return false;
             }
-            
+
             destroyVector(direction);
 
             // Add the simplex and determine a new direction.
             simplex.push(supportPoint);
             direction = simplex.calculateDirection(this);
+
+            //if (COUNT++ > 100) break;
         }
+
+        simplex.destroy(this);
 
         return true;
     }
@@ -58,11 +67,10 @@ class Gjk
     function getSupportVector(a: Polygon, b: Polygon, direction: Vector): Vector
     {
         var aFarthest: Vector = getFarthestPointInDirection(a, direction);
-        var bFarthest: Vector = getFarthestPointInDirection(a, direction.invert());
+        var bFarthest: Vector = getFarthestPointInDirection(b, direction.invert());
         direction.invert();
-        aFarthest.sub(bFarthest);
         destroyVector(bFarthest);
-        return aFarthest;
+        return aFarthest.sub(bFarthest);
     }
 
 

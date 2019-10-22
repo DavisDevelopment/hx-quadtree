@@ -23,7 +23,6 @@ abstract Simplex(Array<Vector>)
         // Since A was just added, we know that the inverse of a points towards the origin.
         var aInverted: Vector = gjk.copyVector(A).invert();
 
-
         // Check if the simplex is a triangle.
         if (this.length == 3)
         {
@@ -55,7 +54,7 @@ abstract Simplex(Array<Vector>)
 
              // Check the handedness of the perpendicular, it should
             // face AWAY from the simplex
-            if (acPerp.dotVector(C) >= 0) 
+            if (acPerp.dotVector(B) >= 0) 
             {
                 acPerp.invert();
             }
