@@ -7,7 +7,6 @@ stages:
 
 test-neko:
   stage: test
-  retry: 2
   variables:
     HXML: test-neko.hxml
   script:
@@ -17,7 +16,6 @@ test-neko:
 
 test-cpp:
   stage: test
-  retry: 2
   cache:
     key: cpp-build
     paths:

@@ -10,12 +10,18 @@ import quadtree.types.Polygon;
 **/
 class Gjk
 {
+    /** Cache for reusing Vector objects. **/
     var vectorPool: VectorLinkedList;
 
 
     public function new() { }
 
 
+    /**
+        Checks whether two given polygons overlap.
+
+        @return Returns `true` if they overlap and `false` if they don't.
+    **/
     public function checkOverlap(a: Polygon, b: Polygon): Bool
     {
         // Build a new Simplex for determining if a collision has occurred.
@@ -30,8 +36,6 @@ class Gjk
 
         // Flip the direction for the next support point.
         direction.invert();
-
-        var COUNT = 0;
 
         while (direction != null)
         {
@@ -54,8 +58,6 @@ class Gjk
             // Add the simplex and determine a new direction.
             simplex.push(supportPoint);
             direction = simplex.calculateDirection(this);
-
-            //if (COUNT++ > 100) break;
         }
 
         simplex.destroy(this);
@@ -98,7 +100,7 @@ class Gjk
     inline function recycleVector(x: Float = 0, y: Float = 0): Vector
     {
         var v: Vector;
-        if (vectorPool == null)
+        if (vectorPool == null || true)
         {
             v = new VectorLinkedList(x, y);
         }
