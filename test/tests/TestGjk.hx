@@ -87,8 +87,10 @@ class TestGjk extends Gjk implements ITest
     {
         var t1: Triangle = new Triangle([0, 0], [0, 1], [1, 0]);
         var t2: Triangle = new Triangle([0, 0], [1, 1], [1, 0]);
+        var t3: Triangle = new Triangle([1, 1], [1, 2], [2, 3]);
 
         Assert.isTrue(checkOverlap(t1, t2));
+        Assert.isFalse(checkOverlap(t1, t3));
     }
     
     

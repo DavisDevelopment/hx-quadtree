@@ -70,9 +70,10 @@ class Vector
         return x == v.x && y == v.y;
     }
 
-
+    #if UNIT_TEST
     public function copy(): Vector
     {
         return new VectorLinkedList(x, y);
     }
+    #end
 }
