@@ -16,10 +16,50 @@ class Gjk
     public function new() { }
 
 
+    public function checkOverlap(a: Polygon, b: Polygon): Bool
+    {
+        // Build a new Simplex for determining if a collision has occurred.
+        var simplex: Simplex = new Simplex();
+
+        // Choose an arbitrary starting direction.
+        var direction: Vector = recycleVector(0, 1);
+
+        // Get the first support point and add it to the simplex.
+        var initSupportPoint: Vector = getSupportVector(a, b, direction);
+        simplex.push(initSupportPoint);
+
+        // Flip the direction for the next support point.
+        direction.invert();
+
+        while (direction != null)
+        {
+            var supportPoint: Vector = getSupportVector(a, b, direction);
+
+            // If the support point did not reach as far as the origin,
+            // the simplex must not contain the origin and therefore there is no
+            // intersection.
+            if (supportPoint.dotVector(direction) <= 0) 
+            {
+                // No intersection
+                return false;
+            }
+            
+            destroyVector(direction);
+
+            // Add the simplex and determine a new direction.
+            simplex.push(supportPoint);
+            direction = simplex.calculateDirection(this);
+        }
+
+        return true;
+    }
+
+
     function getSupportVector(a: Polygon, b: Polygon, direction: Vector): Vector
     {
         var aFarthest: Vector = getFarthestPointInDirection(a, direction);
         var bFarthest: Vector = getFarthestPointInDirection(a, direction.invert());
+        direction.invert();
         aFarthest.sub(bFarthest);
         destroyVector(bFarthest);
         return aFarthest;

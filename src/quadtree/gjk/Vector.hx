@@ -44,7 +44,7 @@ class Vector
 
     public inline function dotVector(v: Vector): Float
     {
-        return (x * v.x) + (y * v.y);
+        return dot(v.x, v.y);
     }
 
 
@@ -53,5 +53,26 @@ class Vector
         x = -x;
         y = -y;
         return this;
+    }
+
+
+    public inline function perpendicular(): Vector
+    {
+        var tmp: Float = x;
+        x = y;
+        y = -tmp;
+        return this;
+    }
+
+
+    public inline function equals(v: Vector): Bool
+    {
+        return x == v.x && y == v.y;
+    }
+
+
+    public inline function copy(): Vector
+    {
+        return new Vector(x, y);
     }
 }

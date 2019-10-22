@@ -56,6 +56,15 @@ typedef Ints = I;
         return 1.79e+308;
         #end
     }
+    
+
+    public static var EPSILON(get, never): Float;
+
+
+    private static inline function get_EPSILON(): Float
+    {
+        return 1e-10;
+    }
 }
 
 @:notNull abstract I(Int) from Int to Int 
