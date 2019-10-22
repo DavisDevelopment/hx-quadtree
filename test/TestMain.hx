@@ -23,8 +23,10 @@ class TestMain
 
     static function onComplete(runner: Runner)
     {
+        #if !js
         var covLogger = MCoverage.getLogger();
         covLogger.report();
+        #end
     }
 }
 

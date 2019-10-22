@@ -1,0 +1,6 @@
+
+hxml/test.hxml
+
+--next
+-js build/js/test.js
+-cmd node build/js/test.js

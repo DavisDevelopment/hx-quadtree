@@ -142,6 +142,6 @@ class TestQuadTreeExecute extends QuadTree implements ITest
     {
         var buf: StringBuf = new StringBuf();
         visualize(buf);
-        Sys.println(buf.toString());
+        trace(buf.toString());
     }
 }

@@ -31,6 +31,22 @@ test-cpp:
   - haxe $HXML
 
 
+test-js:
+  stage: test
+  variables:
+    HXML: test-js.hxml
+  script:
+  # Install NodeJs
+  - apt-get install -yqq curl software-properties-common
+  - curl -sL https://deb.nodesource.com/setup_12.x | sudo bash -
+  - apt-get install -yqq nodejs
+  - node -v
+  - npm -v
+
+  - haxelib install $HXML --always --quiet
+  - haxe $HXML
+
+
 deploy:
   stage: deploy
   only:
