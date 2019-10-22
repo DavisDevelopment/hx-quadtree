@@ -37,8 +37,10 @@ test-js:
     HXML: test-js.hxml
   script:
   # Install NodeJs
+  - apt-get update
   - apt-get install -yqq curl software-properties-common
   - curl -sL https://deb.nodesource.com/setup_12.x | sudo bash -
+  - apt-get update
   - apt-get install -yqq nodejs
   - node -v
   - npm -v
