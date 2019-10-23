@@ -70,6 +70,15 @@ class Gjk
     {
         var aFarthest: Vector = getFarthestPointInDirection(a, direction);
         var bFarthest: Vector = getFarthestPointInDirection(b, direction.invert());
+        /*
+        trace('a: ${polygonToString(a)}');
+        trace('b: ${polygonToString(b)}');
+        trace('dir: ${direction.toString()}');
+        trace('aFarthest: ${aFarthest.toString()}');
+        trace('bFarthest: ${bFarthest.toString()}');
+        trace('support: ${aFarthest.copy().sub(bFarthest).toString()}\n');
+        */
+        
         direction.invert();
         destroyVector(bFarthest);
         return aFarthest.sub(bFarthest);
@@ -78,14 +87,14 @@ class Gjk
 
     function getFarthestPointInDirection(p: Polygon, direction: Vector): Vector
     {
-        var biggestDistance: Float = Floats.MIN;
+        var biggestDistance: Float = null;
         var farthestPoint: Vector = recycleVector();
 
         for (point in p.points)
         {
             var distanceInDirection: Float = direction.dot(point[0], point[1]);
 
-            if (distanceInDirection > biggestDistance)
+            if (biggestDistance == null || distanceInDirection > biggestDistance)
             {
                 farthestPoint.set(point[0], point[1]);
                 biggestDistance = distanceInDirection;
@@ -126,5 +135,18 @@ class Gjk
     {
         cast(v, VectorLinkedList).next = vectorPool;
         vectorPool = cast(v, VectorLinkedList);
+    }
+
+
+    function polygonToString(poly: Polygon): String
+    {
+        var buf: StringBuf = new StringBuf();
+        buf.add("[");
+        for (p in poly.points)
+        {
+            buf.add(' (${p[0]}, ${p[1]})');
+        }
+        buf.add(" ]");
+        return buf.toString();
     }
 }

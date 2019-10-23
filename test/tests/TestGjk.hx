@@ -20,6 +20,13 @@ class TestGjk extends Gjk implements ITest
         Assert.isTrue( getFarthestPointInDirection(t1, v(-1, 0)).equals( v(0, 0) )    );
         Assert.isTrue( getFarthestPointInDirection(t1, v(0, 1)).equals( v(0.5, 0.5) ) );
         Assert.isTrue( getFarthestPointInDirection(t1, v(0, -1)).equals( v(0, 0) )    );
+
+        var t2: Triangle = new Triangle([10, 10], [10, 20], [20, 30]);
+
+        Assert.isTrue( getFarthestPointInDirection(t2, v(1, 0)).equals( v(20, 30) )   );
+        Assert.isTrue( getFarthestPointInDirection(t2, v(-1, 0)).equals( v(10, 10) )  );
+        Assert.isTrue( getFarthestPointInDirection(t2, v(0, 1)).equals( v(20, 30) )   );
+        Assert.isTrue( getFarthestPointInDirection(t2, v(0, -1)).equals( v(10, 10) )  );
     }
 
 
@@ -87,7 +94,7 @@ class TestGjk extends Gjk implements ITest
     {
         var t1: Triangle = new Triangle([0, 0], [0, 1], [1, 0]);
         var t2: Triangle = new Triangle([0, 0], [1, 1], [1, 0]);
-        var t3: Triangle = new Triangle([1, 1], [1, 2], [2, 3]);
+        var t3: Triangle = new Triangle([10, 10], [10, 20], [20, 30]);
 
         Assert.isTrue(checkOverlap(t1, t2));
         Assert.isFalse(checkOverlap(t1, t3));

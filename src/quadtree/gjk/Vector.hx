@@ -75,5 +75,10 @@ class Vector
     {
         return new VectorLinkedList(x, y);
     }
+
+    public function toString(): String
+    {
+        return '($x, $y)';
+    }
     #end
 }
