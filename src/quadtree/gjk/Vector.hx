@@ -84,6 +84,23 @@ class Vector
     }
 
 
+    // Normalizes the vector so that its length is equal to 1 and returns itself for chaining.
+    public inline function normalize(): Vector
+    {
+        var length: Float = getLength();
+        x /= length;
+        y /= length;
+        return this;
+    }
+
+
+    /** Calculates the length of the vector. **/
+    public inline function getLength(): Float
+    {
+        return Math.sqrt(x * x + y * y);
+    }
+
+
     /** Flips the vector to its perpendicular (90-degree clockwise) and returns itself for chaining. **/
     public inline function perpendicular(): Vector
     {

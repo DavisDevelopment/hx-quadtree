@@ -1,5 +1,8 @@
 package tests;
 
+import quadtree.CollisionAreaType;
+import tests.models.MovingPoint;
+import tests.models.Point;
 import tests.models.MovingBox;
 import tests.models.EmptyPolygon;
 import tests.models.Circle;
@@ -45,6 +48,24 @@ class TestGjk extends Gjk implements ITest
         Assert.isTrue( getFarthestPointInDirection(b, v(-1, 0)).equals( v(100, 100) )  );
         Assert.isTrue( getFarthestPointInDirection(b, v(0, 1)).equals( v(100, 200) )   );
         Assert.isTrue( getFarthestPointInDirection(b, v(0, -1)).equals( v(100, 100) )  );
+
+        var p: Point = new Point(100, 100);
+
+        Assert.isTrue( getFarthestPointInDirection(p, v(1, 0)).equals( v(100, 100) )   );
+        Assert.isTrue( getFarthestPointInDirection(p, v(-1, 0)).equals( v(100, 100) )  );
+        Assert.isTrue( getFarthestPointInDirection(p, v(0, 1)).equals( v(100, 100) )   );
+        Assert.isTrue( getFarthestPointInDirection(p, v(0, -1)).equals( v(100, 100) )  );
+
+        var mp: MovingPoint = new MovingPoint(100, 100);
+        mp.moveTo(100, 200);
+
+        Assert.isTrue( getFarthestPointInDirection(mp, v(1, 0)).equals( v(100, 100) )   );
+        Assert.isTrue( getFarthestPointInDirection(mp, v(-1, 0)).equals( v(100, 100) )  );
+        Assert.isTrue( getFarthestPointInDirection(mp, v(0, 1)).equals( v(100, 200) )   );
+        Assert.isTrue( getFarthestPointInDirection(mp, v(0, -1)).equals( v(100, 100) )  );
+
+        mp.areaType = cast(0, CollisionAreaType);
+        Assert.raises( () -> getFarthestPointInDirection(mp, v(1, 0)), String );
     }
 
 
@@ -133,6 +154,23 @@ class TestGjk extends Gjk implements ITest
         Assert.isTrue(checkOverlap(b, c1));
         Assert.isFalse(checkOverlap(b, c2));
         Assert.isTrue(checkOverlap(b, c3));
+    }
+
+
+    function testMovingRectangleAndCircle() 
+    {
+        var b1: MovingBox = new MovingBox(100, 100, 100, 100);
+        var b2: MovingBox = new MovingBox(190, 190, 10, 10);
+        b2.moveTo(200, 200);
+        var p1: MovingPoint = new MovingPoint(199, 199);
+        p1.moveTo(202, 202);
+        var b3: Box = new Box(220, 220, 2, 2);
+        var c1: Circle = new Circle(221, 221, 4);
+
+        Assert.isFalse(checkOverlap(b1, c1));
+        Assert.isFalse(checkOverlap(b2, c1));
+        Assert.isTrue(checkOverlap(b3, c1));
+        Assert.isFalse(checkOverlap(p1, c1));
     }
     
     

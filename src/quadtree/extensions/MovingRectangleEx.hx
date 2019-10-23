@@ -19,9 +19,7 @@ class MovingRectangleEx
         {
             case CollisionAreaType.Point: intersectsWithPoint(hullX, hullY, hullWidth, hullHeight, cast(other, Point).x, cast(other, Point).y);
 
-            case CollisionAreaType.MovingPoint: intersectsWithMovingPoint(hullX, hullY, hullWidth, hullHeight, cast(other, MovingPoint));
-
-            case CollisionAreaType.Rectangle: intersectsWithRectangle(hullX, hullY, hullWidth, hullHeight, cast(other, MovingRectangle));
+            case CollisionAreaType.Rectangle: intersectsWithRectangle(hullX, hullY, hullWidth, hullHeight, cast(other, Rectangle));
 
             case CollisionAreaType.MovingRectangle: intersectsWithMovingRectangle(hullX, hullY, hullWidth, hullHeight, cast(other, MovingRectangle));
 
@@ -36,13 +34,6 @@ class MovingRectangleEx
             && pointY > hullY
             && pointY < hullX + hullWidth
             && pointY < hullY + hullHeight;
-    }
-
-
-    public static inline function intersectsWithMovingPoint(hullX: Float, hullY: Float, hullWidth: Float, hullHeight: Float, point: MovingPoint): Bool
-    {
-        return intersectsWithPoint(hullX, hullY, hullWidth, hullHeight, point.x, point.y)
-            || intersectsWithPoint(hullX, hullY, hullWidth, hullHeight, point.lastX, point.lastY);
     }
 
 

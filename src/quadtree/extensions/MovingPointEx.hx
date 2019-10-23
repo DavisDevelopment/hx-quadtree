@@ -23,8 +23,6 @@ class MovingPointEx
 
             case CollisionAreaType.Rectangle: intersectsWithRectangle(point, cast(other, Rectangle));
 
-            case CollisionAreaType.MovingRectangle: intersectsWithMovingRectangle(point, cast(other, MovingRectangle));
-
             case _: gjk.checkOverlap(point, other);
         }
     }
@@ -46,12 +44,6 @@ class MovingPointEx
     {
         return PointEx.intersectsWithRectangle(point.x, point.y, other)
             || PointEx.intersectsWithRectangle(point.lastX, point.lastY, other);
-    }
-
-
-    public static inline function intersectsWithMovingRectangle(point: MovingPoint, other: MovingRectangle): Bool
-    {
-        return MovingRectangleEx.intersectsWithMovingPoint(other.hullX(), other.hullY(), other.hullWidth(), other.hullHeight(), point);
     }
 
     

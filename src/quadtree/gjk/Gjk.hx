@@ -52,6 +52,7 @@ class Gjk
 
         while (direction != null)
         {
+            direction.normalize();
             supportPoint = getSupportVector(a, b, direction);
 
             // If the support point did not reach as far as the origin,

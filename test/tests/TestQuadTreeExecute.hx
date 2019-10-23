@@ -102,7 +102,8 @@ class TestQuadTreeExecute extends QuadTree implements ITest
 
     function testCollisionPointInRectangle()
     {
-        var b1: Box = new Box(100, 100, 100, 100);
+        var b1: MovingBox = new MovingBox(103, 103, 1, 1);
+        var b2: Box = new Box(100, 100, 100, 100);
         var p1: Point = new Point(150, 150);
         var p2: Point = new Point(300, 300);
         var p3: MovingPoint = new MovingPoint(0, 0);
@@ -111,9 +112,15 @@ class TestQuadTreeExecute extends QuadTree implements ITest
         p4.moveTo(99, 99);
         var p5: Point = new Point(99, 99);
         var p6: Point = new Point(101, 101);
-        var p7: Point = new Point(99, 99);
+        var p7: MovingPoint = new MovingPoint(99, 99);
+        var p8: MovingPoint = new MovingPoint(399, 399);
+        var p9: MovingPoint = new MovingPoint(399, 399);
+        p9.moveTo(405, 405);
+        var p10: Point = new Point(408, 408);
+        var b3: MovingBox = new MovingBox(400, 400, 100, 100);
+        var c1: Circle = new Circle(408, 408, 0.5);
 
-        load([p5, p6, p3, b1, p2, p1, p4, p7]);
+        load([b1, p5, p6, p3, b2, p2, p1, p4, p10, b3, p7, p8, p9, c1]);
 
         execute();
 
@@ -124,7 +131,13 @@ class TestQuadTreeExecute extends QuadTree implements ITest
         Assert.equals(0, p5.collisionsDetected);
         Assert.equals(1, p6.collisionsDetected);
         Assert.equals(0, p7.collisionsDetected);
-        Assert.equals(4, b1.collisionsDetected);
+        Assert.equals(0, p8.collisionsDetected);
+        Assert.equals(1, p9.collisionsDetected);
+        Assert.equals(2, p10.collisionsDetected);
+        Assert.equals(1, b1.collisionsDetected);
+        Assert.equals(5, b2.collisionsDetected);
+        Assert.equals(3, b3.collisionsDetected);
+        Assert.equals(2, c1.collisionsDetected);
     }
 
 
@@ -136,15 +149,19 @@ class TestQuadTreeExecute extends QuadTree implements ITest
         var b3: MovingBox = new MovingBox(201, 201, 99, 99);
         var p1: MovingPoint = new MovingPoint(199, 199);
         p1.moveTo(202, 202);
+        var b4: Box = new Box(220, 220, 2, 2);
+        var c1: Circle = new Circle(221, 221, 4);
 
-        load([b1, p1], [b2, b3]);
+        load([b1, p1, b4], [b2, b3, c1]);
 
         execute();
 
         Assert.equals(1, b1.collisionsDetected);
         Assert.equals(2, b2.collisionsDetected);
-        Assert.equals(1, b3.collisionsDetected);
+        Assert.equals(2, b3.collisionsDetected);
+        Assert.equals(2, b4.collisionsDetected);
         Assert.equals(2, p1.collisionsDetected);
+        Assert.equals(1, c1.collisionsDetected);
     }
     
 
