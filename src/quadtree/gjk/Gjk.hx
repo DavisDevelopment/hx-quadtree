@@ -87,16 +87,23 @@ class Gjk
 
     function getFarthestPointInDirection(p: Polygon, direction: Vector): Vector
     {
-        var biggestDistance: Float = null;
-        var farthestPoint: Vector = recycleVector();
+        var biggestDistance: Float = 0;
+        var farthestPoint: Vector = null;
 
         for (point in p.points)
         {
             var distanceInDirection: Float = direction.dot(point[0], point[1]);
 
-            if (biggestDistance == null || distanceInDirection > biggestDistance)
+            if (distanceInDirection > biggestDistance || farthestPoint == null)
             {
-                farthestPoint.set(point[0], point[1]);
+                if (farthestPoint == null)
+                {
+                    farthestPoint = recycleVector(point[0], point[1]);
+                }
+                else
+                {
+                    farthestPoint.set(point[0], point[1]);
+                }
                 biggestDistance = distanceInDirection;
             }
         }
