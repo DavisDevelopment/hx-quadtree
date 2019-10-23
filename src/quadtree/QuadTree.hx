@@ -261,6 +261,16 @@ class QuadTree
             return;
         }
 
+        /**
+            For now, circles will be added as if they were rectangles.
+            This can only lead to false positives, ending up in quadrants that don't overlap with them,
+            and not false negatives, so collisions should not be missed.
+
+            Doing so, saves a run through the GJK algorithm when adding circles,
+            but with an error rate of (4 - pi) * (r^2) they will end up in extra quadrants.
+
+            Both options may be measured in the future for comparison.
+        **/
         
         final objLeftEdge: Float = circle.centerX - circle.radius;
         final objTopEdge: Float = circle.centerY - circle.radius;
@@ -396,8 +406,9 @@ class QuadTree
                 case CollisionAreaType.MovingRectangle:
                     collisionCheckMovingRectangle(i0);
                 
-                case _: 
-                    throw "Not implemented";
+                // Handle all other cases with the GJK algorithm.
+                case _:
+                    collisionCheckGeneric(i0);
             }
         }
     }
@@ -435,6 +446,29 @@ class QuadTree
     //
     // =============================================================================
 
+
+    function collisionCheckGeneric(index: Int)
+    {
+        var collider: Collider = objects0[index];
+
+        var otherList: Array<Collider> = listToCheck();
+        var firstIndex: Int = listToCheckFirstIndex(index);
+
+        for (i1 in firstIndex...otherList.length)
+        {
+            var other: Collider = otherList[i1];
+
+            if (!other.collisionsEnabled)
+                continue;
+            
+            if (gjk.checkOverlap(collider, other))
+            {
+                onDetectedCollision(collider, other);
+            }
+        }
+    }
+
+
     function collisionCheckPoint(index: Int)
     {
         var point: Point = cast(objects0[index], Point);
@@ -449,7 +483,7 @@ class QuadTree
             if (!other.collisionsEnabled)
                 continue;
             
-            if (point.intersectsWith(other))
+            if (point.intersectsWith(other, gjk))
             {
                 onDetectedCollision(point, other);
             }
@@ -471,7 +505,7 @@ class QuadTree
             if (!other.collisionsEnabled)
                 continue;
 
-            if (movingPoint.intersectsWith(other))
+            if (movingPoint.intersectsWith(other, gjk))
             {
                 onDetectedCollision(movingPoint, other);
             }
@@ -493,7 +527,7 @@ class QuadTree
             if (!other.collisionsEnabled)
                 continue;
 
-            if (rect.intersectsWith(other))
+            if (rect.intersectsWith(other, gjk))
             {
                 onDetectedCollision(rect, other);
             }
@@ -519,7 +553,7 @@ class QuadTree
             if (!other.collisionsEnabled)
                 continue;
 
-            if (MovingRectangleEx.intersectsWith(hullX, hullY, hullWidth, hullHeight, other))
+            if (MovingRectangleEx.intersectsWith(rect, hullX, hullY, hullWidth, hullHeight, other, gjk))
             {
                 onDetectedCollision(rect, other);
             }

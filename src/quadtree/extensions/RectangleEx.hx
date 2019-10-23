@@ -1,5 +1,6 @@
 package quadtree.extensions;
 
+import quadtree.gjk.Gjk;
 import quadtree.gjk.Vector;
 import quadtree.types.Collider;
 import quadtree.types.MovingPoint;
@@ -14,7 +15,7 @@ using quadtree.extensions.MovingRectangleEx;
 
 class RectangleEx
 {
-    public static inline function intersectsWith(rect: Rectangle, other: Collider): Bool
+    public static inline function intersectsWith(rect: Rectangle, other: Collider, gjk: Gjk): Bool
     {
         return switch other.areaType
         {
@@ -26,7 +27,7 @@ class RectangleEx
 
             case CollisionAreaType.MovingRectangle: intersectsWithMovingRectangle(rect, cast(other, MovingRectangle));
 
-            case _: throw "Not implemented";
+            case _: gjk.checkOverlap(rect, other);
         }
     }
 

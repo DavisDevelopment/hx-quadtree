@@ -9,6 +9,7 @@ import quadtree.QuadTree;
 import quadtree.CollisionAreaType;
 import tests.models.Point;
 import tests.models.Box;
+import tests.models.Circle;
 
 using quadtree.QuadTreeEx;
 
@@ -216,6 +217,34 @@ class TestQuadTreeAdd extends QuadTree implements ITest
         Assert.equals(botLeft, traverseTree(qt -> qt.botLeftTree));
         
         var botRight: Triangle = new Triangle([990, 990], [991, 990], [990, 991]);
+        add(botRight);
+        Assert.notNull(botRightTree);
+        Assert.equals(botRight, traverseTree(qt -> qt.botRightTree));
+
+        // Should not have been added here.
+        Assert.equals(0, objects0.length);
+        Assert.equals(0, objects1.length);
+    }
+
+
+    function testAddCircle()
+    {
+        var topRight: Circle = new Circle(990, 10, 2);
+        add(topRight);
+        Assert.notNull(topRightTree);
+        Assert.equals(topRight, traverseTree(qt -> qt.topRightTree));
+
+        var topLeft: Circle = new Circle(10, 10, 2);
+        add(topLeft);
+        Assert.notNull(topLeftTree);
+        Assert.equals(topLeft, traverseTree(qt -> qt.topLeftTree));
+        
+        var botLeft: Circle = new Circle(10, 990, 2);
+        add(botLeft);
+        Assert.notNull(botLeftTree);
+        Assert.equals(botLeft, traverseTree(qt -> qt.botLeftTree));
+        
+        var botRight: Circle = new Circle(990, 990, 2);
         add(botRight);
         Assert.notNull(botRightTree);
         Assert.equals(botRight, traverseTree(qt -> qt.botRightTree));

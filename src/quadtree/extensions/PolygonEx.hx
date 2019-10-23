@@ -1,5 +1,7 @@
 package quadtree.extensions;
 
+import quadtree.gjk.Gjk;
+import quadtree.types.Collider;
 import quadtree.types.Polygon;
 import quadtree.gjk.Vector;
 

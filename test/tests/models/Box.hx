@@ -19,7 +19,7 @@ class Box implements Rectangle
     public var width: Float;
     public var height: Float;
 
-    public var collisionsDetected: Float = 0;
+    public var collisionsDetected: Int = 0;
 
 
     public function new(x: Float, y: Float, width: Float = 0, height: Float = 0)
