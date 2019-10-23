@@ -29,7 +29,10 @@ class TestVector implements ITest
                 expectedSub: v(2, 4),
                 expectedDot: -5,
                 expectedInvert: v(-1, -2),
-                expectedPerp: v(2, -1)
+                expectedPerp: v(2, -1),
+                multWith: -3,
+                expectedMult: v(-3, -6),
+                expectedToString: "(1, 2)"
             }
         ];
 
@@ -49,6 +52,8 @@ class TestVector implements ITest
             Assert.equals(testCase.expectedDot, v1.copy().dotVector(v2));
             Assert.isTrue(v1.copy().invert().equals(testCase.expectedInvert));
             Assert.isTrue(v1.copy().perpendicular().equals(testCase.expectedPerp));
+            Assert.isTrue(v1.copy().mult(testCase.multWith).equals(testCase.expectedMult));
+            Assert.equals(testCase.expectedToString, v1.toString());
         }
     }
 

@@ -150,14 +150,16 @@ class TestQuadTreeExecute extends QuadTree implements ITest
 
     function testCollisionsWithGjk()
     {
-        var b: Box = new Box(100, 100, 2, 2);
+        var b1: Box = new Box(100, 100, 2, 2);
+        var b2: Box = new Box(100, 100, 2, 2);
+        b2.collisionsEnabled = false;
         var t1: Triangle = new Triangle([90, 90], [110, 110], [90, 80]); // yes
         var t2: Triangle = new Triangle([60, 60], [80, 80], [60, 80]); // no
         var c1: Circle = new Circle(90, 90, 20); // yes
         var c2: Circle = new Circle(90, 90, 2); // no
         var c3: Circle = new Circle(101, 101, 1); // yes
 
-        load([t1, t2, c1, c2, c3], [b]);
+        load([t1, t2, c1, c2, c3], [b1, b2]);
 
         execute();
 
@@ -166,9 +168,10 @@ class TestQuadTreeExecute extends QuadTree implements ITest
         Assert.equals(1, c1.collisionsDetected);
         Assert.equals(0, c2.collisionsDetected);
         Assert.equals(1, c3.collisionsDetected);
-        Assert.equals(3, b.collisionsDetected);
+        Assert.equals(3, b1.collisionsDetected);
+        Assert.equals(0, b2.collisionsDetected);
     }
-    
+
 
     function debugPrintTree()
     {

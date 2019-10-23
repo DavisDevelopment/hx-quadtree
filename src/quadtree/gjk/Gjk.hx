@@ -114,7 +114,7 @@ class Gjk
     inline function recycleVector(x: Float = 0, y: Float = 0): Vector
     {
         var v: Vector;
-        if (vectorPool == null || true)
+        if (vectorPool == null)
         {
             v = new VectorLinkedList(x, y);
         }
@@ -143,6 +143,7 @@ class Gjk
     }
 
 
+    @IgnoreCover
     function polygonToString(poly: Polygon): String
     {
         var buf: StringBuf = new StringBuf();

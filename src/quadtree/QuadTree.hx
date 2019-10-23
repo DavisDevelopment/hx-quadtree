@@ -461,11 +461,8 @@ class QuadTree
         for (i1 in firstIndex...otherList.length)
         {
             var other: Collider = otherList[i1];
-
-            if (!other.collisionsEnabled)
-                continue;
             
-            if (gjk.checkOverlap(collider, other))
+            if (other.collisionsEnabled && gjk.checkOverlap(collider, other))
             {
                 onDetectedCollision(collider, other);
             }
@@ -483,11 +480,8 @@ class QuadTree
         for (i1 in firstIndex...otherList.length)
         {
             var other: Collider = otherList[i1];
-
-            if (!other.collisionsEnabled)
-                continue;
             
-            if (point.intersectsWith(other, gjk))
+            if (other.collisionsEnabled && point.intersectsWith(other, gjk))
             {
                 onDetectedCollision(point, other);
             }
@@ -506,10 +500,7 @@ class QuadTree
         {
             var other: Collider = otherList[i1];
 
-            if (!other.collisionsEnabled)
-                continue;
-
-            if (movingPoint.intersectsWith(other, gjk))
+            if (other.collisionsEnabled && movingPoint.intersectsWith(other, gjk))
             {
                 onDetectedCollision(movingPoint, other);
             }
@@ -528,10 +519,7 @@ class QuadTree
         {
             var other: Collider = otherList[i1];
 
-            if (!other.collisionsEnabled)
-                continue;
-
-            if (rect.intersectsWith(other, gjk))
+            if (other.collisionsEnabled && rect.intersectsWith(other, gjk))
             {
                 onDetectedCollision(rect, other);
             }
@@ -554,10 +542,7 @@ class QuadTree
         {
             var other: Collider = otherList[i1];
 
-            if (!other.collisionsEnabled)
-                continue;
-
-            if (MovingRectangleEx.intersectsWith(rect, hullX, hullY, hullWidth, hullHeight, other, gjk))
+            if (other.collisionsEnabled && MovingRectangleEx.intersectsWith(rect, hullX, hullY, hullWidth, hullHeight, other, gjk))
             {
                 onDetectedCollision(rect, other);
             }

@@ -17,12 +17,14 @@ $ haxelib install quadtree
 
 ### Colliding object types
 
-Objects that will be checked for collisions, should implement one of the following interface:
+Objects that will be checked for collisions, should implement one of the following interfaces:
 
 - `Point`
 - `Rectangle`
 - `MovingPoint`
 - `MovingRectangle`
+- `Polygon`
+- `Circle`
 
 ```haxe
 import quadtree.CollisionAreaType;

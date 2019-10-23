@@ -1,5 +1,7 @@
 package tests;
 
+import tests.models.MovingBox;
+import tests.models.EmptyPolygon;
 import tests.models.Circle;
 import tests.models.Box;
 import quadtree.gjk.VectorLinkedList;
@@ -29,6 +31,20 @@ class TestGjk extends Gjk implements ITest
         Assert.isTrue( getFarthestPointInDirection(t2, v(-1, 0)).equals( v(10, 10) )  );
         Assert.isTrue( getFarthestPointInDirection(t2, v(0, 1)).equals( v(20, 30) )   );
         Assert.isTrue( getFarthestPointInDirection(t2, v(0, -1)).equals( v(10, 10) )  );
+
+        var e: EmptyPolygon = new EmptyPolygon();
+
+        Assert.isNull( getFarthestPointInDirection(e, v(1, 0))  );
+        Assert.isNull( getFarthestPointInDirection(e, v(-1, 0)) );
+        Assert.isNull( getFarthestPointInDirection(e, v(0, 1))  );
+        Assert.isNull( getFarthestPointInDirection(e, v(0, -1)) );
+
+        var b: MovingBox = new MovingBox(100, 100, 100, 100);
+
+        Assert.isTrue( getFarthestPointInDirection(b, v(1, 0)).equals( v(200, 100) )   );
+        Assert.isTrue( getFarthestPointInDirection(b, v(-1, 0)).equals( v(100, 100) )  );
+        Assert.isTrue( getFarthestPointInDirection(b, v(0, 1)).equals( v(100, 200) )   );
+        Assert.isTrue( getFarthestPointInDirection(b, v(0, -1)).equals( v(100, 100) )  );
     }
 
 
