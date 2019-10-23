@@ -1,7 +1,20 @@
 package quadtree.gjk;
 
+import quadtree.types.Point;
+import quadtree.types.Rectangle;
+import quadtree.types.MovingPoint;
+import quadtree.types.MovingRectangle;
+import quadtree.types.Circle;
+import quadtree.types.Collider;
 import quadtree.Constants.Floats;
 import quadtree.types.Polygon;
+
+using quadtree.extensions.PointEx;
+using quadtree.extensions.CircleEx;
+using quadtree.extensions.PolygonEx;
+using quadtree.extensions.RectangleEx;
+using quadtree.extensions.MovingPointEx;
+using quadtree.extensions.MovingRectangleEx;
 
 
 /**
@@ -18,11 +31,11 @@ class Gjk
 
 
     /**
-        Checks whether two given polygons overlap.
+        Checks whether two given colliders overlap.
 
         @return Returns `true` if they overlap and `false` if they don't.
     **/
-    public function checkOverlap(a: Polygon, b: Polygon): Bool
+    public function checkOverlap(a: Collider, b: Collider): Bool
     {
         // Build a new Simplex for determining if a collision has occurred.
         var simplex: Simplex = new Simplex();
@@ -66,49 +79,34 @@ class Gjk
     }
 
 
-    function getSupportVector(a: Polygon, b: Polygon, direction: Vector): Vector
+    function getSupportVector(a: Collider, b: Collider, direction: Vector): Vector
     {
         var aFarthest: Vector = getFarthestPointInDirection(a, direction);
-        var bFarthest: Vector = getFarthestPointInDirection(b, direction.invert());
-        /*
-        trace('a: ${polygonToString(a)}');
-        trace('b: ${polygonToString(b)}');
-        trace('dir: ${direction.toString()}');
-        trace('aFarthest: ${aFarthest.toString()}');
-        trace('bFarthest: ${bFarthest.toString()}');
-        trace('support: ${aFarthest.copy().sub(bFarthest).toString()}\n');
-        */
-        
+        var bFarthest: Vector = getFarthestPointInDirection(b, direction.invert());        
         direction.invert();
         destroyVector(bFarthest);
         return aFarthest.sub(bFarthest);
     }
 
 
-    function getFarthestPointInDirection(p: Polygon, direction: Vector): Vector
+    function getFarthestPointInDirection(c: Collider, direction: Vector): Vector
     {
-        var biggestDistance: Float = 0;
-        var farthestPoint: Vector = null;
-
-        for (point in p.points)
+        return switch c.areaType
         {
-            var distanceInDirection: Float = direction.dot(point[0], point[1]);
+            case CollisionAreaType.Polygon: cast(c, Polygon).getFarthestPointInDirection(direction, recycleVector());
 
-            if (distanceInDirection > biggestDistance || farthestPoint == null)
-            {
-                if (farthestPoint == null)
-                {
-                    farthestPoint = recycleVector(point[0], point[1]);
-                }
-                else
-                {
-                    farthestPoint.set(point[0], point[1]);
-                }
-                biggestDistance = distanceInDirection;
-            }
+            case CollisionAreaType.Circle: cast(c, Circle).getFarthestPointInDirection(direction, recycleVector());
+
+            case CollisionAreaType.Point: cast(c, Point).getFarthestPointInDirection(direction, recycleVector());
+
+            case CollisionAreaType.MovingPoint: cast(c, MovingPoint).getFarthestPointInDirection(direction, recycleVector());
+
+            case CollisionAreaType.Rectangle: cast(c, Rectangle).getFarthestPointInDirection(direction, recycleVector());
+
+            case CollisionAreaType.MovingRectangle: cast(c, MovingRectangle).getFarthestPointInDirection(direction, recycleVector());
+
+            case _: throw "Not implemented";
         }
-
-        return farthestPoint;
     }
 
 

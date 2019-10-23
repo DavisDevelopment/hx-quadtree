@@ -1,5 +1,6 @@
 package quadtree;
 
+import quadtree.types.Circle;
 import quadtree.types.Collider;
 import quadtree.types.MovingPoint;
 import quadtree.types.MovingRectangle;
@@ -169,6 +170,9 @@ class QuadTree
             case CollisionAreaType.Rectangle | CollisionAreaType.MovingRectangle:
                 addRectangle(cast(object, Rectangle), group);
 
+            case CollisionAreaType.Circle:
+                addCircle(cast(object, Circle), group);
+
             case _:
                 throw "Must specify an areaType";
         }
@@ -189,51 +193,7 @@ class QuadTree
             return;
         }
 
-        // Check if the object fits completely inside one of the quadrants.
-        if (objLeftEdge > leftEdge && objRightEdge < midpointX)
-        {
-            if (objTopEdge > topEdge && objBottomEdge < midpointY)
-            {
-                addToTopLeft(rect, group);
-                return;
-            }
-            if (objTopEdge > midpointY && objBottomEdge < botEdge)
-            {
-                addToBotLeft(rect, group);
-                return;
-            }
-        }
-        if (objLeftEdge > midpointX && objRightEdge < rightEdge)
-        {
-            if (objTopEdge > topEdge && objBottomEdge < midpointY)
-            {
-                addToTopRight(rect, group);
-                return;
-            }
-            if (objTopEdge > midpointY && objBottomEdge < botEdge)
-            {
-                addToBotRight(rect, group);
-                return;
-            }
-        }
-
-        // Object didn't completely fit in any quadrant, check for partial overlaps.
-        if (this.intersectsTopLeft(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
-        {
-            addToTopLeft(rect, group);
-        }
-        if (this.intersectsTopRight(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
-        {
-            addToTopRight(rect, group);
-        }
-        if (this.intersectsBotRight(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
-        {
-            addToBotRight(rect, group);
-        }
-        if (this.intersectsBotLeft(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
-        {
-            addToBotLeft(rect, group);
-        }
+        addRectBoundObject(rect, objLeftEdge, objTopEdge, objRightEdge, objBottomEdge, group);
     }
 
 
@@ -266,6 +226,75 @@ class QuadTree
             {
                 addToBotRight(point, group);
             }
+        }
+    }
+
+
+    function addCircle(circle: Circle, group: Int = 0)
+    {
+        if (!canSubdivide())
+        {
+            addHere(circle, group);
+            return;
+        }
+
+        
+        final objLeftEdge: Float = circle.centerX - circle.radius;
+        final objTopEdge: Float = circle.centerY - circle.radius;
+        final objRightEdge: Float = circle.centerX + circle.radius;
+        final objBottomEdge: Float = circle.centerY + circle.radius;
+        
+        addRectBoundObject(circle, objLeftEdge, objTopEdge, objRightEdge, objBottomEdge, group);
+    }
+
+
+    @:generic
+    function addRectBoundObject<T: Collider>(object: T, objLeftEdge: Float, objTopEdge: Float, objRightEdge: Float, objBottomEdge: Float, group: Int = 0)
+    {
+        // Check if the object fits completely inside one of the quadrants.
+        if (objLeftEdge > leftEdge && objRightEdge < midpointX)
+        {
+            if (objTopEdge > topEdge && objBottomEdge < midpointY)
+            {
+                addToTopLeft(object, group);
+                return;
+            }
+            if (objTopEdge > midpointY && objBottomEdge < botEdge)
+            {
+                addToBotLeft(object, group);
+                return;
+            }
+        }
+        if (objLeftEdge > midpointX && objRightEdge < rightEdge)
+        {
+            if (objTopEdge > topEdge && objBottomEdge < midpointY)
+            {
+                addToTopRight(object, group);
+                return;
+            }
+            if (objTopEdge > midpointY && objBottomEdge < botEdge)
+            {
+                addToBotRight(object, group);
+                return;
+            }
+        }
+
+        // Object didn't completely fit in any quadrant, check for partial overlaps.
+        if (this.intersectsTopLeft(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
+        {
+            addToTopLeft(object, group);
+        }
+        if (this.intersectsTopRight(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
+        {
+            addToTopRight(object, group);
+        }
+        if (this.intersectsBotRight(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
+        {
+            addToBotRight(object, group);
+        }
+        if (this.intersectsBotLeft(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
+        {
+            addToBotLeft(object, group);
         }
     }
 

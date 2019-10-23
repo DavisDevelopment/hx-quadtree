@@ -1,5 +1,6 @@
 package quadtree.extensions;
 
+import quadtree.gjk.Vector;
 import quadtree.types.Collider;
 import quadtree.types.MovingPoint;
 import quadtree.types.Point;
@@ -83,5 +84,20 @@ class MovingRectangleEx
     public static inline function hullHeight(rect: MovingRectangle): Float
     {
         return rect.height + Math.abs(rect.y - rect.lastY);
+    }
+
+    
+    public static inline function getFarthestPointInDirection(rect: MovingRectangle, direction: Vector, result: Vector): Vector
+    {
+        return PolygonEx.getFarthestPointInDirectionOfPoints(
+            [
+                [ rect.hullX(),                    rect.hullY()                     ],
+                [ rect.hullX() + rect.hullWidth(), rect.hullY()                     ],
+                [ rect.hullX(),                    rect.hullY() + rect.hullHeight() ],
+                [ rect.hullX() + rect.hullWidth(), rect.hullY() + rect.hullHeight() ]
+            ],
+            direction,
+            result
+        );
     }
 }

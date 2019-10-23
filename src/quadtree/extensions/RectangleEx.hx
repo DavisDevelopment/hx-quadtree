@@ -1,5 +1,6 @@
 package quadtree.extensions;
 
+import quadtree.gjk.Vector;
 import quadtree.types.Collider;
 import quadtree.types.MovingPoint;
 import quadtree.types.Point;
@@ -54,5 +55,20 @@ class RectangleEx
     public static inline function intersectsWithMovingRectangle(rect: Rectangle, other: MovingRectangle): Bool
     {
         return MovingRectangleEx.intersectsWithRectangle(other.hullX(), other.hullY(), other.hullWidth(), other.hullHeight(), rect);
+    }
+
+    
+    public static inline function getFarthestPointInDirection(rect: Rectangle, direction: Vector, result: Vector): Vector
+    {
+        return PolygonEx.getFarthestPointInDirectionOfPoints(
+            [
+                [ rect.x,              rect.y               ],
+                [ rect.x + rect.width, rect.y               ],
+                [ rect.x,              rect.y + rect.height ],
+                [ rect.x + rect.width, rect.y + rect.height ]
+            ],
+            direction,
+            result
+        );
     }
 }
