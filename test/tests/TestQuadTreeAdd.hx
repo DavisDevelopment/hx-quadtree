@@ -1,5 +1,6 @@
 package tests;
 
+import tests.models.Triangle;
 import quadtree.types.Collider;
 import utest.Assert;
 import utest.ITest;
@@ -187,6 +188,34 @@ class TestQuadTreeAdd extends QuadTree implements ITest
         Assert.equals(botLeft, traverseTree(qt -> qt.botLeftTree));
         
         var botRight: Point = new Point(990, 990);
+        add(botRight);
+        Assert.notNull(botRightTree);
+        Assert.equals(botRight, traverseTree(qt -> qt.botRightTree));
+
+        // Should not have been added here.
+        Assert.equals(0, objects0.length);
+        Assert.equals(0, objects1.length);
+    }
+
+
+    function testAddTriangle()
+    {
+        var topRight: Triangle = new Triangle([990, 10], [990, 11], [991, 10]);
+        add(topRight);
+        Assert.notNull(topRightTree);
+        Assert.equals(topRight, traverseTree(qt -> qt.topRightTree));
+
+        var topLeft: Triangle = new Triangle([10, 10], [11, 10], [10, 11]);
+        add(topLeft);
+        Assert.notNull(topLeftTree);
+        Assert.equals(topLeft, traverseTree(qt -> qt.topLeftTree));
+        
+        var botLeft: Triangle = new Triangle([10, 990], [11, 990], [10, 991]);
+        add(botLeft);
+        Assert.notNull(botLeftTree);
+        Assert.equals(botLeft, traverseTree(qt -> qt.botLeftTree));
+        
+        var botRight: Triangle = new Triangle([990, 990], [991, 990], [990, 991]);
         add(botRight);
         Assert.notNull(botRightTree);
         Assert.equals(botRight, traverseTree(qt -> qt.botRightTree));

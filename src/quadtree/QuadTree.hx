@@ -1,5 +1,8 @@
 package quadtree;
 
+import quadtree.gjk.Gjk;
+import quadtree.types.Polygon;
+import quadtree.extensions.PolygonEx;
 import quadtree.types.Circle;
 import quadtree.types.Collider;
 import quadtree.types.MovingPoint;
@@ -9,8 +12,10 @@ import quadtree.types.Rectangle;
 
 using quadtree.QuadTreeEx;
 using quadtree.extensions.PointEx;
-using quadtree.extensions.RectangleEx;
+using quadtree.extensions.CircleEx;
+using quadtree.extensions.PolygonEx;
 using quadtree.extensions.MovingPointEx;
+using quadtree.extensions.RectangleEx;
 using quadtree.extensions.MovingRectangleEx;
 
 
@@ -19,12 +24,18 @@ class QuadTree
     var objects0: Array<Collider>;
     var objects1: Array<Collider>;
     var parent: QuadTree;
+    var gjk: Gjk;
 
     var topLeftTree: QuadTree;
     var topRightTree: QuadTree;
     var botLeftTree: QuadTree;
     var botRightTree: QuadTree;
 
+    var topLeftBounds: SubtreeBounds;
+    var topRightBounds: SubtreeBounds;
+    var botLeftBounds: SubtreeBounds;
+    var botRightBounds: SubtreeBounds;
+    
     var leftEdge: Float;
     var topEdge: Float;
     var rightEdge: Float;
@@ -41,6 +52,7 @@ class QuadTree
 
     public inline function new(x: Float, y: Float, width: Float, height: Float, maxDepth: Int = 5)
     {
+        gjk = new Gjk();
         reset(x, y, width, height, maxDepth);
     }
 
@@ -71,6 +83,14 @@ class QuadTree
         halfHeight = Std.int(height / 2);
         midpointX = leftEdge + halfWidth;
         midpointY = topEdge + halfHeight;
+
+        if (canSubdivide())
+        {
+            topLeftBounds = new SubtreeBounds(leftEdge, topEdge, halfWidth, halfHeight);
+            topRightBounds = new SubtreeBounds(midpointX, topEdge, halfWidth, halfHeight);
+            botLeftBounds = new SubtreeBounds(leftEdge, midpointY, halfWidth, halfHeight);
+            botRightBounds = new SubtreeBounds(midpointX, midpointY, halfWidth, halfHeight);
+        }
     }
 
 
@@ -173,6 +193,9 @@ class QuadTree
             case CollisionAreaType.Circle:
                 addCircle(cast(object, Circle), group);
 
+            case CollisionAreaType.Polygon:
+                addPolygon(cast(object, Polygon), group);
+
             case _:
                 throw "Must specify an areaType";
         }
@@ -245,6 +268,33 @@ class QuadTree
         final objBottomEdge: Float = circle.centerY + circle.radius;
         
         addRectBoundObject(circle, objLeftEdge, objTopEdge, objRightEdge, objBottomEdge, group);
+    }
+
+
+    function addPolygon(polygon: Polygon, group: Int = 0)
+    {
+        if (!canSubdivide())
+        {
+            addHere(polygon, group);
+            return;
+        }
+
+        if (gjk.checkOverlap(topLeftBounds, polygon))
+        {
+            addToTopLeft(polygon, group);
+        }
+        if (gjk.checkOverlap(topRightBounds, polygon))
+        {
+            addToTopRight(polygon, group);
+        }
+        if (gjk.checkOverlap(botLeftBounds, polygon))
+        {
+            addToBotLeft(polygon, group);
+        }
+        if (gjk.checkOverlap(botRightBounds, polygon))
+        {
+            addToBotRight(polygon, group);
+        }
     }
 
 
@@ -523,17 +573,6 @@ class QuadTree
     }
 
 
-    inline function addToBotRight(collider: Collider, group: Int = 0)
-    {
-        if (botRightTree == null)
-        {
-            botRightTree = new QuadTree(midpointX, midpointY, halfWidth, halfHeight, maxDepth - 1);
-            botRightTree.parent = this;
-        }
-        botRightTree.add(collider, group);
-    }
-
-
     inline function addToBotLeft(collider: Collider, group: Int = 0)
     {
         if (botLeftTree == null)
@@ -542,6 +581,17 @@ class QuadTree
             botLeftTree.parent = this;
         }
         botLeftTree.add(collider, group);
+    }
+
+
+    inline function addToBotRight(collider: Collider, group: Int = 0)
+    {
+        if (botRightTree == null)
+        {
+            botRightTree = new QuadTree(midpointX, midpointY, halfWidth, halfHeight, maxDepth - 1);
+            botRightTree.parent = this;
+        }
+        botRightTree.add(collider, group);
     }
 
 
@@ -572,4 +622,28 @@ class QuadTree
             botRightTree.visualize(buf, space + "    ");
         }
     }
+}
+
+
+private class SubtreeBounds implements Rectangle
+{
+    public final areaType: CollisionAreaType = CollisionAreaType.Rectangle;
+    public final collisionsEnabled: Bool = false;
+    
+    public final x: Float;
+    public final y: Float;
+    public final width: Float;
+    public final height: Float;
+
+
+    public function new(x: Float, y: Float, width: Float = 0, height: Float = 0)
+    {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+    }
+
+
+    public function onOverlap(other: Collider): Void { }
 }
