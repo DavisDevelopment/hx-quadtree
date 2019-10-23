@@ -572,9 +572,7 @@ class QuadTree
     {
         if (topLeftTree == null)
         {
-            topLeftTree = new QuadTree(leftEdge, topEdge, halfWidth, halfHeight, maxDepth - 1);
-            topLeftTree.useBothLists = useBothLists;
-            topLeftTree.parent = this;
+            topLeftTree = createSubtree(topLeftBounds);
         }
         topLeftTree.add(collider, group);
     }
@@ -584,9 +582,7 @@ class QuadTree
     {
         if (topRightTree == null)
         {
-            topRightTree = new QuadTree(midpointX, topEdge, halfWidth, halfHeight, maxDepth - 1);
-            topRightTree.useBothLists = useBothLists;
-            topRightTree.parent = this;
+            topRightTree = createSubtree(topRightBounds);
         }
         topRightTree.add(collider, group);
     }
@@ -596,9 +592,7 @@ class QuadTree
     {
         if (botLeftTree == null)
         {
-            botLeftTree = new QuadTree(leftEdge, midpointY, halfWidth, halfHeight, maxDepth - 1);
-            botLeftTree.useBothLists = useBothLists;
-            botLeftTree.parent = this;
+            botLeftTree = createSubtree(botLeftBounds);
         }
         botLeftTree.add(collider, group);
     }
@@ -608,11 +602,18 @@ class QuadTree
     {
         if (botRightTree == null)
         {
-            botRightTree = new QuadTree(midpointX, midpointY, halfWidth, halfHeight, maxDepth - 1);
-            botRightTree.useBothLists = useBothLists;
-            botRightTree.parent = this;
+            botRightTree = createSubtree(botRightBounds);
         }
         botRightTree.add(collider, group);
+    }
+
+
+    inline function createSubtree(bounds: SubtreeBounds): QuadTree
+    {
+        var tree: QuadTree = new QuadTree(bounds.x, bounds.y, bounds.width, bounds.height, maxDepth - 1);
+        tree.useBothLists = useBothLists;
+        tree.parent = this;
+        return tree;
     }
 
 
