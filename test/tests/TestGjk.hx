@@ -1,5 +1,7 @@
 package tests;
 
+import tests.models.Circle;
+import tests.models.Box;
 import quadtree.gjk.VectorLinkedList;
 import quadtree.gjk.Simplex;
 import quadtree.gjk.Vector;
@@ -98,6 +100,23 @@ class TestGjk extends Gjk implements ITest
 
         Assert.isTrue(checkOverlap(t1, t2));
         Assert.isFalse(checkOverlap(t1, t3));
+    }
+
+
+    function testVariousCollisions()
+    {
+        var b: Box = new Box(100, 100, 10, 10);
+        var t1: Triangle = new Triangle([90, 90], [110, 110], [90, 80]); // yes
+        var t2: Triangle = new Triangle([60, 60], [80, 80], [60, 80]); // no
+        var c1: Circle = new Circle(90, 90, 20); // yes
+        var c2: Circle = new Circle(90, 90, 2); // no
+        var c3: Circle = new Circle(105, 105, 2); // yes
+
+        Assert.isTrue(checkOverlap(b, t1));
+        Assert.isFalse(checkOverlap(b, t2));
+        Assert.isTrue(checkOverlap(b, c1));
+        Assert.isFalse(checkOverlap(b, c2));
+        Assert.isTrue(checkOverlap(b, c3));
     }
     
     

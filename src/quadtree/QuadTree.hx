@@ -46,6 +46,7 @@ class QuadTree
     var midpointY: Float;
 
     var maxDepth: Int;
+    var useBothLists: Bool;
 
     var overlapProcessCallback: (Dynamic, Dynamic) -> Bool;
 
@@ -109,11 +110,14 @@ class QuadTree
     **/
     public function load(objectGroup: Array<Collider>, ?otherObjectGroup: Array<Collider> = null)
     {
+        useBothLists = (otherObjectGroup != null);
+
         for (obj in objectGroup)
         {
             add(obj, 0);
         }
-        if (otherObjectGroup != null)
+
+        if (useBothLists)
         {
             for (obj in otherObjectGroup)
             {
@@ -202,7 +206,7 @@ class QuadTree
     }
 
 
-    function addRectangle(rect: Rectangle, group: Int = 0)
+    function addRectangle(rect: Rectangle, group: Int)
     {
         final objLeftEdge: Float = rect.x;
         final objTopEdge: Float = rect.y;
@@ -220,7 +224,7 @@ class QuadTree
     }
 
 
-    function addPoint(point: Point, group: Int = 0)
+    function addPoint(point: Point, group: Int)
     {
         if (!canSubdivide() && this.containsPoint(point))
         {
@@ -253,7 +257,7 @@ class QuadTree
     }
 
 
-    function addCircle(circle: Circle, group: Int = 0)
+    function addCircle(circle: Circle, group: Int)
     {
         if (!canSubdivide())
         {
@@ -281,7 +285,7 @@ class QuadTree
     }
 
 
-    function addPolygon(polygon: Polygon, group: Int = 0)
+    function addPolygon(polygon: Polygon, group: Int)
     {
         if (!canSubdivide())
         {
@@ -309,7 +313,7 @@ class QuadTree
 
 
     @:generic
-    function addRectBoundObject<T: Collider>(object: T, objLeftEdge: Float, objTopEdge: Float, objRightEdge: Float, objBottomEdge: Float, group: Int = 0)
+    function addRectBoundObject<T: Collider>(object: T, objLeftEdge: Float, objTopEdge: Float, objRightEdge: Float, objBottomEdge: Float, group: Int)
     {
         // Check if the object fits completely inside one of the quadrants.
         if (objLeftEdge > leftEdge && objRightEdge < midpointX)
@@ -359,7 +363,7 @@ class QuadTree
     }
 
 
-    function addHere(object: Collider, group: Int = 0) 
+    function addHere(object: Collider, group: Int) 
     {
         if (canSubdivide())
         {
@@ -567,62 +571,60 @@ class QuadTree
     //
     // =============================================================================
 
-    inline function useBothLists(): Bool
-    {
-        return objects1.length > 0;
-    }
-
-
     inline function listToCheck(): Array<Collider>
     {
-        return useBothLists() ? objects1 : objects0;
+        return useBothLists ? objects1 : objects0;
     }
 
 
     inline function listToCheckFirstIndex(objBeingCheckedIndex: Int) : Int
     {
-        return useBothLists() ? 0 : objBeingCheckedIndex + 1;
+        return useBothLists ? 0 : objBeingCheckedIndex + 1;
     }
 
 
-    inline function addToTopLeft(collider: Collider, group: Int = 0)
+    inline function addToTopLeft(collider: Collider, group: Int)
     {
         if (topLeftTree == null)
         {
             topLeftTree = new QuadTree(leftEdge, topEdge, halfWidth, halfHeight, maxDepth - 1);
+            topLeftTree.useBothLists = useBothLists;
             topLeftTree.parent = this;
         }
         topLeftTree.add(collider, group);
     }
 
 
-    inline function addToTopRight(collider: Collider, group: Int = 0)
+    inline function addToTopRight(collider: Collider, group: Int)
     {
         if (topRightTree == null)
         {
             topRightTree = new QuadTree(midpointX, topEdge, halfWidth, halfHeight, maxDepth - 1);
+            topRightTree.useBothLists = useBothLists;
             topRightTree.parent = this;
         }
         topRightTree.add(collider, group);
     }
 
 
-    inline function addToBotLeft(collider: Collider, group: Int = 0)
+    inline function addToBotLeft(collider: Collider, group: Int)
     {
         if (botLeftTree == null)
         {
             botLeftTree = new QuadTree(leftEdge, midpointY, halfWidth, halfHeight, maxDepth - 1);
+            botLeftTree.useBothLists = useBothLists;
             botLeftTree.parent = this;
         }
         botLeftTree.add(collider, group);
     }
 
 
-    inline function addToBotRight(collider: Collider, group: Int = 0)
+    inline function addToBotRight(collider: Collider, group: Int)
     {
         if (botRightTree == null)
         {
             botRightTree = new QuadTree(midpointX, midpointY, halfWidth, halfHeight, maxDepth - 1);
+            botRightTree.useBothLists = useBothLists;
             botRightTree.parent = this;
         }
         botRightTree.add(collider, group);

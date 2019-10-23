@@ -146,31 +146,40 @@ class TestQuadTreeExecute extends QuadTree implements ITest
         Assert.equals(1, b3.collisionsDetected);
         Assert.equals(2, p1.collisionsDetected);
     }
-
+    
 
     function testCollisionsWithGjk()
     {
-        var b: Box = new Box(100, 100, 100, 100);
+        var b: Box = new Box(100, 100, 2, 2);
         var t1: Triangle = new Triangle([90, 90], [110, 110], [90, 80]); // yes
         var t2: Triangle = new Triangle([60, 60], [80, 80], [60, 80]); // no
         var c1: Circle = new Circle(90, 90, 20); // yes
-        var c2: Circle = new Circle(90, 90, 10); // no
-        var c3: Circle = new Circle(150, 150, 20); // yes
+        var c2: Circle = new Circle(90, 90, 2); // no
+        var c3: Circle = new Circle(101, 101, 1); // yes
 
         load([t1, t2, c1, c2, c3], [b]);
+
+        execute();
 
         Assert.equals(1, t1.collisionsDetected);
         Assert.equals(0, t2.collisionsDetected);
         Assert.equals(1, c1.collisionsDetected);
         Assert.equals(0, c2.collisionsDetected);
         Assert.equals(1, c3.collisionsDetected);
+        Assert.equals(3, b.collisionsDetected);
     }
-
+    
 
     function debugPrintTree()
     {
         var buf: StringBuf = new StringBuf();
         visualize(buf);
         trace(buf.toString());
+    }
+
+
+    inline function type(d: Dynamic): String
+    {
+        return Type.getClassName(Type.getClass(d));
     }
 }

@@ -68,7 +68,7 @@ class TestQuadTreeAdd extends QuadTree implements ITest
 
         var area: Box = new Box(0, 0, 1000, 1000);
 
-        addToTopLeft(area);
+        addToTopLeft(area, 0);
         Assert.equals(0, topLeftTree.leftEdge);
         Assert.equals(0, topLeftTree.topEdge);
         Assert.equals(500, topLeftTree.rightEdge);
@@ -76,7 +76,7 @@ class TestQuadTreeAdd extends QuadTree implements ITest
         Assert.notNull(topLeftTree);
         Assert.equals(4, topLeftTree.maxDepth);
 
-        addToTopRight(area);
+        addToTopRight(area, 0);
         Assert.equals(500, topRightTree.leftEdge);
         Assert.equals(0, topRightTree.topEdge);
         Assert.equals(1000, topRightTree.rightEdge);
@@ -84,7 +84,7 @@ class TestQuadTreeAdd extends QuadTree implements ITest
         Assert.notNull(topRightTree);
         Assert.equals(4, topRightTree.maxDepth);
 
-        addToBotLeft(area);
+        addToBotLeft(area, 0);
         Assert.equals(0, botLeftTree.leftEdge);
         Assert.equals(500, botLeftTree.topEdge);
         Assert.equals(500, botLeftTree.rightEdge);
@@ -92,7 +92,7 @@ class TestQuadTreeAdd extends QuadTree implements ITest
         Assert.notNull(botLeftTree);
         Assert.equals(4, botLeftTree.maxDepth);
 
-        addToBotRight(area);
+        addToBotRight(area, 0);
         Assert.equals(500, botRightTree.leftEdge);
         Assert.equals(500, botRightTree.topEdge);
         Assert.equals(1000, botRightTree.rightEdge);
