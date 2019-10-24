@@ -21,8 +21,8 @@ using quadtree.extensions.MovingRectangleEx;
 
 class QuadTree
 {
-    var objects0: Array<Collider>;
-    var objects1: Array<Collider>;
+    var objects0: LinkedListNode<Collider>;
+    var objects1: LinkedListNode<Collider>;
     var parent: QuadTree;
     var gjk: Gjk;
 
@@ -60,8 +60,8 @@ class QuadTree
 
     function reset(?x: Float, ?y: Float, ?width: Float, ?height: Float, ?maxDepth: Int)
     {
-        objects0 = new Array<Collider>();
-        objects1 = new Array<Collider>();
+        objects0 = null;
+        objects1 = null;
 
         topLeftTree = null;
         topRightTree = null;
@@ -101,6 +101,9 @@ class QuadTree
         On collisions, objects in `objectGroup` will have their `onOverlap()` method called before
         the respective object in `otherObjectGroup`. When not using the second list and collisions
         are only checked between objects in the first, `onOverlap()` will be called in an undefined order.
+
+        Additionally, the underlying storage in the quadtree resembles a stack, so items that are later
+        in the array will be processed first.
 
         @param objectGroup A list of objects that should be checked for collisions.
                            If `otherObjectGroup` is not provided, then objects in this group will
@@ -373,14 +376,14 @@ class QuadTree
             addToBotRight(object, group);
         }
         else
-        { 
+        {
             switch group
             {
                 case 0:
-                    objects0.push(object);
+                    objects0 = new LinkedListNode(object, objects0);
 
                 case 1:
-                    objects1.push(object);
+                    objects1 = new LinkedListNode(object, objects1);
 
                 case _:
                     throw "Invalid group.";
@@ -391,28 +394,35 @@ class QuadTree
 
     function collisionCheckHere()
     {
-        for (i0 in 0...objects0.length)
+        var objects0Iterator: LinkedListNode<Collider> = objects0;
+
+        while (objects0Iterator != null)
         {
-            if (!objects0[i0].collisionsEnabled)
+            var object: Collider = objects0Iterator.item;
+            var listToCheck: LinkedListNode<Collider> = getListToCheck(objects0Iterator);
+
+            objects0Iterator = objects0Iterator.next;
+
+            if (!object.collisionsEnabled)
                 continue;
 
-            switch objects0[i0].areaType
+            switch object.areaType
             {
                 case CollisionAreaType.Point:
-                    collisionCheckPoint(i0);
+                    collisionCheckPoint(cast(object, Point), listToCheck);
 
                 case CollisionAreaType.MovingPoint:
-                    collisionCheckMovingPoint(i0);
+                    collisionCheckMovingPoint(cast(object, MovingPoint), listToCheck);
 
                 case CollisionAreaType.Rectangle:
-                    collisionCheckRectangle(i0);
+                    collisionCheckRectangle(cast(object, Rectangle), listToCheck);
 
                 case CollisionAreaType.MovingRectangle:
-                    collisionCheckMovingRectangle(i0);
+                    collisionCheckMovingRectangle(cast(object, MovingRectangle), listToCheck);
                 
                 // Handle all other cases with the GJK algorithm.
                 case _:
-                    collisionCheckGeneric(i0);
+                    collisionCheckGeneric(object, listToCheck);
             }
         }
     }
@@ -451,101 +461,87 @@ class QuadTree
     // =============================================================================
 
 
-    function collisionCheckGeneric(index: Int)
+    function collisionCheckGeneric(collider: Collider, otherList: LinkedListNode<Collider>)
     {
-        var collider: Collider = objects0[index];
-
-        var otherList: Array<Collider> = listToCheck();
-        var firstIndex: Int = listToCheckFirstIndex(index);
-
-        for (i1 in firstIndex...otherList.length)
+        while (otherList != null)
         {
-            var other: Collider = otherList[i1];
+            var other: Collider = otherList.item;
             
             if (other.collisionsEnabled && gjk.checkOverlap(collider, other))
             {
                 onDetectedCollision(collider, other);
             }
+
+            otherList = otherList.next;
         }
     }
 
 
-    function collisionCheckPoint(index: Int)
+    function collisionCheckPoint(point: Point, otherList: LinkedListNode<Collider>)
     {
-        var point: Point = cast(objects0[index], Point);
-
-        var otherList: Array<Collider> = listToCheck();
-        var firstIndex: Int = listToCheckFirstIndex(index);
-
-        for (i1 in firstIndex...otherList.length)
+        while (otherList != null)
         {
-            var other: Collider = otherList[i1];
+            var other: Collider = otherList.item;
             
             if (other.collisionsEnabled && point.intersectsWith(other, gjk))
             {
                 onDetectedCollision(point, other);
             }
+
+            otherList = otherList.next;
         }
     }
 
 
-    function collisionCheckMovingPoint(index: Int)
+    function collisionCheckMovingPoint(movingPoint: MovingPoint, otherList: LinkedListNode<Collider>)
     {
-        var movingPoint: MovingPoint = cast(objects0[index], MovingPoint);
-
-        var otherList: Array<Collider> = listToCheck();
-        var firstIndex: Int = listToCheckFirstIndex(index);
-
-        for (i1 in firstIndex...otherList.length)
+        while (otherList != null)
         {
-            var other: Collider = otherList[i1];
+            var other: Collider = otherList.item;
 
             if (other.collisionsEnabled && movingPoint.intersectsWith(other, gjk))
             {
                 onDetectedCollision(movingPoint, other);
             }
+
+            otherList = otherList.next;
         }
     }
 
 
-    function collisionCheckRectangle(index: Int)
+    function collisionCheckRectangle(rect: Rectangle, otherList: LinkedListNode<Collider>)
     {
-        var rect: Rectangle = cast(objects0[index], Rectangle);
-
-        var otherList: Array<Collider> = listToCheck();
-        var firstIndex: Int = listToCheckFirstIndex(index);
-
-        for (i1 in firstIndex...otherList.length)
+        while (otherList != null)
         {
-            var other: Collider = otherList[i1];
+            var other: Collider = otherList.item;
 
             if (other.collisionsEnabled && rect.intersectsWith(other, gjk))
             {
                 onDetectedCollision(rect, other);
             }
+
+            otherList = otherList.next;
         }
     }
 
 
-    function collisionCheckMovingRectangle(index: Int)
+    function collisionCheckMovingRectangle(rect: MovingRectangle, otherList: LinkedListNode<Collider>)
     {
-        var rect: MovingRectangle = cast(objects0[index], MovingRectangle);
         var hullX: Float = rect.hullX();
         var hullY: Float = rect.hullY();
         var hullWidth: Float = rect.hullWidth();
         var hullHeight: Float = rect.hullHeight();
 
-        var otherList: Array<Collider> = listToCheck();
-        var firstIndex: Int = listToCheckFirstIndex(index);
-
-        for (i1 in firstIndex...otherList.length)
+        while (otherList != null)
         {
-            var other: Collider = otherList[i1];
+            var other: Collider = otherList.item;
 
             if (other.collisionsEnabled && MovingRectangleEx.intersectsWith(rect, hullX, hullY, hullWidth, hullHeight, other, gjk))
             {
                 onDetectedCollision(rect, other);
             }
+
+            otherList = otherList.next;
         }
     }
 
@@ -556,15 +552,9 @@ class QuadTree
     //
     // =============================================================================
 
-    inline function listToCheck(): Array<Collider>
+    inline function getListToCheck(objectBeingChecked: LinkedListNode<Collider>): LinkedListNode<Collider>
     {
-        return useBothLists ? objects1 : objects0;
-    }
-
-
-    inline function listToCheckFirstIndex(objBeingCheckedIndex: Int) : Int
-    {
-        return useBothLists ? 0 : objBeingCheckedIndex + 1;
+        return useBothLists ? objects1 : objectBeingChecked.next;
     }
 
 
@@ -621,8 +611,8 @@ class QuadTree
     public function visualize(buf: StringBuf, space: String = "")
     {
         buf.add('${space}[$leftEdge, $topEdge, $rightEdge, $botEdge]\n');
-        buf.add('${space}objects0: [${objects0.length}]\n');
-        buf.add('${space}objects1: [${objects1.length}]\n');
+        buf.add('${space}objects0: [${objects0.getLength()}]\n');
+        buf.add('${space}objects1: [${objects1.getLength()}]\n');
         if (topLeftTree != null)
         {
             buf.add('${space}topLeftTree:\n');

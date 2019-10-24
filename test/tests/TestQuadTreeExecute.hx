@@ -120,7 +120,7 @@ class TestQuadTreeExecute extends QuadTree implements ITest
         var b3: MovingBox = new MovingBox(400, 400, 100, 100);
         var c1: Circle = new Circle(408, 408, 0.5);
 
-        load([b1, p5, p6, p3, b2, p2, p1, p4, p10, b3, p7, p8, p9, c1]);
+        load(reverse([b1, p5, p6, p3, b2, p2, p1, p4, p10, b3, p7, p8, p9, c1]));
 
         execute();
 
@@ -201,5 +201,12 @@ class TestQuadTreeExecute extends QuadTree implements ITest
     inline function type(d: Dynamic): String
     {
         return Type.getClassName(Type.getClass(d));
+    }
+
+
+    inline static function reverse<T>(arr: Array<T>): Array<T>
+    {
+        arr.reverse();
+        return arr;
     }
 }

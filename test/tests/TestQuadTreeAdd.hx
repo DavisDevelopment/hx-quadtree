@@ -1,5 +1,6 @@
 package tests;
 
+import quadtree.LinkedListNode;
 import tests.models.Triangle;
 import quadtree.types.Collider;
 import utest.Assert;
@@ -40,8 +41,8 @@ class TestQuadTreeAdd extends QuadTree implements ITest
         addHere(area, 0);
         addHere(area, 1);
 
-        Assert.equals(area, objects0[0]);
-        Assert.equals(area, objects1[0]);
+        Assert.equals(area, objects0.get(0));
+        Assert.equals(area, objects1.get(0));
     }
 
 
@@ -133,8 +134,8 @@ class TestQuadTreeAdd extends QuadTree implements ITest
         Assert.equals(botRight2, traverseTree(qt -> qt.botRightTree, qt -> qt.objects1, 1));
 
         // Should not have been added here.
-        Assert.equals(0, objects0.length);
-        Assert.equals(0, objects1.length);
+        Assert.isNull(objects0);
+        Assert.isNull(objects1);
     }
 
 
@@ -161,7 +162,7 @@ class TestQuadTreeAdd extends QuadTree implements ITest
 
         var check = function(qt: QuadTree)
         {
-            Assert.equals(area, qt.objects0[0]);
+            Assert.equals(area, qt.objects0.get(0));
             timesChecked++;
         };
 
@@ -194,8 +195,8 @@ class TestQuadTreeAdd extends QuadTree implements ITest
         Assert.equals(botRight, traverseTree(qt -> qt.botRightTree));
 
         // Should not have been added here.
-        Assert.equals(0, objects0.length);
-        Assert.equals(0, objects1.length);
+        Assert.isNull(objects0);
+        Assert.isNull(objects1);
     }
 
 
@@ -222,8 +223,8 @@ class TestQuadTreeAdd extends QuadTree implements ITest
         Assert.equals(botRight, traverseTree(qt -> qt.botRightTree));
 
         // Should not have been added here.
-        Assert.equals(0, objects0.length);
-        Assert.equals(0, objects1.length);
+        Assert.isNull(objects0);
+        Assert.isNull(objects1);
     }
 
 
@@ -250,12 +251,12 @@ class TestQuadTreeAdd extends QuadTree implements ITest
         Assert.equals(botRight, traverseTree(qt -> qt.botRightTree));
 
         // Should not have been added here.
-        Assert.equals(0, objects0.length);
-        Assert.equals(0, objects1.length);
+        Assert.isNull(objects0);
+        Assert.isNull(objects1);
     }
 
 
-    function traverseTree(next: QuadTree->QuadTree, ?objList: QuadTree->Array<Collider> = null, ?index: Int = 0): Collider
+    function traverseTree(next: QuadTree->QuadTree, ?objList: QuadTree->LinkedListNode<Collider> = null, ?index: Int = 0): Collider
     {
         var cur: QuadTree = this;
         do
@@ -264,7 +265,7 @@ class TestQuadTreeAdd extends QuadTree implements ITest
 
             if (cur.maxDepth == 0)
             {
-                return objList == null ? cur.objects0[index] : objList(cur)[index];
+                return objList == null ? cur.objects0.get(index) : objList(cur).get(index);
             }
         }
         while (next(cur) != null);

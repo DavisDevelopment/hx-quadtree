@@ -1,3 +1,5 @@
+import tests.TestQuadTreeAdd;
+import tests.TestQuadTreeExecute;
 import utest.Runner;
 import utest.ui.Report;
 import utest.ui.common.HeaderDisplayMode;
