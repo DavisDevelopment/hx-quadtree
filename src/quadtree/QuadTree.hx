@@ -8,6 +8,8 @@ import quadtree.types.MovingPoint;
 import quadtree.types.MovingRectangle;
 import quadtree.types.Point;
 import quadtree.types.Rectangle;
+import quadtree.helpers.SubtreeBounds;
+import quadtree.helpers.LinkedListNode;
 
 using quadtree.QuadTreeEx;
 using quadtree.extensions.PointEx;
@@ -52,10 +54,10 @@ class QuadTree
     var overlapProcessCallback: (Dynamic, Dynamic) -> Bool;
 
 
-    public inline function new(x: Float, y: Float, width: Float, height: Float, maxDepth: Int = 5)
+    public inline function new(x: Float, y: Float, width: Float, height: Float, maxDepth: Int = 5, ?cache: QuadTreeCache)
     {
         gjk = new Gjk();
-        cache = new QuadTreeCache();
+        this.cache = cache == null ? new QuadTreeCache() : cache;
         reset(x, y, width, height, maxDepth);
     }
 
@@ -93,10 +95,14 @@ class QuadTree
 
         if (canSubdivide())
         {
-            topLeftBounds = new SubtreeBounds(leftEdge, topEdge, halfWidth, halfHeight);
-            topRightBounds = new SubtreeBounds(midpointX, topEdge, halfWidth, halfHeight);
-            botLeftBounds = new SubtreeBounds(leftEdge, midpointY, halfWidth, halfHeight);
-            botRightBounds = new SubtreeBounds(midpointX, midpointY, halfWidth, halfHeight);
+            cache.destroySubtreeBounds(topLeftBounds);
+            cache.destroySubtreeBounds(topRightBounds);
+            cache.destroySubtreeBounds(botLeftBounds);
+            cache.destroySubtreeBounds(botRightBounds);
+            topLeftBounds = cache.recycleSubtreeBounds(leftEdge, topEdge, halfWidth, halfHeight);
+            topRightBounds = cache.recycleSubtreeBounds(midpointX, topEdge, halfWidth, halfHeight);
+            botLeftBounds = cache.recycleSubtreeBounds(leftEdge, midpointY, halfWidth, halfHeight);
+            botRightBounds = cache.recycleSubtreeBounds(midpointX, midpointY, halfWidth, halfHeight);
         }
     }
 
@@ -596,7 +602,7 @@ class QuadTree
     {
         if (tree == null)
         {
-            tree = new QuadTree(bounds.x, bounds.y, bounds.width, bounds.height, maxDepth - 1);
+            tree = new QuadTree(bounds.x, bounds.y, bounds.width, bounds.height, maxDepth - 1, cache);
             tree.parent = this;
             tree.gjk = gjk;
             tree.cache = cache;
@@ -644,28 +650,4 @@ class QuadTree
             botRightTree.visualize(buf, space + "    ");
         }
     }
-}
-
-
-private class SubtreeBounds implements Rectangle
-{
-    public final areaType: CollisionAreaType = CollisionAreaType.Rectangle;
-    public final collisionsEnabled: Bool = false;
-    
-    public final x: Float;
-    public final y: Float;
-    public final width: Float;
-    public final height: Float;
-
-
-    public function new(x: Float, y: Float, width: Float = 0, height: Float = 0)
-    {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-    }
-
-
-    public function onOverlap(other: Collider): Void { }
 }

@@ -1,6 +1,6 @@
 package tests;
 
-import quadtree.LinkedListNode;
+import quadtree.helpers.LinkedListNode;
 import tests.models.Triangle;
 import quadtree.types.Collider;
 import utest.Assert;

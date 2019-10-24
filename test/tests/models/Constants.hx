@@ -1,7 +1,7 @@
-package quadtree;
+package tests.models;
 
-typedef Floats2 = F;
-typedef Ints2 = I;
+typedef Floats = F;
+typedef Ints = I;
 
 
 @:notNull abstract F(Float) from Float to Float 

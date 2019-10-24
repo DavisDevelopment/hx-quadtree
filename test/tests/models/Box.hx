@@ -3,7 +3,7 @@ package tests.models;
 import quadtree.types.Collider;
 import quadtree.CollisionAreaType;
 import quadtree.types.Rectangle;
-import quadtree.Constants.Ints;
+import tests.models.Constants.Ints;
 
 
 class Box implements Rectangle

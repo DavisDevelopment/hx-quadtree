@@ -6,7 +6,6 @@ import quadtree.types.MovingPoint;
 import quadtree.types.MovingRectangle;
 import quadtree.types.Circle;
 import quadtree.types.Collider;
-import quadtree.Constants.Floats;
 import quadtree.types.Polygon;
 
 using quadtree.extensions.PointEx;

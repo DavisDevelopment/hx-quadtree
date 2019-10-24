@@ -1,4 +1,4 @@
-package quadtree;
+package quadtree.helpers;
 
 
 class LinkedListNode<T>

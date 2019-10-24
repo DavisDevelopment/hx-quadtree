@@ -3,7 +3,6 @@ package tests.models;
 import quadtree.types.Collider;
 import quadtree.CollisionAreaType;
 import quadtree.types.Rectangle;
-import quadtree.Constants.Ints;
 
 
 class Circle implements quadtree.types.Circle
