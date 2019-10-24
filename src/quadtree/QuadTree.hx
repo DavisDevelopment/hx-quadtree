@@ -25,6 +25,7 @@ class QuadTree
     var objects1: LinkedListNode<Collider>;
     var parent: QuadTree;
     var gjk: Gjk;
+    var cache: QuadTreeCache;
 
     var topLeftTree: QuadTree;
     var topRightTree: QuadTree;
@@ -54,13 +55,16 @@ class QuadTree
     public inline function new(x: Float, y: Float, width: Float, height: Float, maxDepth: Int = 5)
     {
         gjk = new Gjk();
+        cache = new QuadTreeCache();
         reset(x, y, width, height, maxDepth);
     }
 
 
     function reset(?x: Float, ?y: Float, ?width: Float, ?height: Float, ?maxDepth: Int)
     {
+        cache.destroyLinkedList(objects0);
         objects0 = null;
+        cache.destroyLinkedList(objects1);
         objects1 = null;
 
         topLeftTree = null;
@@ -380,10 +384,10 @@ class QuadTree
             switch group
             {
                 case 0:
-                    objects0 = new LinkedListNode(object, objects0);
+                    objects0 = cache.recycleLinkedList(object, objects0);
 
                 case 1:
-                    objects1 = new LinkedListNode(object, objects1);
+                    objects1 = cache.recycleLinkedList(object, objects1);
 
                 case _:
                     throw "Invalid group.";
@@ -601,8 +605,10 @@ class QuadTree
     inline function createSubtree(bounds: SubtreeBounds): QuadTree
     {
         var tree: QuadTree = new QuadTree(bounds.x, bounds.y, bounds.width, bounds.height, maxDepth - 1);
-        tree.useBothLists = useBothLists;
         tree.parent = this;
+        tree.gjk = gjk;
+        tree.cache = cache;
+        tree.useBothLists = useBothLists;
         return tree;
     }
 

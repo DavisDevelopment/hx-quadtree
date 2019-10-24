@@ -57,12 +57,17 @@ class TestQuadTreeExecute extends QuadTree implements ITest
         Assert.equals(2, timesCalled);
         Assert.isTrue(box.collisionsDetected > 0);
 
+        execute();
+
+        Assert.equals(4, timesCalled);
+        Assert.isTrue(box.collisionsDetected > 0);
+
         // Disable collisions.
         var curCollisions: Int = box.collisionsDetected;
         box.collisionsEnabled = false;
 
         execute();
-        Assert.equals(2, timesCalled);
+        Assert.equals(4, timesCalled);
         Assert.equals(curCollisions, box.collisionsDetected);
     }
 
