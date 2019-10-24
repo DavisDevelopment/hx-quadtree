@@ -28,10 +28,10 @@ class TestQuadTreeExecute extends QuadTree implements ITest
         reset();
         setOverlapProcessCallback(null);
 
-        Assert.isNull(topLeftTree);
-        Assert.isNull(topRightTree);
-        Assert.isNull(botLeftTree);
-        Assert.isNull(botRightTree);
+        Assert.isFalse(subtreeActive(topLeftTree));
+        Assert.isFalse(subtreeActive(topRightTree));
+        Assert.isFalse(subtreeActive(botLeftTree));
+        Assert.isFalse(subtreeActive(botRightTree));
     }
 
 

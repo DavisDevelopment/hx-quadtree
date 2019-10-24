@@ -2,7 +2,6 @@ package quadtree;
 
 import quadtree.gjk.Gjk;
 import quadtree.types.Polygon;
-import quadtree.extensions.PolygonEx;
 import quadtree.types.Circle;
 import quadtree.types.Collider;
 import quadtree.types.MovingPoint;
@@ -48,6 +47,7 @@ class QuadTree
 
     var maxDepth: Int;
     var useBothLists: Bool;
+    var active: Bool;
 
     var overlapProcessCallback: (Dynamic, Dynamic) -> Bool;
 
@@ -62,15 +62,17 @@ class QuadTree
 
     function reset(?x: Float, ?y: Float, ?width: Float, ?height: Float, ?maxDepth: Int)
     {
+        active = true;
+        
         cache.destroyLinkedList(objects0);
         objects0 = null;
         cache.destroyLinkedList(objects1);
         objects1 = null;
 
-        topLeftTree = null;
-        topRightTree = null;
-        botLeftTree = null;
-        botRightTree = null;
+        if (topLeftTree != null)  topLeftTree.active = false;
+        if (topRightTree != null) topRightTree.active = false;
+        if (botLeftTree != null)  botLeftTree.active = false;
+        if (botRightTree != null) botRightTree.active = false;
 
         // Apply defaults.
         x = x != null ? x : leftEdge;
@@ -165,19 +167,19 @@ class QuadTree
         {
             // Internal node, recursively check on children.
 
-            if (topLeftTree != null)
+            if (subtreeActive(topLeftTree))
             {
                 topLeftTree.execute();
             }
-            if (topRightTree != null)
+            if (subtreeActive(topRightTree))
             {
                 topRightTree.execute();
             }
-            if (botLeftTree != null)
+            if (subtreeActive(botLeftTree))
             {
                 botLeftTree.execute();
             }
-            if (botRightTree != null)
+            if (subtreeActive(botRightTree))
             {
                 botRightTree.execute();
             }
@@ -564,52 +566,54 @@ class QuadTree
 
     inline function addToTopLeft(collider: Collider, group: Int)
     {
-        if (topLeftTree == null)
-        {
-            topLeftTree = createSubtree(topLeftBounds);
-        }
+        topLeftTree = validateSubtree(topLeftTree, topLeftBounds);
         topLeftTree.add(collider, group);
     }
 
 
     inline function addToTopRight(collider: Collider, group: Int)
     {
-        if (topRightTree == null)
-        {
-            topRightTree = createSubtree(topRightBounds);
-        }
+        topRightTree = validateSubtree(topRightTree, topRightBounds);
         topRightTree.add(collider, group);
     }
 
 
     inline function addToBotLeft(collider: Collider, group: Int)
     {
-        if (botLeftTree == null)
-        {
-            botLeftTree = createSubtree(botLeftBounds);
-        }
+        botLeftTree = validateSubtree(botLeftTree, botLeftBounds);
         botLeftTree.add(collider, group);
     }
 
 
     inline function addToBotRight(collider: Collider, group: Int)
     {
-        if (botRightTree == null)
-        {
-            botRightTree = createSubtree(botRightBounds);
-        }
+        botRightTree = validateSubtree(botRightTree, botRightBounds);
         botRightTree.add(collider, group);
     }
 
 
-    inline function createSubtree(bounds: SubtreeBounds): QuadTree
+    inline function validateSubtree(tree: QuadTree, bounds: SubtreeBounds): QuadTree
     {
-        var tree: QuadTree = new QuadTree(bounds.x, bounds.y, bounds.width, bounds.height, maxDepth - 1);
-        tree.parent = this;
-        tree.gjk = gjk;
-        tree.cache = cache;
-        tree.useBothLists = useBothLists;
+        if (tree == null)
+        {
+            tree = new QuadTree(bounds.x, bounds.y, bounds.width, bounds.height, maxDepth - 1);
+            tree.parent = this;
+            tree.gjk = gjk;
+            tree.cache = cache;
+            tree.useBothLists = useBothLists;
+        }
+        else if (!tree.active)
+        {
+            tree.reset(bounds.x, bounds.y, bounds.width, bounds.height, maxDepth - 1);
+            tree.useBothLists = useBothLists;
+        }
         return tree;
+    }
+
+
+    inline function subtreeActive(tree: QuadTree): Bool
+    {
+        return tree != null && tree.active;
     }
 
 

@@ -27,10 +27,10 @@ class TestQuadTreeAdd extends QuadTree implements ITest
     {
         reset(0, 0, 1000, 1000, 5);
 
-        Assert.isNull(topLeftTree);
-        Assert.isNull(topRightTree);
-        Assert.isNull(botLeftTree);
-        Assert.isNull(botRightTree);
+        Assert.isFalse(subtreeActive(topLeftTree));
+        Assert.isFalse(subtreeActive(topRightTree));
+        Assert.isFalse(subtreeActive(botLeftTree));
+        Assert.isFalse(subtreeActive(botRightTree));
     }
 
 
