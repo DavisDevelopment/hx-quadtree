@@ -1,7 +1,7 @@
 package quadtree;
 
-typedef Floats = F;
-typedef Ints = I;
+typedef Floats2 = F;
+typedef Ints2 = I;
 
 
 @:notNull abstract F(Float) from Float to Float 
