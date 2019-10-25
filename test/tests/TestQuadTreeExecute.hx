@@ -122,7 +122,7 @@ class TestQuadTreeExecute extends QuadTree implements ITest
         Assert.equals(0, b1.collisionsDetected);
         Assert.equals(0, b2.collisionsDetected);
 
-        b1.angle = 90;
+        b1.angle = 90 * MathUtils.TO_RAD;
 
         reset();
         hasSubdivided = true;
@@ -131,11 +131,11 @@ class TestQuadTreeExecute extends QuadTree implements ITest
 
         execute();
         
-        // Now it should have intersected.
+        // Now they should have intersected.
         Assert.equals(1, b1.collisionsDetected);
         Assert.equals(1, b2.collisionsDetected);
 
-        b1.angle = 180;
+        b1.angle = 180 * MathUtils.TO_RAD;
 
         reset();
         hasSubdivided = true;
@@ -144,7 +144,7 @@ class TestQuadTreeExecute extends QuadTree implements ITest
 
         execute();
         
-        // Now it should not have intersected again.
+        // Now they should not have intersected again.
         Assert.equals(1, b1.collisionsDetected);
         Assert.equals(1, b2.collisionsDetected);
     }

@@ -175,6 +175,23 @@ class TestGjk extends Gjk implements ITest
         Assert.isTrue(checkOverlap(b3, c1));
         Assert.isFalse(checkOverlap(p1, c1));
     }
+
+
+    function testRotatedRectangles()
+    {
+        var b1: Box = new Box(0, 0, 100, 10);
+        var b2: Box = new Box(0, 30, 100, 10);
+
+        Assert.isFalse(checkOverlap(b1, b2));
+
+        b1.angle = 90 * MathUtils.TO_RAD;
+        
+        Assert.isTrue(checkOverlap(b1, b2));
+
+        b1.angle = 180 * MathUtils.TO_RAD;
+        
+        Assert.isFalse(checkOverlap(b1, b2));
+    }
     
     
     inline function v(x: Float, y: Float): Vector return new VectorLinkedList(x, y);
