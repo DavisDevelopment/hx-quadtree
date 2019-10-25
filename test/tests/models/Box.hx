@@ -18,6 +18,7 @@ class Box implements Rectangle
     public var y: Float;
     public var width: Float;
     public var height: Float;
+    public var angle: Float = 0;
 
     public var collisionsDetected: Int = 0;
 

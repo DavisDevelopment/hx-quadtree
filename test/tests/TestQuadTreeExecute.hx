@@ -1,5 +1,6 @@
 package tests;
 
+import quadtree.helpers.MathUtils;
 import tests.models.Circle;
 import tests.models.Triangle;
 import utest.Assert;
@@ -149,6 +150,7 @@ class TestQuadTreeExecute extends QuadTree implements ITest
     function testMovingRectangleCollisions()
     {
         var b1: MovingBox = new MovingBox(100, 100, 100, 100);
+        b1.angle = 180 * MathUtils.TO_RAD;
         var b2: MovingBox = new MovingBox(190, 190, 10, 10);
         b2.moveTo(200, 200);
         var b3: MovingBox = new MovingBox(201, 201, 99, 99);

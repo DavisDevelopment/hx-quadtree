@@ -8,6 +8,7 @@ class SubtreeBounds implements Rectangle
 {
     public final areaType: CollisionAreaType = CollisionAreaType.Rectangle;
     public final collisionsEnabled: Bool = false;
+    public final angle: Float = 0;
     
     public var x: Float;
     public var y: Float;

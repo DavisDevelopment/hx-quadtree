@@ -1,6 +1,8 @@
 package quadtree.gjk;
 
 
+import quadtree.helpers.MathUtils;
+
 class Vector
 {
     public var x: Float;
@@ -112,9 +114,9 @@ class Vector
 
 
     /** Checks if the vector has equal coordinates with the one given. **/
-    public inline function equals(v: Vector): Bool
+    public function equals(v: Vector): Bool
     {
-        return x == v.x && y == v.y;
+        return MathUtils.floatEquals(x, v.x) && MathUtils.floatEquals(y, v.y);
     }
 
     #if UNIT_TEST

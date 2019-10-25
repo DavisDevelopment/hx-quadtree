@@ -54,6 +54,12 @@ class MovingRectangleEx
             && hullY              < other.hullY() + other.hullHeight();
     }
 
+    
+    public static inline function getFarthestPointInDirection(rect: MovingRectangle, direction: Vector, result: Vector): Vector
+    {
+        return RectangleEx.getFarthestPointInDirectionRect(rect.hullX(), rect.hullY(), rect.hullWidth(), rect.hullHeight(), rect.angle, direction, result);
+    }
+
 
     public static inline function hullX(rect: MovingRectangle): Float
     {
@@ -76,20 +82,5 @@ class MovingRectangleEx
     public static inline function hullHeight(rect: MovingRectangle): Float
     {
         return rect.height + Math.abs(rect.y - rect.lastY);
-    }
-
-    
-    public static inline function getFarthestPointInDirection(rect: MovingRectangle, direction: Vector, result: Vector): Vector
-    {
-        return PolygonEx.getFarthestPointInDirectionOfPoints(
-            [
-                [ rect.hullX(),                    rect.hullY()                     ],
-                [ rect.hullX() + rect.hullWidth(), rect.hullY()                     ],
-                [ rect.hullX(),                    rect.hullY() + rect.hullHeight() ],
-                [ rect.hullX() + rect.hullWidth(), rect.hullY() + rect.hullHeight() ]
-            ],
-            direction,
-            result
-        );
     }
 }

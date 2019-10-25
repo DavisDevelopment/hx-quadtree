@@ -17,9 +17,9 @@ test-neko:
 test-cpp:
   stage: test
   cache:
-    key: cpp-build
+    key: cpp-test
     paths:
-    - build/cpp/obj
+    - build/cpp/
   variables:
     HXML: test-cpp.hxml
   script:
