@@ -1,6 +1,5 @@
 package quadtree.extensions;
 
-import quadtree.helpers.MathUtils;
 import quadtree.gjk.Gjk;
 import quadtree.gjk.Vector;
 import quadtree.types.Collider;
@@ -9,6 +8,7 @@ import quadtree.types.Point;
 import quadtree.types.Rectangle;
 import quadtree.types.MovingRectangle;
 
+using quadtree.helpers.MathUtils;
 using quadtree.extensions.MovingRectangleEx;
 
 
@@ -45,7 +45,7 @@ class PointEx
 
     public static function intersectsWithRectangle(pointX: Float, pointY: Float, other: Rectangle): Bool
     {
-        if (other.angle != 0)
+        if (!other.angle.isZero())
         {
             var cos: Float = MathUtils.fastCos(-other.angle);
             var sin: Float = MathUtils.fastSin(-other.angle);

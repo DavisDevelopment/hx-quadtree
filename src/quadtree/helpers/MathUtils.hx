@@ -70,6 +70,12 @@ class MathUtils
 	}
 
 
+	public static inline function isZero(f: Float): Bool
+	{
+		return Math.abs(f) < EPSILON;
+	}
+
+
     public static inline function rotateX(cos: Float, sin: Float, x: Float, y: Float, x0: Float, y0: Float): Float
     {
         return x0 + (x - x0)*cos - (y - y0)*sin;

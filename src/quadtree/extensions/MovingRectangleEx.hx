@@ -1,6 +1,5 @@
 package quadtree.extensions;
 
-import quadtree.helpers.MathUtils;
 import quadtree.gjk.Gjk;
 import quadtree.gjk.Vector;
 import quadtree.types.Collider;
@@ -10,6 +9,7 @@ import quadtree.types.Rectangle;
 import quadtree.types.MovingRectangle;
 
 using quadtree.extensions.MovingRectangleEx;
+using quadtree.helpers.MathUtils;
 
 
 class MovingRectangleEx
@@ -21,10 +21,10 @@ class MovingRectangleEx
             case CollisionAreaType.Point: 
                 intersectsWithPoint(hullX, hullY, hullWidth, hullHeight, rect.angle, cast(other, Point).x, cast(other, Point).y);
 
-            case CollisionAreaType.Rectangle if (rect.angle < MathUtils.EPSILON && cast(other, Rectangle).angle < MathUtils.EPSILON):
+            case CollisionAreaType.Rectangle if (rect.angle.isZero() && cast(other, Rectangle).angle.isZero()):
                 intersectsWithRectangle(hullX, hullY, hullWidth, hullHeight, cast(other, Rectangle));
 
-            case CollisionAreaType.MovingRectangle if (rect.angle < MathUtils.EPSILON && cast(other, MovingRectangle).angle < MathUtils.EPSILON):
+            case CollisionAreaType.MovingRectangle if (rect.angle.isZero() && cast(other, MovingRectangle).angle.isZero()):
                 intersectsWithMovingRectangle(hullX, hullY, hullWidth, hullHeight, cast(other, MovingRectangle));
 
             case _: gjk.checkOverlap(rect, other);
@@ -34,7 +34,7 @@ class MovingRectangleEx
 
     public static inline function intersectsWithPoint(hullX: Float, hullY: Float, hullWidth: Float, hullHeight: Float, angle:Float, pointX: Float, pointY: Float): Bool
     {
-        if (angle != 0)
+        if (!angle.isZero())
         {
             var cos: Float = MathUtils.fastCos(-angle);
             var sin: Float = MathUtils.fastSin(-angle);

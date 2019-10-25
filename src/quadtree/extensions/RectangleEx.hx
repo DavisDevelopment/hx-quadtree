@@ -1,6 +1,5 @@
 package quadtree.extensions;
 
-import quadtree.helpers.MathUtils;
 import quadtree.gjk.Gjk;
 import quadtree.gjk.Vector;
 import quadtree.types.Collider;
@@ -9,6 +8,7 @@ import quadtree.types.Point;
 import quadtree.types.Rectangle;
 import quadtree.types.MovingRectangle;
 
+using quadtree.helpers.MathUtils;
 using quadtree.extensions.PointEx;
 using quadtree.extensions.MovingPointEx;
 using quadtree.extensions.MovingRectangleEx;
@@ -26,10 +26,10 @@ class RectangleEx
             case CollisionAreaType.MovingPoint: 
                 intersectsWithMovingPoint(rect, cast(other, MovingPoint));
 
-            case CollisionAreaType.Rectangle if (rect.angle < MathUtils.EPSILON && cast(other, Rectangle).angle < MathUtils.EPSILON):
+            case CollisionAreaType.Rectangle if (rect.angle.isZero() && cast(other, Rectangle).angle.isZero()):
                 intersectsWithRectangle(rect, cast(other, Rectangle));
 
-            case CollisionAreaType.MovingRectangle if (rect.angle < MathUtils.EPSILON && cast(other, MovingRectangle).angle < MathUtils.EPSILON):
+            case CollisionAreaType.MovingRectangle if (rect.angle.isZero() && cast(other, MovingRectangle).angle.isZero()):
                 intersectsWithMovingRectangle(rect, cast(other, MovingRectangle));
 
             case _: gjk.checkOverlap(rect, other);
@@ -72,7 +72,7 @@ class RectangleEx
     
     public static function getFarthestPointInDirectionRect(x: Float, y: Float, width: Float, height: Float, angle: Float, direction: Vector, result: Vector): Vector
     {
-        if (angle == 0)
+        if (angle.isZero())
         {
             var distanceToTopLeft: Float = direction.dot(x, y);
             var distanceToTopRight: Float  = direction.dot(x + width, y);
