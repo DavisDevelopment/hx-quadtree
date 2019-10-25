@@ -1,5 +1,6 @@
 package quadtree.extensions;
 
+import quadtree.helpers.MathUtils;
 import quadtree.gjk.Gjk;
 import quadtree.gjk.Vector;
 import quadtree.types.Collider;
@@ -42,8 +43,22 @@ class PointEx
     }
 
 
-    public static inline function intersectsWithRectangle(pointX: Float, pointY: Float, other: Rectangle): Bool
+    public static function intersectsWithRectangle(pointX: Float, pointY: Float, other: Rectangle): Bool
     {
+        if (other.angle != 0)
+        {
+            var cos: Float = MathUtils.fastCos(-other.angle);
+            var sin: Float = MathUtils.fastSin(-other.angle);
+            var rectCenterX: Float = other.x + (other.width / 2);
+            var rectCenterY: Float = other.y + (other.height / 2);
+
+            var rotatedX: Float = MathUtils.rotateX(cos, sin, pointX, pointY, rectCenterX, rectCenterY);
+            var rotatedY: Float = MathUtils.rotateY(cos, sin, pointX, pointY, rectCenterX, rectCenterY);
+
+            pointX = rotatedX;
+            pointY = rotatedY;
+        }        
+
         return pointX > other.x
             && pointY > other.y
             && pointX < other.x + other.width
@@ -53,7 +68,7 @@ class PointEx
 
     public static inline function intersectsWithMovingRectangle(point: Point, other: MovingRectangle): Bool
     {
-        return MovingRectangleEx.intersectsWithPoint(other.hullX(), other.hullY(), other.hullWidth(), other.hullHeight(), point.x, point.y);
+        return MovingRectangleEx.intersectsWithPoint(other.hullX(), other.hullY(), other.hullWidth(), other.hullHeight(), other.angle, point.x, point.y);
     }
 
     

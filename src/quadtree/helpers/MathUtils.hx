@@ -6,6 +6,7 @@ package quadtree.helpers;
 **/
 class MathUtils
 {
+	/** Constant to account for floating point numerical errors. Number smaller than this will be considered zero. **/
 	public static inline var EPSILON: Float = 0.0000001;
 
 
@@ -67,4 +68,16 @@ class MathUtils
 	{
 		return Math.abs(f1 - f2) < EPSILON;
 	}
+
+
+    public static inline function rotateX(cos: Float, sin: Float, x: Float, y: Float, x0: Float, y0: Float): Float
+    {
+        return x0 + (x - x0)*cos - (y - y0)*sin;
+    }
+
+
+    public static inline function rotateY(cos: Float, sin: Float, x: Float, y: Float, x0: Float, y0: Float): Float
+    {
+        return y0 + (x - x0)*sin + (y - y0)*cos;
+    }
 }

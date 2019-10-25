@@ -1,5 +1,6 @@
 package quadtree.extensions;
 
+import quadtree.helpers.MathUtils;
 import quadtree.gjk.Gjk;
 import quadtree.gjk.Vector;
 import quadtree.types.Collider;
@@ -17,19 +18,36 @@ class MovingRectangleEx
     {
         return switch other.areaType
         {
-            case CollisionAreaType.Point: intersectsWithPoint(hullX, hullY, hullWidth, hullHeight, cast(other, Point).x, cast(other, Point).y);
+            case CollisionAreaType.Point: 
+                intersectsWithPoint(hullX, hullY, hullWidth, hullHeight, rect.angle, cast(other, Point).x, cast(other, Point).y);
 
-            case CollisionAreaType.Rectangle: intersectsWithRectangle(hullX, hullY, hullWidth, hullHeight, cast(other, Rectangle));
+            case CollisionAreaType.Rectangle if (rect.angle < MathUtils.EPSILON && cast(other, Rectangle).angle < MathUtils.EPSILON):
+                intersectsWithRectangle(hullX, hullY, hullWidth, hullHeight, cast(other, Rectangle));
 
-            case CollisionAreaType.MovingRectangle: intersectsWithMovingRectangle(hullX, hullY, hullWidth, hullHeight, cast(other, MovingRectangle));
+            case CollisionAreaType.MovingRectangle if (rect.angle < MathUtils.EPSILON && cast(other, MovingRectangle).angle < MathUtils.EPSILON):
+                intersectsWithMovingRectangle(hullX, hullY, hullWidth, hullHeight, cast(other, MovingRectangle));
 
             case _: gjk.checkOverlap(rect, other);
         }
     }
 
 
-    public static inline function intersectsWithPoint(hullX: Float, hullY: Float, hullWidth: Float, hullHeight: Float, pointX: Float, pointY: Float): Bool
+    public static inline function intersectsWithPoint(hullX: Float, hullY: Float, hullWidth: Float, hullHeight: Float, angle:Float, pointX: Float, pointY: Float): Bool
     {
+        if (angle != 0)
+        {
+            var cos: Float = MathUtils.fastCos(-angle);
+            var sin: Float = MathUtils.fastSin(-angle);
+            var rectCenterX: Float = hullX + (hullWidth / 2);
+            var rectCenterY: Float = hullY + (hullHeight / 2);
+
+            var rotatedX: Float = MathUtils.rotateX(cos, sin, pointX, pointY, rectCenterX, rectCenterY);
+            var rotatedY: Float = MathUtils.rotateY(cos, sin, pointX, pointY, rectCenterX, rectCenterY);
+
+            pointX = rotatedX;
+            pointY = rotatedY;
+        }
+
         return pointX > hullX
             && pointY > hullY
             && pointY < hullX + hullWidth

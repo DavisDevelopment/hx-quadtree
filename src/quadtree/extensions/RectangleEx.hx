@@ -20,13 +20,17 @@ class RectangleEx
     {
         return switch other.areaType
         {
-            case CollisionAreaType.Point: intersectsWithPoint(rect, cast(other, Point));
+            case CollisionAreaType.Point: 
+                intersectsWithPoint(rect, cast(other, Point));
 
-            case CollisionAreaType.MovingPoint: intersectsWithMovingPoint(rect, cast(other, MovingPoint));
+            case CollisionAreaType.MovingPoint: 
+                intersectsWithMovingPoint(rect, cast(other, MovingPoint));
 
-            case CollisionAreaType.Rectangle: intersectsWithRectangle(rect, cast(other, Rectangle));
+            case CollisionAreaType.Rectangle if (rect.angle < MathUtils.EPSILON && cast(other, Rectangle).angle < MathUtils.EPSILON):
+                intersectsWithRectangle(rect, cast(other, Rectangle));
 
-            case CollisionAreaType.MovingRectangle: intersectsWithMovingRectangle(rect, cast(other, MovingRectangle));
+            case CollisionAreaType.MovingRectangle if (rect.angle < MathUtils.EPSILON && cast(other, MovingRectangle).angle < MathUtils.EPSILON):
+                intersectsWithMovingRectangle(rect, cast(other, MovingRectangle));
 
             case _: gjk.checkOverlap(rect, other);
         }
@@ -111,22 +115,22 @@ class RectangleEx
             if (distanceToTopLeft > distanceToTopRight && distanceToTopLeft > distanceToBotLeft && distanceToTopLeft > distanceToBotRight)
             {
                 // top left
-                result.set( rotateX(cos, sin, x, y, centerX, centerY) , rotateY(cos, sin, x, y, centerX, centerY) );
+                result.set( MathUtils.rotateX(cos, sin, x, y, centerX, centerY) , MathUtils.rotateY(cos, sin, x, y, centerX, centerY) );
             }
             else if (distanceToTopRight > distanceToBotLeft && distanceToTopRight > distanceToBotRight)
             {
                 // top right
-                result.set( rotateX(cos, sin, x + width, y, centerX, centerY) , rotateY(cos, sin, x + width, y, centerX, centerY) );
+                result.set( MathUtils.rotateX(cos, sin, x + width, y, centerX, centerY) , MathUtils.rotateY(cos, sin, x + width, y, centerX, centerY) );
             }
             else if (distanceToBotLeft > distanceToBotRight)
             {
                 // bot left
-                result.set( rotateX(cos, sin,x, y + height, centerX, centerY) , rotateY(cos, sin, x, y + height, centerX, centerY) );
+                result.set( MathUtils.rotateX(cos, sin,x, y + height, centerX, centerY) , MathUtils.rotateY(cos, sin, x, y + height, centerX, centerY) );
             }
             else
             {
                 // bot right
-                result.set( rotateX(cos, sin, x + width, y + height, centerX, centerY) , rotateY(cos, sin, x + width, y + height, centerX, centerY) );
+                result.set( MathUtils.rotateX(cos, sin, x + width, y + height, centerX, centerY) , MathUtils.rotateY(cos, sin, x + width, y + height, centerX, centerY) );
             }
         }
 
@@ -136,18 +140,6 @@ class RectangleEx
 
     static inline function rotatedDot(v: Vector, cos: Float, sin: Float, x: Float, y: Float, x0: Float, y0: Float)
     {
-        return v.dot( rotateX(cos, sin, x, y, x0, y0) , rotateY(cos, sin, x, y, x0, y0) );
-    }
-
-
-    static inline function rotateX(cos: Float, sin: Float, x: Float, y: Float, x0: Float, y0: Float): Float
-    {
-        return x0 + (x - x0)*cos - (y - y0)*sin;
-    }
-
-
-    static inline function rotateY(cos: Float, sin: Float, x: Float, y: Float, x0: Float, y0: Float): Float
-    {
-        return y0 + (x - x0)*sin + (y - y0)*cos;
+        return v.dot( MathUtils.rotateX(cos, sin, x, y, x0, y0) , MathUtils.rotateY(cos, sin, x, y, x0, y0) );
     }
 }

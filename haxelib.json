@@ -6,7 +6,7 @@
   "description": "Fast Quad-Tree collision detection library, supporting all convex polygons.",
   "version": "0.0.0",
   "classPath": "src",
-  "releasenote": "First working release. Some issues left but most shapes are supported.",
+  "releasenote": "Added support for rotated rectangles.",
   "contributors": [ "Haath" ],
   "dependencies": {
   }
