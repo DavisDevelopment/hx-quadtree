@@ -12,6 +12,7 @@ import quadtree.helpers.SubtreeBounds;
 import quadtree.helpers.LinkedListNode;
 
 using quadtree.QuadTreeEx;
+using quadtree.helpers.MathUtils;
 using quadtree.extensions.PointEx;
 using quadtree.extensions.CircleEx;
 using quadtree.extensions.PolygonEx;
@@ -201,6 +202,12 @@ class QuadTree
 
     function add(object: Collider, group: Int = 0)
     {
+        if (!canSubdivide())
+        {
+            addHere(object, group);
+            return;
+        }
+
         switch object.areaType
         {
             case CollisionAreaType.Point | CollisionAreaType.MovingPoint:
@@ -213,7 +220,7 @@ class QuadTree
                 addCircle(cast(object, Circle), group);
 
             case CollisionAreaType.Polygon:
-                addPolygon(cast(object, Polygon), group);
+                addGeneric(cast(object, Polygon), group);
 
             case _:
                 throw "Must specify an areaType";
@@ -223,30 +230,24 @@ class QuadTree
 
     function addRectangle(rect: Rectangle, group: Int)
     {
-        final objLeftEdge: Float = rect.x;
-        final objTopEdge: Float = rect.y;
-        final objRightEdge: Float = rect.x + rect.width;
-        final objBottomEdge: Float = rect.y + rect.height;
-
-        // Check if the entire node fits inside the object.
-        if (!canSubdivide() || this.isContainedInArea(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
+        if (rect.angle.isZero())
         {
-            addHere(rect, group);
-            return;
-        }
+            final objLeftEdge: Float = rect.x;
+            final objTopEdge: Float = rect.y;
+            final objRightEdge: Float = rect.x + rect.width;
+            final objBottomEdge: Float = rect.y + rect.height;
 
-        addRectBoundObject(rect, objLeftEdge, objTopEdge, objRightEdge, objBottomEdge, group);
+            addRectBoundObject(rect, objLeftEdge, objTopEdge, objRightEdge, objBottomEdge, group);
+        }
+        else
+        {
+            addGeneric(rect, group);
+        }
     }
 
 
     function addPoint(point: Point, group: Int)
     {
-        if (!canSubdivide() && this.containsPoint(point))
-        {
-            addHere(point, group);
-            return;
-        }
-
         if (point.x < midpointX)
         {
             if (point.y < midpointY)
@@ -274,12 +275,6 @@ class QuadTree
 
     function addCircle(circle: Circle, group: Int)
     {
-        if (!canSubdivide())
-        {
-            addHere(circle, group);
-            return;
-        }
-
         /**
             For now, circles will be added as if they were rectangles.
             This can only lead to false positives, ending up in quadrants that don't overlap with them,
@@ -300,29 +295,23 @@ class QuadTree
     }
 
 
-    function addPolygon(polygon: Polygon, group: Int)
+    function addGeneric(collider: Collider, group: Int)
     {
-        if (!canSubdivide())
+        if (gjk.checkOverlap(topLeftBounds, collider))
         {
-            addHere(polygon, group);
-            return;
+            addToTopLeft(collider, group);
         }
-
-        if (gjk.checkOverlap(topLeftBounds, polygon))
+        if (gjk.checkOverlap(topRightBounds, collider))
         {
-            addToTopLeft(polygon, group);
+            addToTopRight(collider, group);
         }
-        if (gjk.checkOverlap(topRightBounds, polygon))
+        if (gjk.checkOverlap(botLeftBounds, collider))
         {
-            addToTopRight(polygon, group);
+            addToBotLeft(collider, group);
         }
-        if (gjk.checkOverlap(botLeftBounds, polygon))
+        if (gjk.checkOverlap(botRightBounds, collider))
         {
-            addToBotLeft(polygon, group);
-        }
-        if (gjk.checkOverlap(botRightBounds, polygon))
-        {
-            addToBotRight(polygon, group);
+            addToBotRight(collider, group);
         }
     }
 
