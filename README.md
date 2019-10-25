@@ -79,4 +79,14 @@ qt.load(objectList1, objectList2);
 qt.execute();
 ```
 
+Being familiar with quad-trees, you can also configure its properties.
 
+```haxe
+// The maximum depth of the tree.
+// After it is reached, leaf nodes will simply be filled with all objects added to them.
+qt.maxDepth = 5;
+
+// The amount of objects a node can hold before it is subdivided into quadrants.
+// The amount of collision checks that happen on each node will be equal to this number squared.
+qt.objectsPerNode = 4;
+```

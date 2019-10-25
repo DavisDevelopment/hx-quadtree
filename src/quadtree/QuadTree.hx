@@ -23,8 +23,13 @@ using quadtree.extensions.MovingRectangleEx;
 
 class QuadTree
 {
+    public var maxDepth: Int = 5;
+    public var objectsPerNode: Int = 4;
+
     var objects0: LinkedListNode<Collider>;
+    var objects0Length: Int;
     var objects1: LinkedListNode<Collider>;
+    var objects1Length: Int;
     var parent: QuadTree;
     var gjk: Gjk;
     var cache: QuadTreeCache;
@@ -48,29 +53,32 @@ class QuadTree
     var midpointX: Float;
     var midpointY: Float;
 
-    var maxDepth: Int;
     var useBothLists: Bool;
     var active: Bool;
+    var hasSubdivided: Bool;
 
     var overlapProcessCallback: (Dynamic, Dynamic) -> Bool;
 
 
-    public inline function new(x: Float, y: Float, width: Float, height: Float, maxDepth: Int = 5, ?cache: QuadTreeCache)
+    public inline function new(x: Float, y: Float, width: Float, height: Float, ?cache: QuadTreeCache)
     {
         gjk = new Gjk();
         this.cache = cache == null ? new QuadTreeCache() : cache;
-        reset(x, y, width, height, maxDepth);
+        reset(x, y, width, height);
     }
 
 
-    function reset(?x: Float, ?y: Float, ?width: Float, ?height: Float, ?maxDepth: Int)
+    function reset(?x: Float, ?y: Float, ?width: Float, ?height: Float)
     {
         active = true;
+        hasSubdivided = false;
         
         cache.destroyLinkedList(objects0);
         objects0 = null;
+        objects0Length = 0;
         cache.destroyLinkedList(objects1);
         objects1 = null;
+        objects1Length = 0;
 
         if (topLeftTree != null)  topLeftTree.active = false;
         if (topRightTree != null) topRightTree.active = false;
@@ -82,7 +90,6 @@ class QuadTree
         y = y != null ? y : topEdge;
         width = width != null ? width : rightEdge - x;
         height = height != null ? height : botEdge - x;
-        this.maxDepth = maxDepth != null ? maxDepth : this.maxDepth;
 
         // Update boundaries.
         leftEdge = x;
@@ -170,7 +177,7 @@ class QuadTree
     **/
     public function execute()
     {
-        if (canSubdivide())
+        if (hasSubdivided)
         {
             // Internal node, recursively check on children.
 
@@ -202,7 +209,7 @@ class QuadTree
 
     function add(object: Collider, group: Int = 0)
     {
-        if (!canSubdivide())
+        if (!hasSubdivided)
         {
             addHere(object, group);
             return;
@@ -369,7 +376,7 @@ class QuadTree
 
     function addHere(object: Collider, group: Int) 
     {
-        if (canSubdivide())
+        if (hasSubdivided)
         {
             addToTopLeft(object, group);
             addToTopRight(object, group);
@@ -382,14 +389,50 @@ class QuadTree
             {
                 case 0:
                     objects0 = cache.recycleLinkedList(object, objects0);
+                    objects0Length++;
 
                 case 1:
                     objects1 = cache.recycleLinkedList(object, objects1);
+                    objects1Length++;
 
                 case _:
                     throw "Invalid group.";
             }
+
+            if (shouldSubdivide())
+            {
+                subdivideTree();
+            }
         }
+    }
+
+
+    function subdivideTree()
+    {
+        hasSubdivided = true;
+
+        var it0: LinkedListNode<Collider> = objects0;
+        while (it0 != null)
+        {
+            add(it0.item, 0);
+
+            it0 = it0.next;
+            objects0Length--;
+        }
+
+        var it1: LinkedListNode<Collider> = objects1;
+        while (it1 != null)
+        {
+            add(it1.item, 1);
+
+            it1 = it1.next;
+            objects0Length--;
+        }
+
+        cache.destroyLinkedList(objects0);
+        objects0 = null;
+        cache.destroyLinkedList(objects1);
+        objects1 = null;
     }
 
 
@@ -454,6 +497,34 @@ class QuadTree
     {
         return maxDepth > 0;
     }
+
+
+    inline function isLeafNode(): Bool
+    {
+        return !isInternalNode();
+    }
+
+
+    inline function isInternalNode(): Bool
+    {
+        return subtreeActive(topLeftTree)
+            || subtreeActive(topRightTree)
+            || subtreeActive(botLeftTree)
+            || subtreeActive(botRightTree);
+    }
+
+
+    inline function shouldSubdivide(): Bool
+    {
+        return canSubdivide() && (objects0Length > objectsPerNode || objects1Length > objectsPerNode);
+    }
+
+
+    inline function isNodeEmpty(): Bool
+    {
+        return objects0Length == 0 && objects1Length == 0;
+    }
+
 
     // =============================================================================
     //
@@ -591,17 +662,19 @@ class QuadTree
     {
         if (tree == null)
         {
-            tree = new QuadTree(bounds.x, bounds.y, bounds.width, bounds.height, maxDepth - 1, cache);
+            tree = new QuadTree(bounds.x, bounds.y, bounds.width, bounds.height, cache);
             tree.parent = this;
+            tree.maxDepth = maxDepth - 1;
             tree.gjk = gjk;
             tree.cache = cache;
             tree.useBothLists = useBothLists;
         }
         else if (!tree.active)
         {
-            tree.reset(bounds.x, bounds.y, bounds.width, bounds.height, maxDepth - 1);
+            tree.reset(bounds.x, bounds.y, bounds.width, bounds.height);
             tree.useBothLists = useBothLists;
         }
+        hasSubdivided = true;
         return tree;
     }
 
@@ -616,8 +689,8 @@ class QuadTree
     public function visualize(buf: StringBuf, space: String = "")
     {
         buf.add('${space}[$leftEdge, $topEdge, $rightEdge, $botEdge]\n');
-        buf.add('${space}objects0: [${objects0.getLength()}]\n');
-        buf.add('${space}objects1: [${objects1.getLength()}]\n');
+        buf.add('${space}objects0: [${objects0 == null ? 0 : objects0.getLength()}]\n');
+        buf.add('${space}objects1: [${objects1 == null ? 0 : objects1.getLength()}]\n');
         if (topLeftTree != null)
         {
             buf.add('${space}topLeftTree:\n');

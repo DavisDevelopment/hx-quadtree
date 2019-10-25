@@ -20,7 +20,8 @@ class TestQuadTreeExecute extends QuadTree implements ITest
 {
     public function new()
     {
-        super(0, 0, 1000, 1000, 5);
+        super(0, 0, 1000, 1000);
+        maxDepth = 5;
     }
 
 
@@ -106,6 +107,35 @@ class TestQuadTreeExecute extends QuadTree implements ITest
     }
 
 
+    function testRotatedRectangle()
+    {
+        hasSubdivided = true;
+
+        var b1: Box = new Box(0, 0, 100, 10);
+        var b2: Box = new Box(0, 30, 100, 10);
+
+        load([b1, b2]);
+
+        execute();
+
+        // Normally, they should not intersect.
+        Assert.equals(0, b1.collisionsDetected);
+        Assert.equals(0, b2.collisionsDetected);
+
+        b1.angle = 90;
+
+        reset();
+        hasSubdivided = true;
+        
+        load([b1, b2]);
+
+        execute();
+        
+        Assert.equals(1, b1.collisionsDetected);
+        Assert.equals(1, b2.collisionsDetected);
+    }
+
+
     function testCollisionPointInRectangle()
     {
         var b1: MovingBox = new MovingBox(103, 103, 1, 1);
@@ -183,7 +213,7 @@ class TestQuadTreeExecute extends QuadTree implements ITest
         var c2: Circle = new Circle(90, 90, 2); // no
         var c3: Circle = new Circle(101, 101, 1); // yes
 
-        load([t1, t2, c1, c2, c3], [b1, b2]);
+        load([b1, b2], [t1, t2, c1, c2, c3]);
 
         execute();
 
