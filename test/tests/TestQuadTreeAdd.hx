@@ -55,6 +55,27 @@ class TestQuadTreeAdd extends QuadTree implements ITest
     }
 
 
+    function testIsInternalNode()
+    {
+        Assert.isFalse(isInternalNode());
+
+        validateSubtree(topLeftTree, topLeftBounds);
+        Assert.isTrue(isInternalNode());
+
+        reset();
+        validateSubtree(topRightTree, topRightBounds);
+        Assert.isTrue(isInternalNode());
+
+        reset();
+        validateSubtree(botLeftTree, botRightBounds);
+        Assert.isTrue(isInternalNode());
+
+        reset();
+        validateSubtree(botRightTree, botRightBounds);
+        Assert.isTrue(isInternalNode());
+    }
+
+
     function testAddInvalidAreaType()
     {
         var area: Box = new Box(0, 0, 1000, 1000);

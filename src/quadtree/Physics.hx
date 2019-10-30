@@ -46,8 +46,7 @@ class Physics
 
         @param velocity1 The velocity vector of the first object.
         @param velocity2 The velocity vector of the second object.
-        @param angleCos The cosine of the angle on which the two objects are being separated.
-        @param angleSin The sine of the angle on which the two objects are being separated.
+        @param angle The angle on which the two objects are being separated.
         @param mass1 The mass of the first object.
         @param mass2 The mass of the second object.
         @param elasticity1 The elasticity of the first object.
@@ -56,7 +55,7 @@ class Physics
     **/
     public static function momentumConservationCollision(
         velocity1: Vector, velocity2: Vector, 
-        angleCos: Float, angleSin: Float, 
+        angle: Float, 
         mass1: Float = 1, mass2: Float = 1,
         elasticity1: Float = 1, elasticity2: Float = 1)
     {
@@ -65,6 +64,9 @@ class Physics
 
         var vel2x: Float = momentumConservationVelocity(velocity2.x, velocity1.x, mass2, mass1);
         var vel2y: Float = momentumConservationVelocity(velocity2.y, velocity1.y, mass2, mass1);
+
+        var angleCos: Float = MathUtils.fastCos(angle);
+        var angleSin: Float = MathUtils.fastSin(angle);
 
         var vel1: Float = elasticity1 * Math.sqrt(vel1x * vel1x + vel1y * vel1y);
         velocity1.x = - vel1 * angleCos;

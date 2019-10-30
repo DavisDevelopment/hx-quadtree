@@ -25,10 +25,10 @@ class TestPhysics implements ITest
         var v1 = v(1, 0);
         var v2 = v(-1, 0);
 
-        Physics.momentumConservationCollision(v1, v2, 1, 1);
+        Physics.momentumConservationCollision(v1, v2, 0);
 
-        Assert.isTrue( v1.equals(v(-1, -1)) );
-        Assert.isTrue( v2.equals(v(1, 1)) );
+        Assert.isTrue( v1.equals(v(-1, 0)) );
+        Assert.isTrue( v2.equals(v(1, 0)) );
     }
 
 
@@ -51,12 +51,16 @@ class TestPhysics implements ITest
     {
         var c1 = new Circle(0, 0, 100);
         var c2 = new Circle(100, 0, 50);
+        var c3 = new Circle(200, 200, 10);
 
         Assert.equals(50, Physics.computeOverlap(c1, c2, AXIS_X));
         Assert.isTrue( Physics.computeOverlap(c1, c2, AXIS_Y).isZero() );
 
         Assert.equals(-50, Physics.computeOverlap(c2, c1, AXIS_X));
         Assert.isTrue( Physics.computeOverlap(c2, c1, AXIS_Y).isZero() );
+
+        Assert.equals(0, Physics.computeOverlap(c1, c3, AXIS_X));
+        Assert.equals(0, Physics.computeOverlap(c1, c3, AXIS_Y));
     }
 
 
@@ -71,6 +75,25 @@ class TestPhysics implements ITest
 
         Assert.equals(10, Physics.computeOverlap(b, c, AXIS_X));
         Assert.isTrue( Physics.computeOverlap(b, c, AXIS_Y).isZero() );
+    }
+
+
+    function testSeparate()
+    {
+        var b1 = new MovingBox(-50, -50, 50, 50);
+        b1.moveTo(0, 0);
+
+        var b2 = new MovingBox(25, 25, 50, 50);
+        
+        var angle: Float = Physics.separate(b1, b2, false, true);
+
+        Assert.isTrue( MathUtils.floatEquals(angle, Math.PI / 4) );
+
+        Assert.equals(25, b2.x);
+        Assert.equals(25, b2.y);
+        
+        Assert.equals(-25, b1.x);
+        Assert.equals(-25, b1.y);
     }
 
     
