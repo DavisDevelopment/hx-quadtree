@@ -68,7 +68,7 @@ class QuadTree
     }
 
 
-    function reset(?x: Float, ?y: Float, ?width: Float, ?height: Float)
+    public function reset(?x: Float, ?y: Float, ?width: Float, ?height: Float)
     {
         active = true;
         hasSubdivided = false;

@@ -12,4 +12,10 @@ class CircleEx
 
         return center.addMult(direction, c.radius);
     }
+
+
+    public static inline function getCenter(c: Circle, result: Vector): Vector
+    {
+        return result.set(c.centerX, c.centerY);
+    }
 }

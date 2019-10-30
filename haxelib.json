@@ -3,7 +3,7 @@
   "url" : "https://gitlab.com/haath/quadtree",
   "license": "MIT",
   "tags": ["quadtree", "quad", "tree", "collision", "detection"],
-  "description": "Fast Quad-Tree collision detection library, supporting all convex polygons.",
+  "description": "Fast Quad-Tree 2D collision detection library, supporting all convex polygons.",
   "version": "0.0.0",
   "classPath": "src",
   "releasenote": "Added support for rotated rectangles.",

@@ -8,6 +8,9 @@ class Triangle implements Polygon
 {
     public var areaType: CollisionAreaType = CollisionAreaType.Polygon;
     public var collisionsEnabled: Bool = true;
+    
+    public var refX: Float = 0;
+    public var refY: Float = 0;
 
     public var points: Array<Array<Float>>;
 

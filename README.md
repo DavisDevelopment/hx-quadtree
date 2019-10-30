@@ -1,9 +1,14 @@
-Quadtree Haxe
+Quadtree
 [![pipeline status](https://gitlab.com/haath/quadtree/badges/master/pipeline.svg)](https://gitlab.com/haath/quadtree/pipelines/latest)
 [![coverage report](https://gitlab.com/haath/quadtree/badges/master/coverage.svg)](https://gitlab.com/haath/quadtree/pipelines/latest)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://gitlab.com/haath/quadtree/blob/master/LICENSE)
 [![release](https://img.shields.io/badge/release-haxelib-informational)](https://lib.haxe.org/p/quadtree/)
 ====================
+
+
+Fast, otpimized and configurable collision-detection library with Quad Trees.
+Efficient implementation of the GJK algorithm to support any convex polygon shape, with separate
+faster handling of specialized cases like between rectangles and points.
 
 
 ## Installation
@@ -94,4 +99,12 @@ qt.maxDepth = 5;
 // Quad trees with large boundaries (f.e world maps) may benefit from having less objects per node,
 // this way the tree will be split more often and objects far-away from each other won't be checked against each other as much.
 qt.objectsPerNode = 4;
+
+// Set a custom function to further handle the overlapping of two objects.
+// This callback will be called each time two objects overlap, and if it returns false
+// the onOverlap() method of the objects will not be called.
+qt.setOverlapProcessCallback(function(c1: Collider, c2: Collider)
+{
+    return true;
+});
 ```

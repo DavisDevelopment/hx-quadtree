@@ -10,18 +10,12 @@ class PolygonEx
 {
     public static inline function getFarthestPointInDirection(p: Polygon, direction: Vector, result: Vector): Vector
     {
-        return getFarthestPointInDirectionOfPoints(p.points, direction, result);
-    }
-
-
-    public static function getFarthestPointInDirectionOfPoints(points: Array<Array<Float>>, direction: Vector, result: Vector): Vector
-    {
         var biggestDistance: Float = 0;
         var found: Bool = false;
 
-        for (point in points)
+        for (point in p.points)
         {
-            var distanceInDirection: Float = direction.dot(point[0], point[1]);
+            var distanceInDirection: Float = direction.dot(p.refX + point[0], p.refY + point[1]);
 
             if (distanceInDirection > biggestDistance || !found)
             {
