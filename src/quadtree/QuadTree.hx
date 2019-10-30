@@ -217,16 +217,16 @@ class QuadTree
 
         switch object.areaType
         {
-            case CollisionAreaType.Point | CollisionAreaType.MovingPoint:
+            case Point | MovingPoint:
                 addPoint(cast(object, Point), group);
 
-            case CollisionAreaType.Rectangle | CollisionAreaType.MovingRectangle:
+            case Rectangle | MovingRectangle:
                 addRectangle(cast(object, Rectangle), group);
 
-            case CollisionAreaType.Circle:
+            case Circle | MovingCircle:
                 addCircle(cast(object, Circle), group);
 
-            case CollisionAreaType.Polygon:
+            case Polygon | MovingPolygon:
                 addGeneric(cast(object, Polygon), group);
 
             case _:

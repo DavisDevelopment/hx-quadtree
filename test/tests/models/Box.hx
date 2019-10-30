@@ -42,5 +42,12 @@ class Box implements Rectangle
     {
         return new Box(0, 0, Ints.MAX, Ints.MAX);
     }
+    
+
+    public function moveToSeparate(deltaX: Float, deltaY: Float)
+    {
+        x += deltaX;
+        y += deltaY;
+    }
 }
 

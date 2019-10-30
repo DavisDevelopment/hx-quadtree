@@ -26,4 +26,11 @@ class Point implements quadtree.types.Point
     {
         collisionsDetected++;
     }
+    
+
+    public function moveToSeparate(deltaX: Float, deltaY: Float)
+    {
+        x += deltaX;
+        y += deltaY;
+    }
 }

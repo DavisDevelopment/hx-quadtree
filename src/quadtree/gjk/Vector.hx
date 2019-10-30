@@ -5,6 +5,9 @@ import quadtree.helpers.MathUtils;
 
 class Vector
 {
+    public static inline var AXIS_X = 1;
+    public static inline var AXIS_Y = 2;
+    
     public var x: Float;
     public var y: Float;
 

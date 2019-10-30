@@ -1,10 +1,45 @@
 package quadtree;
 
+import quadtree.types.Rectangle;
+import quadtree.helpers.Overlap;
+import quadtree.types.Circle;
+import tests.models.MovingPoint;
+import quadtree.types.MovingRectangle;
+import quadtree.types.Collider;
 import quadtree.gjk.Vector;
+import quadtree.gjk.Vector.AXIS_X;
+import quadtree.gjk.Vector.AXIS_Y;
+
+using quadtree.Physics;
+using quadtree.extensions.CircleEx;
+using quadtree.helpers.MathUtils;
 
 
 class Physics
 {
+    public static function separate(obj1: Collider, obj2: Collider, obj1Immovable: Bool = false, obj2Immovable: Bool = false): Float
+    {
+        var overlapX: Float = computeOverlap(obj1, obj2, AXIS_X);
+        var overlapY: Float = computeOverlap(obj1, obj2, AXIS_Y);
+
+        if (obj2Immovable || !obj2.isMovableType())
+        {
+            obj1.moveToSeparate(-overlapX, -overlapY);
+        }
+        else if (obj1Immovable || !obj1.isMovableType())
+        {
+            obj2.moveToSeparate(overlapX, overlapY);
+        }
+        else
+        {
+            obj1.moveToSeparate(-overlapX / 2, -overlapY / 2);
+            obj2.moveToSeparate( overlapX / 2,  overlapY / 2);
+        }
+
+        return Math.atan2(overlapY, overlapX);
+    }
+
+
     /**
         Performs a momentum conservation collision on the two given velocity vectors, 
         updating them to their new post-collision velocities.
@@ -51,8 +86,82 @@ class Physics
         @param otherVelocity The velocity of the other object on the respective axis.
         @return The new velocity of the object on the respective axis after the collision.
     **/
-    public static inline function momentumConservationVelocity(velocity: Float, otherVelocity: Float, mass: Float = 1, otherMass: Float = 1): Float
+    static inline function momentumConservationVelocity(velocity: Float, otherVelocity: Float, mass: Float = 1, otherMass: Float = 1): Float
     {
-        return ( (mass - otherMass) * velocity + 2 * otherMass * otherVelocity ) / (mass + otherMass);
+        return ( (mass - otherMass) * velocity + (2 * otherMass * otherVelocity) ) / (mass + otherMass);
+    }
+
+
+    /**
+        Computes the overlap of two given objects on the given axis.
+        This function assumes that the objects are moveable and bases the overlap on
+        their last movement.
+
+        This overlap should be subtracted from `obj1` and added to `obj2`.
+    **/
+    static function computeOverlap(obj1: Collider, obj2: Collider, axis: Int): Float
+    {
+        // Check if both are circles.
+        if (obj1.isCircle() && obj2.isCircle())
+        {
+            return Overlap.circleInCircle(cast obj1, cast obj2, axis);
+        }
+
+        // Calculate overlap based on movement.
+        var delta1: Float = getObjectDelta(obj1, axis);
+        var delta2: Float = getObjectDelta(obj2, axis);
+        var delta: Float = delta1 - delta2;
+
+        // Check if one is a circle and the other a rectangle.
+        if (obj1.isCircle() && obj2.isAlignedRectangle())
+        {
+            return Overlap.circleInAlignedRectangle(cast obj1, cast obj2, axis, delta);
+        }
+        if (obj1.isAlignedRectangle() && obj2.isCircle())
+        {
+            return -Overlap.circleInAlignedRectangle(cast obj2, cast obj1, axis, -delta);
+        }
+
+        // Check if both are rectangles.
+        if (obj1.isAlignedRectangle() && obj2.isAlignedRectangle())
+        {
+            return Overlap.alignedRectangleInAlignedRectangle(cast obj1, cast obj2, axis, delta);
+        }
+
+        return delta;
+    }
+
+
+    static inline function getObjectDelta(obj: Collider, axis: Int): Float
+    {
+        return switch [obj.areaType, axis]
+        {
+            case [MovingRectangle, AXIS_X]: cast(obj, MovingRectangle).x - cast(obj, MovingRectangle).lastX;
+            case [MovingRectangle, AXIS_Y]: cast(obj, MovingRectangle).y - cast(obj, MovingRectangle).lastY;
+            
+            case [MovingPoint, AXIS_X]: cast(obj, MovingPoint).x - cast(obj, MovingPoint).lastX;
+            case [MovingPoint, AXIS_Y]: cast(obj, MovingPoint).y - cast(obj, MovingPoint).lastY;
+
+            case _: 0;
+        }
+    }
+
+
+    static inline function isAlignedRectangle(obj: Collider): Bool
+    {
+        return obj.areaType & (CollisionAreaType.Rectangle | CollisionAreaType.MovingRectangle) > 0
+            && cast(obj, Rectangle).angle.isZero();
+    }
+
+
+    static inline function isCircle(obj: Collider): Bool
+    {
+        return obj.areaType & (CollisionAreaType.Circle | CollisionAreaType.MovingCircle) > 0;
+    }
+
+
+    static inline function isMovableType(obj: Collider): Bool
+    {
+        return obj.areaType & (CollisionAreaType.MovingPoint | CollisionAreaType.MovingRectangle | CollisionAreaType.MovingCircle | CollisionAreaType.MovingPolygon) > 0;
     }
 }

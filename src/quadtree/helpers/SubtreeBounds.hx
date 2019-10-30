@@ -31,4 +31,8 @@ class SubtreeBounds implements Rectangle
 
     @IgnoreCover
     public function onOverlap(other: Collider): Void { }
+    
+
+    @IgnoreCover
+    public function moveToSeparate(deltaX: Float, deltaY: Float) { }
 }

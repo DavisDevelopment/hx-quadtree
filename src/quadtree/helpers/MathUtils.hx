@@ -86,4 +86,13 @@ class MathUtils
     {
         return y0 + (x - x0)*sin + (y - y0)*cos;
     }
+
+
+	/**
+		Calculates the angle between two given points in radians.
+	**/
+	public static inline function angleBetween(fromX: Float, fromY: Float, toX: Float, toY: Float): Float
+	{
+		return Math.atan2(toY - fromY, toX - fromX);
+	}
 }

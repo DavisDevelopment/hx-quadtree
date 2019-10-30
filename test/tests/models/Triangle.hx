@@ -30,4 +30,11 @@ class Triangle implements Polygon
     {
         collisionsDetected++;
     }
+    
+
+    public function moveToSeparate(deltaX: Float, deltaY: Float)
+    {
+        refX += deltaX;
+        refY += deltaY;
+    }
 }

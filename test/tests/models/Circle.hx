@@ -29,5 +29,12 @@ class Circle implements quadtree.types.Circle
     {
         collisionsDetected++;
     }
+    
+
+    public function moveToSeparate(deltaX: Float, deltaY: Float)
+    {
+        centerX += deltaX;
+        centerY += deltaY;
+    }
 }
 
