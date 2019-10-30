@@ -38,7 +38,7 @@ class MathUtils
 	 * @param	n	The angle in radians.
 	 * @return	An approximated sine of `n`.
 	 */
-    public static inline function fastSin(n: Float): Float
+    public static function fastSin(n: Float): Float
 	{
 		n *= 0.3183098862; // divide by pi to normalize
 

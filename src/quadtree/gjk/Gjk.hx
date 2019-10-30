@@ -40,7 +40,7 @@ class Gjk
         var simplex: Simplex = new Simplex();
 
         // Choose an arbitrary starting direction.
-        var direction: Vector = recycleVector(0, 1);
+        var direction: Vector = recycleVector(1, 0);
 
         // Get the first support point and add it to the simplex.
         var supportPoint: Vector = getSupportVector(a, b, direction);
@@ -113,7 +113,7 @@ class Gjk
     @:allow(quadtree.gjk.Simplex)
     inline function recycleVector(x: Float = 0, y: Float = 0): Vector
     {
-        var v: Vector;
+        var v: VectorLinkedList;
         if (vectorPool == null)
         {
             v = new VectorLinkedList(x, y);
@@ -121,8 +121,10 @@ class Gjk
         else
         {
             v = vectorPool;
-            v.set(x, y);
             vectorPool = vectorPool.next;
+
+            v.set(x, y);
+            v.next = null;
         }
         return v;
     }

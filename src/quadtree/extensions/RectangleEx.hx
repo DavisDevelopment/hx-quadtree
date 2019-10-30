@@ -106,40 +106,43 @@ class RectangleEx
             var centerY: Float = y + (height / 2);
             var cos: Float = MathUtils.fastCos(angle);
             var sin: Float = MathUtils.fastSin(angle);
+
+            var x0: Float = MathUtils.rotateX(cos, sin, x,         y,          centerX, centerY);
+            var y0: Float = MathUtils.rotateY(cos, sin, x,         y,          centerX, centerY);
+            var x1: Float = MathUtils.rotateX(cos, sin, x + width, y,          centerX, centerY);
+            var y1: Float = MathUtils.rotateY(cos, sin, x + width, y,          centerX, centerY);
+            var x2: Float = MathUtils.rotateX(cos, sin, x,         y + height, centerX, centerY);
+            var y2: Float = MathUtils.rotateY(cos, sin, x,         y + height, centerX, centerY);
+            var x3: Float = MathUtils.rotateX(cos, sin, x + width, y + height, centerX, centerY);
+            var y3: Float = MathUtils.rotateY(cos, sin, x + width, y + height, centerX, centerY);
             
-            var distanceToTopLeft: Float = rotatedDot(direction, cos, sin, x, y, centerX, centerY);
-            var distanceToTopRight: Float = rotatedDot(direction, cos, sin, x + width, y, centerX, centerY);
-            var distanceToBotLeft: Float = rotatedDot(direction, cos, sin, x, y + height, centerX, centerY);
-            var distanceToBotRight: Float = rotatedDot(direction, cos, sin, x + width, y + height, centerX, centerY);
+            var distanceToTopLeft: Float  = direction.dot(x0, y0);
+            var distanceToTopRight: Float = direction.dot(x1, y1);
+            var distanceToBotLeft: Float  = direction.dot(x2, y2);
+            var distanceToBotRight: Float = direction.dot(x3, y3);
 
             if (distanceToTopLeft > distanceToTopRight && distanceToTopLeft > distanceToBotLeft && distanceToTopLeft > distanceToBotRight)
             {
                 // top left
-                result.set( MathUtils.rotateX(cos, sin, x, y, centerX, centerY) , MathUtils.rotateY(cos, sin, x, y, centerX, centerY) );
+                result.set(x0, y0);
             }
             else if (distanceToTopRight > distanceToBotLeft && distanceToTopRight > distanceToBotRight)
             {
                 // top right
-                result.set( MathUtils.rotateX(cos, sin, x + width, y, centerX, centerY) , MathUtils.rotateY(cos, sin, x + width, y, centerX, centerY) );
+                result.set(x1, y1);
             }
             else if (distanceToBotLeft > distanceToBotRight)
             {
                 // bot left
-                result.set( MathUtils.rotateX(cos, sin,x, y + height, centerX, centerY) , MathUtils.rotateY(cos, sin, x, y + height, centerX, centerY) );
+                result.set(x2, y2);
             }
             else
             {
                 // bot right
-                result.set( MathUtils.rotateX(cos, sin, x + width, y + height, centerX, centerY) , MathUtils.rotateY(cos, sin, x + width, y + height, centerX, centerY) );
+                result.set(x3, y3);
             }
         }
 
         return result;
-    }
-
-
-    static inline function rotatedDot(v: Vector, cos: Float, sin: Float, x: Float, y: Float, x0: Float, y0: Float)
-    {
-        return v.dot( MathUtils.rotateX(cos, sin, x, y, x0, y0) , MathUtils.rotateY(cos, sin, x, y, x0, y0) );
     }
 }

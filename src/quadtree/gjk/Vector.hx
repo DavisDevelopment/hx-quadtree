@@ -122,15 +122,15 @@ class Vector
         return MathUtils.floatEquals(x, v.x) && MathUtils.floatEquals(y, v.y);
     }
 
+    public function toString(): String
+    {
+        return '(${Math.round(x)}, ${Math.round(y)})';
+    }
+
     #if UNIT_TEST
     public function copy(): Vector
     {
         return new VectorLinkedList(x, y);
-    }
-
-    public function toString(): String
-    {
-        return '($x, $y)';
     }
     #end
 }

@@ -45,11 +45,10 @@ class TestGjk extends Gjk implements ITest
 
         var b: MovingBox = new MovingBox(100, 100, 100, 200);
         b.angle = 90 * MathUtils.TO_RAD;
-
-        Assert.isTrue( getFarthestPointInDirection(b, v(1, 0)).equals( v(250, 150) )   );
-        Assert.isTrue( getFarthestPointInDirection(b, v(-1, 0)).equals( v(50, 250) )  );
-        Assert.isTrue( getFarthestPointInDirection(b, v(0, 1)).equals( v(250, 250) )   );
-        Assert.isTrue( getFarthestPointInDirection(b, v(0, -1)).equals( v(50, 150) )  );
+        Assert.floatEquals(250, getFarthestPointInDirection(b, v(1, 0)).x );
+        Assert.floatEquals(50, getFarthestPointInDirection(b, v(-1, 0)).x );
+        Assert.floatEquals(250, getFarthestPointInDirection(b, v(0, 1)).y );
+        Assert.floatEquals(150, getFarthestPointInDirection(b, v(0, -1)).y );
 
 
         var p: Point = new Point(100, 100);
@@ -188,9 +187,39 @@ class TestGjk extends Gjk implements ITest
         
         Assert.isTrue(checkOverlap(b1, b2));
 
-        b1.angle = 180 * MathUtils.TO_RAD;
+        b1.angle = - 180 * MathUtils.TO_RAD;
         
         Assert.isFalse(checkOverlap(b1, b2));
+    }
+
+
+    function testUseCaseFailedCases()
+    {
+        var b: MovingBox = new MovingBox(400, 100, 100, 100);
+
+        var b1p: MovingBox = new MovingBox(180, 205, 300, 100, 50);
+        var b2p: MovingBox = new MovingBox(170, 210, 300, 100, 49);
+        var b3p: MovingBox = new MovingBox(470, 165, 300, 100, -88);
+
+        var b1n: MovingBox = new MovingBox(195, 165, 300, 100, -162);
+        var b2n: MovingBox = new MovingBox(470, 165, 300, 100, -162);
+        var b3n: MovingBox = new MovingBox(150, 120, 300, 100, 17);
+
+        Assert.isTrue( checkOverlap(b, b1p) );
+        Assert.isTrue( checkOverlap(b, b2p) );
+        Assert.isTrue( checkOverlap(b, b3p) ); //
+        
+        Assert.isFalse( checkOverlap(b, b1n) ); // 
+        Assert.isFalse( checkOverlap(b, b2n) );
+        Assert.isFalse( checkOverlap(b, b3n) ); //
+    }
+
+
+    inline function vectorEquals(expected: Array<Float>, v: Vector)
+    {
+        Assert.equals(2, expected.length);
+        Assert.floatEquals(expected[0], v.x);
+        Assert.floatEquals(expected[1], v.y);
     }
     
     
