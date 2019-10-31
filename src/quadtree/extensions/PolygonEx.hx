@@ -13,13 +13,16 @@ class PolygonEx
         var biggestDistance: Float = 0;
         var found: Bool = false;
 
-        for (point in p.points)
+        for (i in 0...p.points.length)
         {
-            var distanceInDirection: Float = direction.dot(p.refX + point[0], p.refY + point[1]);
+            var x: Float = p.refX + p.points[i][0];
+            var y: Float = p.refY + p.points[i][1];
+
+            var distanceInDirection: Float = direction.dot(x, y);
 
             if (distanceInDirection > biggestDistance || !found)
             {
-                result.set(point[0], point[1]);
+                result.set(x, y);
                 biggestDistance = distanceInDirection;
                 found = true;
             }

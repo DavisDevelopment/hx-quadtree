@@ -68,6 +68,15 @@ class TestGjk extends Gjk implements ITest
 
         mp.areaType = cast(0, CollisionAreaType);
         Assert.raises( () -> getFarthestPointInDirection(mp, v(1, 0)), String );
+
+        var b2: MovingBox = new MovingBox(400, 100, 100, 100);
+        Assert.floatEquals(500, getFarthestPointInDirection(b2, v(1, 0)).x );
+        Assert.floatEquals(400, getFarthestPointInDirection(b2, v(-1, 0)).x );
+        Assert.floatEquals(200, getFarthestPointInDirection(b2, v(0, 1)).y );
+        Assert.floatEquals(100, getFarthestPointInDirection(b2, v(0, -1)).y );
+        vectorEquals([500, 200], getFarthestPointInDirection(b2, v(1, 1)));
+        vectorEquals([400, 100], getFarthestPointInDirection(b2, v(-1, -1)));
+        vectorEquals([500, 100], getFarthestPointInDirection(b2, v(1, -1)));
     }
 
 
@@ -190,28 +199,6 @@ class TestGjk extends Gjk implements ITest
         b1.angle = - 180 * MathUtils.TO_RAD;
         
         Assert.isFalse(checkOverlap(b1, b2));
-    }
-
-
-    function testUseCaseFailedCases()
-    {
-        var b: MovingBox = new MovingBox(400, 100, 100, 100);
-
-        var b1p: MovingBox = new MovingBox(180, 205, 300, 100, 50);
-        var b2p: MovingBox = new MovingBox(170, 210, 300, 100, 49);
-        var b3p: MovingBox = new MovingBox(470, 165, 300, 100, -88);
-
-        var b1n: MovingBox = new MovingBox(195, 165, 300, 100, -162);
-        var b2n: MovingBox = new MovingBox(470, 165, 300, 100, -162);
-        var b3n: MovingBox = new MovingBox(150, 120, 300, 100, 17);
-
-        Assert.isTrue( checkOverlap(b, b1p) );
-        Assert.isTrue( checkOverlap(b, b2p) );
-        Assert.isTrue( checkOverlap(b, b3p) ); //
-        
-        Assert.isFalse( checkOverlap(b, b1n) ); // 
-        Assert.isFalse( checkOverlap(b, b2n) );
-        Assert.isFalse( checkOverlap(b, b3n) ); //
     }
 
 
