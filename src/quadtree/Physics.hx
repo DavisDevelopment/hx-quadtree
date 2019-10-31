@@ -3,8 +3,8 @@ package quadtree;
 import quadtree.types.Rectangle;
 import quadtree.helpers.Overlap;
 import quadtree.types.Circle;
-import tests.models.MovingPoint;
 import quadtree.types.MovingRectangle;
+import quadtree.types.MovingPoint;
 import quadtree.types.Collider;
 import quadtree.gjk.Vector;
 import quadtree.gjk.Vector.AXIS_X;
@@ -17,23 +17,45 @@ using quadtree.helpers.MathUtils;
 
 class Physics
 {
+    /**
+        Separates the two given overlapping objects, based on their movement.
+
+        @param obj1 The first object.
+        @param obj2 The second object.
+        @param obj1Immovable Whether or not `obj1` can be moved. Setting this to true overrides the object's `areaType`.
+        @param obj2Immovable Whether or not `obj2` can be moved. Setting this to true overrides the object's `areaType`.
+        @return The angle at which the two objects were separated, which can then be used to update their velocities.
+                Returns `null` if the objects were not actually overlapping and separation did not happen.
+    **/
     public static function separate(obj1: Collider, obj2: Collider, obj1Immovable: Bool = false, obj2Immovable: Bool = false): Float
     {
         var overlapX: Float = computeOverlap(obj1, obj2, AXIS_X);
         var overlapY: Float = computeOverlap(obj1, obj2, AXIS_Y);
 
-        if (obj2Immovable || !obj2.isMovableType())
+        if (overlapX.isZero() && overlapY.isZero())
+        {
+            return null;
+        }
+
+        var obj1canMove: Bool = !obj1Immovable && obj1.isMovableType();
+        var obj2canMove: Bool = !obj2Immovable && obj2.isMovableType();
+        
+        if (obj1canMove && obj2canMove)
+        {
+            obj1.moveToSeparate(-overlapX / 2, -overlapY / 2);
+            obj2.moveToSeparate( overlapX / 2,  overlapY / 2);
+        }
+        else if (!obj2canMove)
         {
             obj1.moveToSeparate(-overlapX, -overlapY);
         }
-        else if (obj1Immovable || !obj1.isMovableType())
+        else if (!obj1canMove)
         {
             obj2.moveToSeparate(overlapX, overlapY);
         }
         else
         {
-            obj1.moveToSeparate(-overlapX / 2, -overlapY / 2);
-            obj2.moveToSeparate( overlapX / 2,  overlapY / 2);
+            return null;
         }
 
         return Math.atan2(overlapY, overlapX);
