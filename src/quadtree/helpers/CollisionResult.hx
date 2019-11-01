@@ -30,7 +30,7 @@ class CollisionResult
     public var obj1Velocity(default, null): Vector;
     /** The mass of the first object. Default is `1`.**/
     public var obj1Mass: Float;
-    /** The elasticity of the first object. Default is `1`.**/
+    /** The elasticity of the first object. Default is `0`.**/
     public var obj1Elasticity: Float;
     /** Whether the first object is immovable. Default is `false`. **/
     public var obj1Immovable: Bool;
@@ -39,7 +39,7 @@ class CollisionResult
     public var obj2Velocity(default, null): Vector;
     /** The mass of the second object. Default is `1`.**/
     public var obj2Mass: Float;
-    /** The elasticity of the second object. Default is `1`.**/
+    /** The elasticity of the second object. Default is `0`.**/
     public var obj2Elasticity: Float;
     /** Whether the second object is immovable. Default is `false`. **/
     public var obj2Immovable: Bool;
@@ -59,12 +59,12 @@ class CollisionResult
         this.object1 = object1;
         obj1Velocity.set(0, 0);
         obj1Mass = 1;
-        obj1Elasticity = 1;
+        obj1Elasticity = 0;
         obj1Immovable = false;
         this.object2 = object2;
         obj2Velocity.set(0, 0);
         obj2Mass = 1;
-        obj2Elasticity = 1;
+        obj2Elasticity = 0;
         obj2Immovable = false;
 
         overlapX = 0;

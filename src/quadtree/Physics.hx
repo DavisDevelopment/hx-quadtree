@@ -219,23 +219,24 @@ class Physics
         var delta1: Float = obj1.getObjectDelta(axis);
         var delta2: Float = obj2.getObjectDelta(axis);
         var delta: Float = delta1 - delta2;
+        var overlap: Float = delta;
 
         // Check if one is a circle and the other a rectangle.
         if (obj1.isCircle() && obj2.isAlignedRectangle())
         {
-            return Overlap.circleInAlignedRectangle(cast obj1, cast obj2, axis, delta);
+            overlap = Overlap.circleInAlignedRectangle(cast obj1, cast obj2, axis, delta);
         }
         if (obj1.isAlignedRectangle() && obj2.isCircle())
         {
-            return -Overlap.circleInAlignedRectangle(cast obj2, cast obj1, axis, -delta);
+            overlap = -Overlap.circleInAlignedRectangle(cast obj2, cast obj1, axis, -delta);
         }
 
         // Check if both are rectangles.
         if (obj1.isAlignedRectangle() && obj2.isAlignedRectangle())
         {
-            return Overlap.alignedRectangleInAlignedRectangle(cast obj1, cast obj2, axis, delta);
+            overlap = Overlap.alignedRectangleInAlignedRectangle(cast obj1, cast obj2, axis, delta);
         }
-
-        return delta;
+        
+        return overlap >= 1 ? overlap : 0;
     }
 }
