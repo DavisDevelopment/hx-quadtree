@@ -11,7 +11,7 @@ import quadtree.gjk.Vector;
 import quadtree.gjk.Vector.AXIS_X;
 import quadtree.gjk.Vector.AXIS_Y;
 
-using quadtree.Physics;
+using quadtree.extensions.ColliderEx;
 using quadtree.extensions.CircleEx;
 using quadtree.helpers.MathUtils;
 
@@ -25,79 +25,136 @@ class Physics
     **/
     public static function separate(collisionResult: CollisionResult)
     {
-        var obj1: Collider = collisionResult.object1;
-        var obj2: Collider = collisionResult.object2;
+        final obj1: Collider = collisionResult.object1;
+        final obj2: Collider = collisionResult.object2;
+
+        final obj1canMove: Bool = collisionResult.canObject1Move();
+        final obj2canMove: Bool = collisionResult.canObject2Move();
 
         var overlapX: Float = computeOverlap(obj1, obj2, AXIS_X);
         var overlapY: Float = computeOverlap(obj1, obj2, AXIS_Y);
 
-        if (overlapX.isZero() && overlapY.isZero())
+        if (!overlapY.isZero() && overlapX / overlapY < 0.2)
         {
-            collisionResult.setSeparation(overlapX, overlapY, false);
-            return;
+            // Significantly smaller margin on the x-axis, use only that for separation.
+            overlapY = 0;
+        }
+        else if (!overlapX.isZero() && overlapY / overlapX < 0.2)
+        {
+            // Significantly smaller margin on the x-axis, use only that for separation.
+            overlapX = 0;
         }
 
-        var obj1canMove: Bool = !collisionResult.obj1Immovable && obj1.isMovableType();
-        var obj2canMove: Bool = !collisionResult.obj2Immovable && obj2.isMovableType();
-        
-        if (obj1canMove && obj2canMove)
+
+        var separationHappened: Bool = false;
+
+        if (overlapX.isZero() && overlapY.isZero())
+        {
+            // No overlap, do nothing.
+        }
+        else if (obj1canMove && obj2canMove)
         {
             obj1.moveToSeparate(-overlapX / 2, -overlapY / 2);
             obj2.moveToSeparate( overlapX / 2,  overlapY / 2);
+            separationHappened = true;
         }
         else if (!obj2canMove)
         {
             obj1.moveToSeparate(-overlapX, -overlapY);
+            separationHappened = true;
         }
         else if (!obj1canMove)
         {
             obj2.moveToSeparate(overlapX, overlapY);
-        }
-        else
-        {
-            collisionResult.setSeparation(overlapX, overlapY, false);
-            return;
+            separationHappened = true;
         }
 
-        collisionResult.setSeparation(overlapX, overlapY, true, Math.atan2(overlapY, overlapX));
+        collisionResult.setSeparation(overlapX, overlapY, separationHappened, Math.atan2(overlapY, overlapX));
     }
 
 
     /**
-        Performs a momentum conservation collision on the two given velocity vectors, 
+        Performs a momentum conservation collision on the two given velocity vectors in the given collision result,
         updating them to their new post-collision velocities.
 
-        @param velocity1 The velocity vector of the first object.
-        @param velocity2 The velocity vector of the second object.
-        @param angle The angle on which the two objects are being separated.
-        @param mass1 The mass of the first object.
-        @param mass2 The mass of the second object.
-        @param elasticity1 The elasticity of the first object.
-        @param elasticity2 The elasticity of the second object.
+        @param collisionResult The collision result. The velocities in this object will be updated in-place to their new post-collision values.
+        @return Returns `false` if both objects are immovable, and velocities weren't updated.
 
     **/
-    public static function momentumConservationCollision(
-        velocity1: Vector, velocity2: Vector, 
-        angle: Float, 
-        mass1: Float = 1, mass2: Float = 1,
-        elasticity1: Float = 1, elasticity2: Float = 1)
+    public static function momentumConservationCollision(collisionResult: CollisionResult): Bool
     {
-        var vel1x: Float = momentumConservationVelocity(velocity1.x, velocity2.x, mass1, mass2);
-        var vel1y: Float = momentumConservationVelocity(velocity1.y, velocity2.y, mass1, mass2);
+        final velocity1: Vector = collisionResult.obj1Velocity;
+        final mass1: Float = collisionResult.obj1Mass;
+        final elasticity1: Float = collisionResult.obj1Elasticity;
+        final canMove1: Bool = collisionResult.canObject1Move();
 
-        var vel2x: Float = momentumConservationVelocity(velocity2.x, velocity1.x, mass2, mass1);
-        var vel2y: Float = momentumConservationVelocity(velocity2.y, velocity1.y, mass2, mass1);
+        final velocity2: Vector = collisionResult.obj2Velocity;
+        final mass2: Float = collisionResult.obj2Mass;
+        final elasticity2: Float = collisionResult.obj2Elasticity;
+        final canMove2: Bool = collisionResult.canObject2Move();
 
-        var angleCos: Float = MathUtils.fastCos(angle);
-        var angleSin: Float = MathUtils.fastSin(angle);
+        final overlapX: Float = collisionResult.overlapX;
+        final overlapY: Float = collisionResult.overlapY;
+        final separationAngle: Float = collisionResult.separationAngle;
 
-        var vel1: Float = elasticity1 * Math.sqrt(vel1x * vel1x + vel1y * vel1y);
-        velocity1.x = - vel1 * angleCos;
-        velocity1.y = - vel1 * angleSin;
+        if (!canMove1 && !canMove2)
+        {
+            // Both objects are immovable.
+            return false;
+        }
 
-        var vel2: Float = elasticity2 * Math.sqrt(vel2x * vel2x + vel2y * vel2y);
-        velocity2.x = vel2 * angleCos;
-        velocity2.y = vel2 * angleSin;
+        if (canMove1 && canMove2)
+        {
+            var vel1x: Float = momentumConservationVelocity(velocity1.x, velocity2.x, mass1, mass2);
+            var vel1y: Float = momentumConservationVelocity(velocity1.y, velocity2.y, mass1, mass2);
+
+            var vel2x: Float = momentumConservationVelocity(velocity2.x, velocity1.x, mass2, mass1);
+            var vel2y: Float = momentumConservationVelocity(velocity2.y, velocity1.y, mass2, mass1);
+
+            var angleCos: Float = MathUtils.fastCos(separationAngle);
+            var angleSin: Float = MathUtils.fastSin(separationAngle);
+
+            var vel1: Float = elasticity1 * Math.sqrt(vel1x * vel1x + vel1y * vel1y);
+            velocity1.x = - vel1 * angleCos;
+            velocity1.y = - vel1 * angleSin;
+
+            var vel2: Float = elasticity2 * Math.sqrt(vel2x * vel2x + vel2y * vel2y);
+            velocity2.x = vel2 * angleCos;
+            velocity2.y = vel2 * angleSin;
+        }
+        else if (!canMove2)
+        {
+            computeBounce(velocity1, Math.PI + separationAngle, elasticity1, overlapX, overlapY);
+        }
+        else if (!canMove1)
+        {
+            computeBounce(velocity2, separationAngle, elasticity2, overlapX, overlapY);
+        }
+
+
+        return true;
+    }
+
+
+    static function computeBounce(velocity: Vector, angle: Float, elasticity: Float, overlapX: Float, overlapY: Float)
+    {
+        if (overlapX.isZero())
+        {
+            // Bounce only on the y-axis.
+            velocity.y = - elasticity * velocity.y;
+        }
+        else if (overlapY.isZero())
+        {
+            // Bounce only on the x-axis.
+            velocity.x = - elasticity * velocity.x;
+        }
+        else
+        {
+            var scalarVelocity: Float = elasticity * velocity.getLength();
+
+            velocity.x = scalarVelocity * MathUtils.fastCos(angle);
+            velocity.y = scalarVelocity * MathUtils.fastSin(angle);
+        }
     }
 
 
@@ -133,8 +190,8 @@ class Physics
         }
 
         // Calculate overlap based on movement.
-        var delta1: Float = getObjectDelta(obj1, axis);
-        var delta2: Float = getObjectDelta(obj2, axis);
+        var delta1: Float = obj1.getObjectDelta(axis);
+        var delta2: Float = obj2.getObjectDelta(axis);
         var delta: Float = delta1 - delta2;
 
         // Check if one is a circle and the other a rectangle.
@@ -154,39 +211,5 @@ class Physics
         }
 
         return delta;
-    }
-
-
-    static inline function getObjectDelta(obj: Collider, axis: Int): Float
-    {
-        return switch [obj.areaType, axis]
-        {
-            case [MovingRectangle, AXIS_X]: cast(obj, MovingRectangle).x - cast(obj, MovingRectangle).lastX;
-            case [MovingRectangle, AXIS_Y]: cast(obj, MovingRectangle).y - cast(obj, MovingRectangle).lastY;
-            
-            case [MovingPoint, AXIS_X]: cast(obj, MovingPoint).x - cast(obj, MovingPoint).lastX;
-            case [MovingPoint, AXIS_Y]: cast(obj, MovingPoint).y - cast(obj, MovingPoint).lastY;
-
-            case _: 0;
-        }
-    }
-
-
-    static inline function isAlignedRectangle(obj: Collider): Bool
-    {
-        return obj.areaType & (CollisionAreaType.Rectangle | CollisionAreaType.MovingRectangle) > 0
-            && cast(obj, Rectangle).angle.isZero();
-    }
-
-
-    static inline function isCircle(obj: Collider): Bool
-    {
-        return obj.areaType & (CollisionAreaType.Circle | CollisionAreaType.MovingCircle) > 0;
-    }
-
-
-    static inline function isMovableType(obj: Collider): Bool
-    {
-        return obj.areaType & (CollisionAreaType.MovingPoint | CollisionAreaType.MovingRectangle | CollisionAreaType.MovingCircle | CollisionAreaType.MovingPolygon) > 0;
     }
 }

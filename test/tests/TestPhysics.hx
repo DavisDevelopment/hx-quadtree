@@ -23,13 +23,44 @@ class TestPhysics implements ITest
 
     function testMomentumConservationCollision()
     {
-        var v1 = v(1, 0);
-        var v2 = v(-1, 0);
+        var collisionResult: CollisionResult = new CollisionResult(new MovingBox(0, 0), new MovingBox(0, 0));
+        collisionResult.obj1Velocity.set(1, 0);
+        collisionResult.obj2Velocity.set(-1, 0);
 
-        Physics.momentumConservationCollision(v1, v2, 0);
+        Physics.momentumConservationCollision(collisionResult);
 
-        Assert.isTrue( v1.equals(v(-1, 0)) );
-        Assert.isTrue( v2.equals(v(1, 0)) );
+        Assert.isTrue( collisionResult.obj1Velocity.equals(v(-1, 0)) );
+        Assert.isTrue( collisionResult.obj2Velocity.equals(v(1, 0)) );
+    }
+
+
+    function testBounceCollision()
+    {
+        var box = new MovingBox(0, 0, 10, 10);
+        var wall = new Box(20, -10, 10, 100);
+
+        box.moveTo(12, 2);
+
+        var collisionResult:CollisionResult = new CollisionResult(box, wall);
+
+        Physics.separate(collisionResult);
+
+        // Separation should have happened only on the x-axis.
+        Assert.isTrue(collisionResult.separationHappened);
+        Assert.floatEquals(0, collisionResult.separationAngle);
+        Assert.floatEquals(0, collisionResult.overlapY);
+        Assert.floatEquals(2, collisionResult.overlapX);
+        Assert.floatEquals(10, box.x);
+        Assert.floatEquals(2, box.y);
+        Assert.floatEquals(20, wall.x);
+        Assert.floatEquals(-10, wall.y);
+
+        collisionResult.obj1Velocity.set(12, 2);
+        collisionResult.obj1Elasticity = 0.5;
+
+        Physics.momentumConservationCollision(collisionResult);
+
+        vectorEquals([-6, 2], collisionResult.obj1Velocity);
     }
 
 
@@ -100,6 +131,14 @@ class TestPhysics implements ITest
         
         Assert.equals(-25, b1.x);
         Assert.equals(-25, b1.y);
+    }
+
+
+    inline function vectorEquals(expected: Array<Float>, v: Vector)
+    {
+        Assert.equals(2, expected.length);
+        Assert.floatEquals(expected[0], v.x);
+        Assert.floatEquals(expected[1], v.y);
     }
 
     
