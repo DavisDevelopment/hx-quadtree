@@ -84,7 +84,8 @@ qt.load(objectList1, objectList2);
 qt.execute();
 ```
 
-#### Configure
+
+### Configurating the QuadTree
 
 Being familiar with quad-trees, you can also configure its properties.
 
@@ -108,5 +109,52 @@ qt.setOverlapProcessCallback(function(collisionResult: quadtree.helpers.Collisio
     var obj0 = collisionResult.object0;
     var obj1 = collisionResult.object1;
     return true;
+});
+```
+
+
+### Collision Separation and Velocity
+
+This library can also handle the separation of overlapping objects,
+as well as calculating their velocities according to momentum conservation.
+
+A good place to perform this would be the overlap process callback,
+which is called before objects are notified of their collision.
+
+```haxe
+import quadtree.Physics;
+import quadtree.helpers.CollisionResult;
+
+qt.setOverlapProcessCallback(function(collisionResult: CollisionResult)
+{
+    var obj0 = collisionResult.object0;
+    var obj1 = collisionResult.object1;
+
+    // First separate the objects.
+    Physics.separate(collisionResult);
+    
+    if (collisionResult.separationHappened)
+    {
+        // If separation actually happened, we can also update their velocities.
+
+        // First configure the collision result.
+        collisionResult.obj1Velocity.set( ... );
+        collisionResult.obj1Mass = ...;
+        collisionResult.obj1Elasticity = ...;
+        collisionResult.obj1Immovable = false;
+
+        // Similary for object2.
+        collisionResult.obj2Velocity.set( ... );
+
+        // The next function will calculate the new velocity for each object,
+        // and modify the two vectors, obj1Velocity and obj2Velocity.
+        Physics.momentumConservationCollision(collisionResult);
+
+        // Finally, update the velocities on the objects themselves.
+        obj0.velocity = collisionResult.obj1Velocity;
+        obj1.velocity = collisionResult.obj2Velocity;
+    }
+
+    return collisionResult.separationHappened;
 });
 ```
