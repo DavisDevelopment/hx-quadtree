@@ -5,6 +5,7 @@ import quadtree.gjk.Vector.AXIS_Y;
 import quadtree.types.Collider;
 import quadtree.types.Rectangle;
 import quadtree.types.MovingPoint;
+import quadtree.types.MovingCircle;
 import quadtree.types.MovingRectangle;
 
 using quadtree.helpers.MathUtils;
@@ -21,6 +22,9 @@ class ColliderEx
             
             case [MovingPoint, AXIS_X]: cast(obj, MovingPoint).x - cast(obj, MovingPoint).lastX;
             case [MovingPoint, AXIS_Y]: cast(obj, MovingPoint).y - cast(obj, MovingPoint).lastY;
+            
+            case [MovingCircle, AXIS_X]: cast(obj, MovingCircle).centerX - cast(obj, MovingCircle).lastX;
+            case [MovingCircle, AXIS_Y]: cast(obj, MovingCircle).centerY - cast(obj, MovingCircle).lastY;
 
             case _: 0;
         }

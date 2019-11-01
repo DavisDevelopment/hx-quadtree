@@ -34,15 +34,23 @@ class Physics
         var overlapX: Float = computeOverlap(obj1, obj2, AXIS_X);
         var overlapY: Float = computeOverlap(obj1, obj2, AXIS_Y);
 
-        if (!overlapY.isZero() && Math.abs(overlapX / overlapY) < 0.3)
+        if (!overlapX.isZero() && !overlapY.isZero())
         {
-            // Significantly smaller margin on the x-axis, use only that for separation.
-            overlapY = 0;
-        }
-        else if (!overlapX.isZero() && Math.abs(overlapY / overlapX) < 0.3)
-        {
-            // Significantly smaller margin on the x-axis, use only that for separation.
-            overlapX = 0;
+            // We have overlap on both axes.
+            // Check if we can ignore one of them and settle for a small
+            // correction on the other.
+            // (for example when touching the ground, you only want to correct upwards)
+
+            if (!overlapX.isZero() && Math.abs(overlapX / overlapY) < 0.3)
+            {
+                // Significantly smaller margin on the x-axis, use only that for separation.
+                overlapY = 0;
+            }
+            else if (!overlapY.isZero() && Math.abs(overlapY / overlapX) < 0.3)
+            {
+                // Significantly smaller margin on the y-axis, use only that for separation.
+                overlapX = 0;
+            }
         }
 
 

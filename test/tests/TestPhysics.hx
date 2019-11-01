@@ -3,6 +3,7 @@ package tests;
 import quadtree.helpers.CollisionResult;
 import tests.models.Circle;
 import tests.models.MovingBox;
+import tests.models.MovingCircle;
 import tests.models.Box;
 import utest.Assert;
 import quadtree.helpers.MathUtils;
@@ -99,7 +100,7 @@ class TestPhysics implements ITest
         var collisionResult:CollisionResult = new CollisionResult(b1, b2);
 
         Physics.separate(collisionResult);
-        // Separation should have happened only on the x-axis.
+        // Separation should have happened only on the y-axis.
         Assert.isTrue(collisionResult.separationHappened);
         Assert.floatEquals(Math.PI / 2, collisionResult.separationAngle);
         Assert.floatEquals(2, collisionResult.overlapY);
@@ -114,9 +115,46 @@ class TestPhysics implements ITest
         
         Physics.momentumConservationCollision(collisionResult);
 
-        // Equal masses, velocities should be exchanged on the x-axis.
+        // Equal masses, velocities should be exchanged on the y-axis.
         vectorEquals([2, -10], collisionResult.obj1Velocity);
         vectorEquals([3, 12], collisionResult.obj2Velocity);
+    }
+
+
+    function testCollisionCircles()
+    {
+        var c1 = new MovingCircle(0, 0, 10);
+        var c2 = new MovingCircle(30, 0, 10);
+
+        c1.moveTo(12, 0);
+
+        Assert.floatEquals(2, Physics.computeOverlap(c1, c2, AXIS_X));
+        Assert.floatEquals(-2, Physics.computeOverlap(c2, c1, AXIS_X));
+        Assert.floatEquals(0, Physics.computeOverlap(c1, c2, AXIS_Y));
+        Assert.floatEquals(0, Physics.computeOverlap(c2, c1, AXIS_Y));
+        
+        var collisionResult:CollisionResult = new CollisionResult(c1, c2);
+
+        Physics.separate(collisionResult);
+        
+        // Separation should have happened only on the x-axis.
+        Assert.isTrue(collisionResult.separationHappened);
+        Assert.floatEquals(0, collisionResult.separationAngle);
+        Assert.floatEquals(0, collisionResult.overlapY);
+        Assert.floatEquals(2, collisionResult.overlapX);
+        Assert.floatEquals(11, c1.centerX);
+        Assert.floatEquals(0, c1.centerY);
+        Assert.floatEquals(31, c2.centerX);
+        Assert.floatEquals(0, c2.centerY);
+        
+        collisionResult.obj1Velocity.set(12, 0);
+        collisionResult.obj2Velocity.set(0, 0);
+        
+        Physics.momentumConservationCollision(collisionResult);
+
+        // Equal masses, velocities should be exchanged on the x-axis.
+        vectorEquals([0, 0], collisionResult.obj1Velocity);
+        vectorEquals([12, 0], collisionResult.obj2Velocity);
     }
 
 

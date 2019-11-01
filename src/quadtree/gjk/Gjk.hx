@@ -93,17 +93,17 @@ class Gjk
     {
         return switch c.areaType
         {
-            case CollisionAreaType.Polygon: cast(c, Polygon).getFarthestPointInDirection(direction, recycleVector());
+            case Polygon | MovingPolygon: cast(c, Polygon).getFarthestPointInDirection(direction, recycleVector());
 
-            case CollisionAreaType.Circle: cast(c, Circle).getFarthestPointInDirection(direction, recycleVector());
+            case Circle | MovingCircle: cast(c, Circle).getFarthestPointInDirection(direction, recycleVector());
 
-            case CollisionAreaType.Point: cast(c, Point).getFarthestPointInDirection(direction, recycleVector());
+            case Point: cast(c, Point).getFarthestPointInDirection(direction, recycleVector());
 
-            case CollisionAreaType.MovingPoint: cast(c, MovingPoint).getFarthestPointInDirection(direction, recycleVector());
+            case MovingPoint: cast(c, MovingPoint).getFarthestPointInDirection(direction, recycleVector());
 
-            case CollisionAreaType.Rectangle: cast(c, Rectangle).getFarthestPointInDirection(direction, recycleVector());
+            case Rectangle: cast(c, Rectangle).getFarthestPointInDirection(direction, recycleVector());
 
-            case CollisionAreaType.MovingRectangle: cast(c, MovingRectangle).getFarthestPointInDirection(direction, recycleVector());
+            case MovingRectangle: cast(c, MovingRectangle).getFarthestPointInDirection(direction, recycleVector());
 
             case _: throw "Not implemented";
         }
