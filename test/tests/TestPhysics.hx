@@ -1,5 +1,6 @@
 package tests;
 
+import quadtree.helpers.CollisionResult;
 import tests.models.Circle;
 import tests.models.MovingBox;
 import tests.models.Box;
@@ -84,10 +85,15 @@ class TestPhysics implements ITest
         b1.moveTo(0, 0);
 
         var b2 = new MovingBox(25, 25, 50, 50);
-        
-        var angle: Float = Physics.separate(b1, b2, false, true);
 
-        Assert.isTrue( MathUtils.floatEquals(angle, Math.PI / 4) );
+        var collisionResult: CollisionResult = new CollisionResult(b1, b2);
+        collisionResult.obj1Immovable = false;
+        collisionResult.obj2Immovable = true;
+        
+        Physics.separate(collisionResult);
+
+        Assert.equals(true, collisionResult.separationHappened);
+        Assert.floatEquals(Math.PI / 4, collisionResult.separationAngle);
 
         Assert.equals(25, b2.x);
         Assert.equals(25, b2.y);

@@ -1,5 +1,6 @@
 package quadtree;
 
+import quadtree.helpers.CollisionResult;
 import quadtree.types.Rectangle;
 import quadtree.helpers.Overlap;
 import quadtree.types.Circle;
@@ -20,25 +21,24 @@ class Physics
     /**
         Separates the two given overlapping objects, based on their movement.
 
-        @param obj1 The first object.
-        @param obj2 The second object.
-        @param obj1Immovable Whether or not `obj1` can be moved. Setting this to true overrides the object's `areaType`.
-        @param obj2Immovable Whether or not `obj2` can be moved. Setting this to true overrides the object's `areaType`.
-        @return The angle at which the two objects were separated, which can then be used to update their velocities.
-                Returns `null` if the objects were not actually overlapping and separation did not happen.
+        @param collisionResult The collision result. This object will be modified in-place to contain information about the separation.
     **/
-    public static function separate(obj1: Collider, obj2: Collider, obj1Immovable: Bool = false, obj2Immovable: Bool = false): Float
+    public static function separate(collisionResult: CollisionResult)
     {
+        var obj1: Collider = collisionResult.object1;
+        var obj2: Collider = collisionResult.object2;
+
         var overlapX: Float = computeOverlap(obj1, obj2, AXIS_X);
         var overlapY: Float = computeOverlap(obj1, obj2, AXIS_Y);
 
         if (overlapX.isZero() && overlapY.isZero())
         {
-            return null;
+            collisionResult.setSeparation(overlapX, overlapY, false);
+            return;
         }
 
-        var obj1canMove: Bool = !obj1Immovable && obj1.isMovableType();
-        var obj2canMove: Bool = !obj2Immovable && obj2.isMovableType();
+        var obj1canMove: Bool = !collisionResult.obj1Immovable && obj1.isMovableType();
+        var obj2canMove: Bool = !collisionResult.obj2Immovable && obj2.isMovableType();
         
         if (obj1canMove && obj2canMove)
         {
@@ -55,10 +55,11 @@ class Physics
         }
         else
         {
-            return null;
+            collisionResult.setSeparation(overlapX, overlapY, false);
+            return;
         }
 
-        return Math.atan2(overlapY, overlapX);
+        collisionResult.setSeparation(overlapX, overlapY, true, Math.atan2(overlapY, overlapX));
     }
 
 

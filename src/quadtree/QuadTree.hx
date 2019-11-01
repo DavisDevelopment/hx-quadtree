@@ -10,6 +10,7 @@ import quadtree.types.Point;
 import quadtree.types.Rectangle;
 import quadtree.helpers.SubtreeBounds;
 import quadtree.helpers.LinkedListNode;
+import quadtree.helpers.CollisionResult;
 
 using quadtree.QuadTreeEx;
 using quadtree.helpers.MathUtils;
@@ -19,6 +20,8 @@ using quadtree.extensions.PolygonEx;
 using quadtree.extensions.MovingPointEx;
 using quadtree.extensions.RectangleEx;
 using quadtree.extensions.MovingRectangleEx;
+
+typedef OverlapProcessCallback = (CollisionResult) -> Bool;
 
 
 class QuadTree
@@ -57,7 +60,7 @@ class QuadTree
     var active: Bool;
     var hasSubdivided: Bool;
 
-    var overlapProcessCallback: (Dynamic, Dynamic) -> Bool;
+    var overlapProcessCallback: OverlapProcessCallback;
 
 
     public inline function new(x: Float, y: Float, width: Float, height: Float, ?cache: QuadTreeCache)
@@ -165,7 +168,7 @@ class QuadTree
         **Note:** When using two groups, the first argument passed to the callback function will always be the object
         from the first group.
     **/
-    public inline function setOverlapProcessCallback(overlapProcessCallback: (Dynamic, Dynamic) -> Bool)
+    public inline function setOverlapProcessCallback(overlapProcessCallback: OverlapProcessCallback)
     {
         this.overlapProcessCallback = overlapProcessCallback;
     }
@@ -472,23 +475,24 @@ class QuadTree
     }
 
 
-    function onDetectedCollision(obj0: Collider, obj1: Collider)
+    function onDetectedCollision(obj1: Collider, obj2: Collider)
     {
         if (parent == null)
         {
             // Root node, process collision here.
 
-            if (overlapProcessCallback == null || overlapProcessCallback(obj0, obj1))
+            _collisionResult.set(obj1, obj2);
+            if (overlapProcessCallback == null || overlapProcessCallback(_collisionResult))
             {
-                obj0.onOverlap(obj1);
-                obj1.onOverlap(obj0);
+                obj1.onOverlap(obj2);
+                obj2.onOverlap(obj1);
             }
         }
         else
         {
             // Leaf or internal node, process collision on the parent.
 
-            parent.onDetectedCollision(obj0, obj1);
+            parent.onDetectedCollision(obj1, obj2);
         }
     }
 
@@ -712,4 +716,12 @@ class QuadTree
             botRightTree.visualize(buf, space + "    ");
         }
     }
+
+
+    // =============================================================================
+    //
+    //                       CACHED REUSABLE OBJECTS
+    //
+    // =============================================================================
+    var _collisionResult: CollisionResult = new CollisionResult();
 }

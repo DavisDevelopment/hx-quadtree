@@ -103,8 +103,10 @@ qt.objectsPerNode = 4;
 // Set a custom function to further handle the overlapping of two objects.
 // This callback will be called each time two objects overlap, and if it returns false
 // the onOverlap() method of the objects will not be called.
-qt.setOverlapProcessCallback(function(c1: Collider, c2: Collider)
+qt.setOverlapProcessCallback(function(collisionResult: quadtree.helpers.CollisionResult)
 {
+    var obj0 = collisionResult.object0;
+    var obj1 = collisionResult.object1;
     return true;
 });
 ```
