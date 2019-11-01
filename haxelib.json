@@ -6,7 +6,7 @@
   "description": "Fast Quad-Tree 2D collision detection library, supporting all convex polygons.",
   "version": "0.0.0",
   "classPath": "src",
-  "releasenote": "Added basic physics support for separation and momentum.",
+  "releasenote": "Added default method of getting overlap on specific shapes.",
   "contributors": [ "Haath" ],
   "dependencies": {
   }
