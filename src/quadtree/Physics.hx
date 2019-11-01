@@ -34,12 +34,12 @@ class Physics
         var overlapX: Float = computeOverlap(obj1, obj2, AXIS_X);
         var overlapY: Float = computeOverlap(obj1, obj2, AXIS_Y);
 
-        if (!overlapY.isZero() && overlapX / overlapY < 0.2)
+        if (!overlapY.isZero() && Math.abs(overlapX / overlapY) < 0.3)
         {
             // Significantly smaller margin on the x-axis, use only that for separation.
             overlapY = 0;
         }
-        else if (!overlapX.isZero() && overlapY / overlapX < 0.2)
+        else if (!overlapX.isZero() && Math.abs(overlapY / overlapX) < 0.3)
         {
             // Significantly smaller margin on the x-axis, use only that for separation.
             overlapX = 0;
@@ -105,22 +105,40 @@ class Physics
 
         if (canMove1 && canMove2)
         {
+            // First compute their new velocities by computing moment conservation on each axis separately.
             var vel1x: Float = momentumConservationVelocity(velocity1.x, velocity2.x, mass1, mass2);
             var vel1y: Float = momentumConservationVelocity(velocity1.y, velocity2.y, mass1, mass2);
 
-            var vel2x: Float = momentumConservationVelocity(velocity2.x, velocity1.x, mass2, mass1);
             var vel2y: Float = momentumConservationVelocity(velocity2.y, velocity1.y, mass2, mass1);
+            var vel2x: Float = momentumConservationVelocity(velocity2.x, velocity1.x, mass2, mass1);
 
-            var angleCos: Float = MathUtils.fastCos(separationAngle);
-            var angleSin: Float = MathUtils.fastSin(separationAngle);
+            if (overlapX.isZero())
+            {
+                // Bounce only on the y-axis.
+                velocity1.y = elasticity1 * vel1y;
+                velocity2.y = elasticity2 * vel2y;
+            }
+            else if (overlapY.isZero())
+            {
+                // Bounce only on the x-axis.
+                velocity1.x = elasticity1 * vel1x;
+                velocity2.x = elasticity2 * vel2x;
+            }
+            else
+            {
+                var angleCos: Float = MathUtils.fastCos(separationAngle);
+                var angleSin: Float = MathUtils.fastSin(separationAngle);
 
-            var vel1: Float = elasticity1 * Math.sqrt(vel1x * vel1x + vel1y * vel1y);
-            velocity1.x = - vel1 * angleCos;
-            velocity1.y = - vel1 * angleSin;
+                var velocity1Scalar: Float = elasticity1 * Math.sqrt(vel1x * vel1x + vel1y * vel1y);
+                var velocity2Scalar: Float = elasticity2 * Math.sqrt(vel2x * vel2x + vel2y * vel2y);
 
-            var vel2: Float = elasticity2 * Math.sqrt(vel2x * vel2x + vel2y * vel2y);
-            velocity2.x = vel2 * angleCos;
-            velocity2.y = vel2 * angleSin;
+                velocity1.x = - velocity1Scalar * angleCos;
+                velocity1.y = - velocity1Scalar * angleSin;
+
+                velocity2.x = velocity2Scalar * angleCos;
+                velocity2.y = velocity2Scalar * angleSin;
+            }
+
         }
         else if (!canMove2)
         {
