@@ -43,11 +43,9 @@ class Overlap
 
             // |-x----- r2 <- r1 ---------
             case AXIS_X if (delta < 0): r1.x - r2.x - r2.width;
-            /*
-            case AXIS_X if (Math.abs(r1.x + r1.width - r2.x) < Math.abs(r1.x - r2.x - r2.width)): r1.x + r1.width - r2.x;
 
-            case AXIS_X: r1.x - r2.x - r2.width;
-            */
+            // No delta info, get the smallest side.
+            case AXIS_X: MathUtils.minAbs(r1.x + r1.width - r2.x, r1.x - r2.x - r2.width);
 
             // |-y----- r1 -> r2 ---------
             case AXIS_Y if (delta > 0): r1.y + r1.height - r2.y;
@@ -55,11 +53,8 @@ class Overlap
             // |-y----- r2 <- r1 ---------
             case AXIS_Y if (delta < 0): r1.y - r2.y - r2.height;
 
-            /*
-            case AXIS_Y if (Math.abs(r1.y + r1.height - r2.y) < Math.abs(r1.y - r2.y - r2.height)): r1.y + r1.height - r2.y;
-
-            case AXIS_Y: r1.y - r2.y - r2.height;
-            */
+            // No delta info, get the smallest side.
+            case AXIS_Y: MathUtils.minAbs(r1.y + r1.height - r2.y, r1.y - r2.y - r2.height);
 
             case _: 0;
         }
@@ -75,12 +70,9 @@ class Overlap
 
             // |-x----- r <- c ---------
             case AXIS_X if (delta < 0): c.centerX - c.radius - r.x - r.width;
-
-            /*
-            case AXIS_X if (Math.abs(c.centerX + c.radius - r.x) < Math.abs(c.centerX - c.radius - r.x - r.width)): c.centerX + c.radius - r.x;
-
-            case AXIS_X: c.centerX - c.radius - r.x - r.width;
-            */
+            
+            // No delta info, get the smallest side.
+            case AXIS_X: MathUtils.minAbs(c.centerX + c.radius - r.x, c.centerX - c.radius - r.x - r.width);
 
             // |-y----- c -> r ---------
             case AXIS_Y if (delta > 0): c.centerY + c.radius - r.y;
@@ -88,11 +80,8 @@ class Overlap
             // |-y----- r <- c ---------
             case AXIS_Y if (delta < 0): c.centerY - c.radius - r.y - r.height;
 
-            /*
-            case AXIS_Y if (Math.abs(c.centerY + c.radius - r.y) < Math.abs(c.centerY - c.radius - r.y - r.height)): c.centerY + c.radius - r.y;
-
-            case AXIS_Y: c.centerY - c.radius - r.y - r.height;
-            */
+            // No delta info, get the smallest side.
+            case AXIS_Y: MathUtils.minAbs(c.centerY + c.radius - r.y, c.centerY - c.radius - r.y - r.height);
 
             case _: 0;
         }

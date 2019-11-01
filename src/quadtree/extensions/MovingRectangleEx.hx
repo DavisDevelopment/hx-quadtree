@@ -34,24 +34,7 @@ class MovingRectangleEx
 
     public static inline function intersectsWithPoint(hullX: Float, hullY: Float, hullWidth: Float, hullHeight: Float, angle:Float, pointX: Float, pointY: Float): Bool
     {
-        if (!angle.isZero())
-        {
-            var cos: Float = MathUtils.fastCos(-angle);
-            var sin: Float = MathUtils.fastSin(-angle);
-            var rectCenterX: Float = hullX + (hullWidth / 2);
-            var rectCenterY: Float = hullY + (hullHeight / 2);
-
-            var rotatedX: Float = MathUtils.rotateX(cos, sin, pointX, pointY, rectCenterX, rectCenterY);
-            var rotatedY: Float = MathUtils.rotateY(cos, sin, pointX, pointY, rectCenterX, rectCenterY);
-
-            pointX = rotatedX;
-            pointY = rotatedY;
-        }
-
-        return pointX > hullX
-            && pointY > hullY
-            && pointY < hullX + hullWidth
-            && pointY < hullY + hullHeight;
+        return PointEx.intersectsWithRectangle(pointX, pointY, hullX, hullY, hullWidth, hullHeight, angle);
     }
 
 

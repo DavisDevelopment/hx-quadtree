@@ -22,7 +22,7 @@ class PointEx
 
             case CollisionAreaType.MovingPoint: intersectsWithMovingPoint(point, cast(other, MovingPoint));
 
-            case CollisionAreaType.Rectangle: intersectsWithRectangle(point.x, point.y, cast(other, Rectangle));
+            case CollisionAreaType.Rectangle: intersectsWithRectangle(point.x, point.y, cast(other, Rectangle).x, cast(other, Rectangle).y, cast(other, Rectangle).width, cast(other, Rectangle).height, cast(other, Rectangle).angle);
 
             case CollisionAreaType.MovingRectangle: intersectsWithMovingRectangle(point, cast(other, MovingRectangle));
 
@@ -43,14 +43,14 @@ class PointEx
     }
 
 
-    public static function intersectsWithRectangle(pointX: Float, pointY: Float, other: Rectangle): Bool
+    public static function intersectsWithRectangle(pointX: Float, pointY: Float, x: Float, y: Float, width: Float, height: Float, angle: Float): Bool
     {
-        if (!other.angle.isZero())
+        if (!angle.isZero())
         {
-            var cos: Float = MathUtils.fastCos(-other.angle);
-            var sin: Float = MathUtils.fastSin(-other.angle);
-            var rectCenterX: Float = other.x + (other.width / 2);
-            var rectCenterY: Float = other.y + (other.height / 2);
+            var cos: Float = MathUtils.fastCos(-angle);
+            var sin: Float = MathUtils.fastSin(-angle);
+            var rectCenterX: Float = x + (width / 2);
+            var rectCenterY: Float = y + (height / 2);
 
             var rotatedX: Float = MathUtils.rotateX(cos, sin, pointX, pointY, rectCenterX, rectCenterY);
             var rotatedY: Float = MathUtils.rotateY(cos, sin, pointX, pointY, rectCenterX, rectCenterY);
@@ -59,16 +59,16 @@ class PointEx
             pointY = rotatedY;
         }        
 
-        return pointX > other.x
-            && pointY > other.y
-            && pointX < other.x + other.width
-            && pointY < other.y + other.height;
+        return pointX > x
+            && pointY > y
+            && pointX < x + width
+            && pointY < y + height;
     }
 
 
     public static inline function intersectsWithMovingRectangle(point: Point, other: MovingRectangle): Bool
     {
-        return MovingRectangleEx.intersectsWithPoint(other.hullX(), other.hullY(), other.hullWidth(), other.hullHeight(), other.angle, point.x, point.y);
+        return intersectsWithRectangle(point.x, point.y, other.hullX(), other.hullY(), other.hullWidth(), other.hullHeight(), other.angle);
     }
 
     

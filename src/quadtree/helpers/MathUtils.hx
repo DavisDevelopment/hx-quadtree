@@ -64,6 +64,24 @@ class MathUtils
 	}
 
 
+	/**
+		Returns the number with the smaller absolute value.
+	**/
+	public static inline function minAbs(a: Float, b: Float): Float
+	{
+		return Math.abs(a) <= Math.abs(b) ? a : b;
+	}
+
+
+	/**
+		Returns the number with the larger absolute value.
+	**/
+	public static inline function maxAbs(a: Float, b: Float): Float
+	{
+		return Math.abs(a) >= Math.abs(b) ? a : b;
+	}
+
+
 	public static inline function floatEquals(f1: Float, f2: Float): Bool
 	{
 		return Math.abs(f1 - f2) < EPSILON;

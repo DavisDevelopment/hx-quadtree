@@ -39,7 +39,7 @@ class RectangleEx
 
     public static inline function intersectsWithPoint(rect: Rectangle, other: Point): Bool
     {
-        return PointEx.intersectsWithRectangle(other.x, other.y, rect);
+        return PointEx.intersectsWithRectangle(other.x, other.y, rect.x, rect.y, rect.width, rect.height, rect.angle);
     }
 
 

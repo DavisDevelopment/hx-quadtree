@@ -31,4 +31,16 @@ class TestMathUtils implements ITest
             v += Step;
         }
     }
+
+
+    function testAbsMinMax()
+    {
+        Assert.equals(5, MathUtils.maxAbs(5, 4));
+        Assert.equals(-5, MathUtils.maxAbs(-5, 4));
+        Assert.equals(5, MathUtils.minAbs(5, -10));
+        Assert.equals(-5, MathUtils.minAbs(-5, 10));
+        Assert.equals(5, MathUtils.minAbs(5, 10));
+        Assert.equals(-10, MathUtils.maxAbs(5, -10));
+        Assert.equals(-5, MathUtils.minAbs(10, -5));
+    }
 }

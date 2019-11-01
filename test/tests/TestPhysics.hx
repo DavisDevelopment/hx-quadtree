@@ -196,11 +196,11 @@ class TestPhysics implements ITest
         b.moveTo(0, 0);
         var c = new Circle(100, 50, 10);
 
-        Assert.equals(-10, Physics.computeOverlap(c, b, AXIS_X));
-        Assert.isTrue( Physics.computeOverlap(c, b, AXIS_Y).isZero() );
+        Assert.floatEquals(-10, Physics.computeOverlap(c, b, AXIS_X));
+        Assert.floatEquals(60, Physics.computeOverlap(c, b, AXIS_Y));
 
-        Assert.equals(10, Physics.computeOverlap(b, c, AXIS_X));
-        Assert.isTrue( Physics.computeOverlap(b, c, AXIS_Y).isZero() );
+        Assert.floatEquals(10, Physics.computeOverlap(b, c, AXIS_X));
+        Assert.floatEquals(-60, Physics.computeOverlap(b, c, AXIS_Y));
     }
 
 
