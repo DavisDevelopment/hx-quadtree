@@ -45,6 +45,7 @@ class TestPhysics implements ITest
 
         collisionResult.obj1Velocity.set(12, 2);
         collisionResult.obj1Elasticity = 0.5;
+        collisionResult.obj2Elasticity = 1;
 
         Physics.momentumConservationCollision(collisionResult);
 
@@ -75,6 +76,8 @@ class TestPhysics implements ITest
         
         collisionResult.obj1Velocity.set(12, 2);
         collisionResult.obj2Velocity.set(-10, 3);
+        collisionResult.obj1Elasticity = 1;
+        collisionResult.obj2Elasticity = 1;
         
         Physics.momentumConservationCollision(collisionResult);
 
@@ -112,6 +115,8 @@ class TestPhysics implements ITest
         
         collisionResult.obj1Velocity.set(2, 12);
         collisionResult.obj2Velocity.set(3, -10);
+        collisionResult.obj1Elasticity = 1;
+        collisionResult.obj2Elasticity = 1;
         
         Physics.momentumConservationCollision(collisionResult);
 
@@ -149,6 +154,8 @@ class TestPhysics implements ITest
         
         collisionResult.obj1Velocity.set(12, 0);
         collisionResult.obj2Velocity.set(0, 0);
+        collisionResult.obj1Elasticity = 1;
+        collisionResult.obj2Elasticity = 1;
         
         Physics.momentumConservationCollision(collisionResult);
 

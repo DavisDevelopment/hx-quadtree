@@ -237,6 +237,6 @@ class Physics
             overlap = Overlap.alignedRectangleInAlignedRectangle(cast obj1, cast obj2, axis, delta);
         }
         
-        return overlap >= 1 ? overlap : 0;
+        return overlap;
     }
 }
