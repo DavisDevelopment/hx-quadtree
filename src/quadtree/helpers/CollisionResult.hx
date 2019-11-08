@@ -3,6 +3,7 @@ package quadtree.helpers;
 import quadtree.gjk.Vector;
 import quadtree.types.Collider;
 
+using quadtree.helpers.MathUtils;
 using quadtree.extensions.ColliderEx;
 
 
@@ -93,5 +94,11 @@ class CollisionResult
     public inline function canObject2Move(): Bool
     {
         return object2 != null && !obj2Immovable && object2.isMovableType();
+    }
+
+
+    public inline function wereOverlapping(): Bool
+    {
+        return !overlapX.isZero() || !overlapY.isZero();
     }
 }
