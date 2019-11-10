@@ -64,6 +64,13 @@ class MathUtils
 	}
 
 
+	public static inline function fastAtan2(y: Float, x: Float): Float
+	{
+		// TODO
+		return Math.atan2(y, x);
+	}
+
+
 	/**
 		Returns the number with the smaller absolute value.
 	**/

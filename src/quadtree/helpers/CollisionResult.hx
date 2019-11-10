@@ -7,6 +7,14 @@ using quadtree.helpers.MathUtils;
 using quadtree.extensions.ColliderEx;
 
 
+@:enum
+abstract ObjectId(Int)
+{
+    var Object1 = 1;
+    var Object2 = 2;
+}
+
+
 /**
     Helper class used to store information about the collision of two objects,
     as well as their separation and velocity calculations.
@@ -24,8 +32,6 @@ class CollisionResult
     public var overlapY(default, null): Float;
     /** Whether or not separation happened during the call to Physics.separate(). **/
     public var separationHappened(default, null): Bool;
-    /** The angle by which the two objects were separated. Updated by Physics.separate().**/
-    public var separationAngle(default, null): Float;
 
     /** The velocity of the first object. Update by calling set() on it. **/
     public var obj1Velocity(default, null): Vector;
@@ -71,17 +77,6 @@ class CollisionResult
         overlapX = 0;
         overlapY = 0;
         separationHappened = false;
-        separationAngle = 0;
-    }
-
-
-    @:allow(quadtree.Physics)
-    function setSeparation(overlapX: Float, overlapY: Float, separationHappened: Bool, separationAngle: Float = 0)
-    {
-        this.overlapX = overlapX;
-        this.overlapY = overlapY;
-        this.separationHappened = separationHappened;
-        this.separationAngle = separationAngle;
     }
 
 
@@ -100,5 +95,39 @@ class CollisionResult
     public inline function wereOverlapping(): Bool
     {
         return !overlapX.isZero() || !overlapY.isZero();
+    }
+
+
+    /** 
+        The angle by which the two objects were separated. Updated by Physics.separate().
+    **/
+    public inline function separationAngle(): Float
+    {
+        return MathUtils.fastAtan2(overlapY, overlapX);
+    }
+
+
+    @:allow(quadtree.Physics)
+    inline function addOverlap(overlapX: Float, overlapY: Float)
+    {
+        this.overlapX = MathUtils.maxAbs(this.overlapX, overlapX);
+        this.overlapY = MathUtils.maxAbs(this.overlapY, overlapY);
+        this.separationHappened = this.separationHappened || separationHappened;
+    }
+
+
+    @:allow(quadtree.Physics)
+    inline function addSeparation(overlapX: Float, overlapY: Float, separationHappened: Bool)
+    {
+        addOverlap(overlapX, overlapY);
+        this.separationHappened = this.separationHappened || separationHappened;
+    }
+
+
+    @:allow(quadtree.Physics)
+    inline function setObjects(obj1: Collider, obj2: Collider)
+    {
+        object1 = obj1;
+        object2 = obj2;
     }
 }

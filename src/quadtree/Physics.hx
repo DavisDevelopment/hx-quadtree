@@ -1,6 +1,7 @@
 package quadtree;
 
 import quadtree.helpers.CollisionResult;
+import quadtree.helpers.CollisionResult.ObjectId;
 import quadtree.types.Rectangle;
 import quadtree.helpers.Overlap;
 import quadtree.types.Circle;
@@ -25,59 +26,59 @@ class Physics
     **/
     public static function separate(collisionResult: CollisionResult)
     {
+        computeOverlap(collisionResult);
+        performSeparation(collisionResult);
+    }
+
+
+    /**
+        Updates the given CollisionResult with the overlap of the two objects on each axis.
+    **/
+    public static function computeOverlap(collisionResult: CollisionResult)
+    {
         final obj1: Collider = collisionResult.object1;
         final obj2: Collider = collisionResult.object2;
 
-        final obj1canMove: Bool = collisionResult.canObject1Move();
-        final obj2canMove: Bool = collisionResult.canObject2Move();
+        var overlapX: Float = computeOverlapOnAxis(obj1, obj2, AXIS_X);
+        var overlapY: Float = computeOverlapOnAxis(obj1, obj2, AXIS_Y);
 
-        var overlapX: Float = computeOverlap(obj1, obj2, AXIS_X);
-        var overlapY: Float = computeOverlap(obj1, obj2, AXIS_Y);
+        collisionResult.addOverlap(overlapX, overlapY);
+    }
 
-        if (!overlapX.isZero() && !overlapY.isZero())
+
+    /**
+        Similar to `Physics.separate()`, but used to separate one object from multiple others.
+        An example where this might be useful is tilemaps, where a hitbox may overlap with multiple 
+        tiles at the same time. In such cases, this function will attempt to find the way to separate
+        it from all the tiles at once with the minimum correction in position.
+
+        @param collisionResult The collision result.
+        @param objectId Whether the single object being separated is object0 or object1 of the collision result.
+        @param otherObjects The array of objects, from which to separate the object specified by `objectId`.
+    **/
+    public static function separateFromMultiple(collisionResult: CollisionResult, objectId: ObjectId, otherObjects: Array<Collider>)
+    {
+        final originalObj1: Collider = collisionResult.object1;
+        final originalObj2: Collider = collisionResult.object2;
+
+        var obj1: Collider = originalObj1;
+        var obj2: Collider = originalObj2;
+
+        for (otherObj in otherObjects)
         {
-            // We have overlap on both axes.
-            // Check if we can ignore one of them and settle for a small
-            // correction on the other.
-            // (for example when touching the ground, you only want to correct upwards)
-
-            if (!overlapX.isZero() && Math.abs(overlapX / overlapY) < 0.3)
+            switch objectId
             {
-                // Significantly smaller margin on the x-axis, use only that for separation.
-                overlapY = 0;
+                case Object1: obj2 = otherObj;
+                case Object2: obj1 = otherObj;
             }
-            else if (!overlapY.isZero() && Math.abs(overlapY / overlapX) < 0.3)
-            {
-                // Significantly smaller margin on the y-axis, use only that for separation.
-                overlapX = 0;
-            }
+
+            collisionResult.setObjects(obj1, obj2);
+            computeOverlap(collisionResult);
         }
 
+        collisionResult.setObjects(originalObj1, originalObj2);
 
-        var separationHappened: Bool = false;
-
-        if (overlapX.isZero() && overlapY.isZero())
-        {
-            // No overlap, do nothing.
-        }
-        else if (obj1canMove && obj2canMove)
-        {
-            obj1.moveToSeparate(-overlapX / 2, -overlapY / 2);
-            obj2.moveToSeparate( overlapX / 2,  overlapY / 2);
-            separationHappened = true;
-        }
-        else if (!obj2canMove)
-        {
-            obj1.moveToSeparate(-overlapX, -overlapY);
-            separationHappened = true;
-        }
-        else if (!obj1canMove)
-        {
-            obj2.moveToSeparate(overlapX, overlapY);
-            separationHappened = true;
-        }
-
-        collisionResult.setSeparation(overlapX, overlapY, separationHappened, Math.atan2(overlapY, overlapX));
+        performSeparation(collisionResult);
     }
 
 
@@ -103,7 +104,7 @@ class Physics
 
         final overlapX: Float = collisionResult.overlapX;
         final overlapY: Float = collisionResult.overlapY;
-        final separationAngle: Float = collisionResult.separationAngle;
+        final separationAngle: Float = collisionResult.separationAngle();
 
         if (!canMove1 && !canMove2)
         {
@@ -162,6 +163,63 @@ class Physics
     }
 
 
+    static function performSeparation(collisionResult: CollisionResult)
+    {
+        final obj1: Collider = collisionResult.object1;
+        final obj2: Collider = collisionResult.object2;
+
+        final obj1canMove: Bool = collisionResult.canObject1Move();
+        final obj2canMove: Bool = collisionResult.canObject2Move();
+
+        var overlapX: Float = collisionResult.overlapX;
+        var overlapY: Float = collisionResult.overlapY;
+
+        if (!overlapX.isZero() && !overlapY.isZero())
+        {
+            // We have overlap on both axes.
+            // Check if we can ignore one of them and settle for a small
+            // correction on the other.
+            // (for example when touching the ground, you only want to correct upwards)
+
+            if (!overlapX.isZero() && Math.abs(overlapX / overlapY) < 0.3)
+            {
+                // Significantly smaller margin on the x-axis, use only that for separation.
+                overlapY = 0;
+            }
+            else if (!overlapY.isZero() && Math.abs(overlapY / overlapX) < 0.3)
+            {
+                // Significantly smaller margin on the y-axis, use only that for separation.
+                overlapX = 0;
+            }
+        }
+
+        var separationHappened: Bool = false;
+
+        if (overlapX.isZero() && overlapY.isZero())
+        {
+            // No overlap, do nothing.
+        }
+        else if (obj1canMove && obj2canMove)
+        {
+            obj1.moveToSeparate(-overlapX / 2, -overlapY / 2);
+            obj2.moveToSeparate( overlapX / 2,  overlapY / 2);
+            separationHappened = true;
+        }
+        else if (!obj2canMove)
+        {
+            obj1.moveToSeparate(-overlapX, -overlapY);
+            separationHappened = true;
+        }
+        else if (!obj1canMove)
+        {
+            obj2.moveToSeparate(overlapX, overlapY);
+            separationHappened = true;
+        }
+
+        collisionResult.addSeparation(overlapX, overlapY, separationHappened);
+    }
+
+
     static function computeBounce(velocity: Vector, angle: Float, elasticity: Float, overlapX: Float, overlapY: Float)
     {
         if (overlapX.isZero())
@@ -207,7 +265,7 @@ class Physics
 
         This overlap should be subtracted from `obj1` and added to `obj2`.
     **/
-    static function computeOverlap(obj1: Collider, obj2: Collider, axis: Int): Float
+    static function computeOverlapOnAxis(obj1: Collider, obj2: Collider, axis: Int): Float
     {
         // Check if both are circles.
         if (obj1.isCircle() && obj2.isCircle())
