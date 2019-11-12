@@ -1,5 +1,6 @@
 package quadtree.helpers;
 
+import quadtree.types.Rectangle;
 import quadtree.gjk.Vector;
 import quadtree.types.Collider;
 
@@ -107,12 +108,33 @@ class CollisionResult
     }
 
 
+    /**
+        Computes and returns the Minkowski difference of `to - from`.
+    **/
+    public function computeMinkowskiDifference(): Rectangle
+    {
+        var from: Rectangle = object2.getBoundingBox();
+        var to: Rectangle = object1.getBoundingBox();
+
+        if (from == null || to == null)
+        {
+            return null;
+        }
+
+        return new BoundingBox(
+            to.x - (to.width / 2) - from.x,
+            to.y - (to.height / 2) - from.y,
+            to.width + from.width,
+            to.height + from.height
+        );
+    }
+
+
     @:allow(quadtree.Physics)
     inline function addOverlap(overlapX: Float, overlapY: Float)
     {
         this.overlapX = MathUtils.maxAbs(this.overlapX, overlapX);
         this.overlapY = MathUtils.maxAbs(this.overlapY, overlapY);
-        this.separationHappened = this.separationHappened || separationHappened;
     }
 
 

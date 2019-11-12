@@ -9,5 +9,4 @@ interface MovingCircle extends Circle
     
     /** The y-coordinate of the circle's center on the previous frame. **/
     public var lastY(default, never): Float;
-
 }

@@ -84,4 +84,10 @@ class MovingRectangleEx
     {
         return rect.height + Math.abs(rect.y - rect.lastY);
     }
+
+
+    public static inline function getBoundingBox(r: MovingRectangle): Rectangle
+    {
+        return r;
+    }
 }

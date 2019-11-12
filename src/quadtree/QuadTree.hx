@@ -8,7 +8,7 @@ import quadtree.types.MovingPoint;
 import quadtree.types.MovingRectangle;
 import quadtree.types.Point;
 import quadtree.types.Rectangle;
-import quadtree.helpers.SubtreeBounds;
+import quadtree.helpers.BoundingBox;
 import quadtree.helpers.LinkedListNode;
 import quadtree.helpers.CollisionResult;
 
@@ -42,10 +42,10 @@ class QuadTree
     var botLeftTree: QuadTree;
     var botRightTree: QuadTree;
 
-    var topLeftBounds: SubtreeBounds;
-    var topRightBounds: SubtreeBounds;
-    var botLeftBounds: SubtreeBounds;
-    var botRightBounds: SubtreeBounds;
+    var topLeftBounds: BoundingBox;
+    var topRightBounds: BoundingBox;
+    var botLeftBounds: BoundingBox;
+    var botRightBounds: BoundingBox;
     
     var leftEdge: Float;
     var topEdge: Float;
@@ -106,14 +106,14 @@ class QuadTree
 
         if (canSubdivide())
         {
-            cache.destroySubtreeBounds(topLeftBounds);
-            cache.destroySubtreeBounds(topRightBounds);
-            cache.destroySubtreeBounds(botLeftBounds);
-            cache.destroySubtreeBounds(botRightBounds);
-            topLeftBounds = cache.recycleSubtreeBounds(leftEdge, topEdge, halfWidth, halfHeight);
-            topRightBounds = cache.recycleSubtreeBounds(midpointX, topEdge, halfWidth, halfHeight);
-            botLeftBounds = cache.recycleSubtreeBounds(leftEdge, midpointY, halfWidth, halfHeight);
-            botRightBounds = cache.recycleSubtreeBounds(midpointX, midpointY, halfWidth, halfHeight);
+            cache.destroyBoundingBox(topLeftBounds);
+            cache.destroyBoundingBox(topRightBounds);
+            cache.destroyBoundingBox(botLeftBounds);
+            cache.destroyBoundingBox(botRightBounds);
+            topLeftBounds = cache.recycleBoundingBox(leftEdge, topEdge, halfWidth, halfHeight);
+            topRightBounds = cache.recycleBoundingBox(midpointX, topEdge, halfWidth, halfHeight);
+            botLeftBounds = cache.recycleBoundingBox(leftEdge, midpointY, halfWidth, halfHeight);
+            botRightBounds = cache.recycleBoundingBox(midpointX, midpointY, halfWidth, halfHeight);
         }
     }
 
@@ -662,7 +662,7 @@ class QuadTree
     }
 
 
-    inline function validateSubtree(tree: QuadTree, bounds: SubtreeBounds): QuadTree
+    inline function validateSubtree(tree: QuadTree, bounds: BoundingBox): QuadTree
     {
         if (tree == null)
         {

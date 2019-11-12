@@ -1,14 +1,14 @@
 package quadtree;
 
 import quadtree.types.Collider;
-import quadtree.helpers.SubtreeBounds;
+import quadtree.helpers.BoundingBox;
 import quadtree.helpers.LinkedListNode;
 
 
 class QuadTreeCache
 {
     var linkedListPool: LinkedListNode<Collider>;
-    var subtreeBoundsPool: SubtreeBounds;
+    var BoundingBoxPool: BoundingBox;
 
 
     public function new() { }
@@ -47,16 +47,16 @@ class QuadTreeCache
     }
 
 
-    public inline function recycleSubtreeBounds(x: Float, y: Float, width: Float, height: Float): SubtreeBounds
+    public inline function recycleBoundingBox(x: Float, y: Float, width: Float, height: Float): BoundingBox
     {
-        if (subtreeBoundsPool == null)
+        if (BoundingBoxPool == null)
         {
-            return new SubtreeBounds(x, y, width, height);
+            return new BoundingBox(x, y, width, height);
         }
         else
         {
-            var bounds: SubtreeBounds = subtreeBoundsPool;
-            subtreeBoundsPool = subtreeBoundsPool.next;
+            var bounds: BoundingBox = BoundingBoxPool;
+            BoundingBoxPool = BoundingBoxPool.next;
 
             bounds.x = x;
             bounds.y = y;
@@ -68,12 +68,12 @@ class QuadTreeCache
     }
 
 
-    public inline function destroySubtreeBounds(bounds: SubtreeBounds)
+    public inline function destroyBoundingBox(bounds: BoundingBox)
     {
         if (bounds != null)
         {
-            bounds.next = subtreeBoundsPool;
-            subtreeBoundsPool = bounds;
+            bounds.next = BoundingBoxPool;
+            BoundingBoxPool = bounds;
         }
     }
 

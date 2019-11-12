@@ -14,6 +14,7 @@ import quadtree.gjk.Vector.AXIS_Y;
 
 using quadtree.extensions.ColliderEx;
 using quadtree.extensions.CircleEx;
+using quadtree.extensions.RectangleEx;
 using quadtree.helpers.MathUtils;
 
 
@@ -36,13 +37,24 @@ class Physics
     **/
     public static function computeOverlap(collisionResult: CollisionResult)
     {
-        final obj1: Collider = collisionResult.object1;
-        final obj2: Collider = collisionResult.object2;
+        var minkowskiDiff: Rectangle = collisionResult.computeMinkowskiDifference();
 
-        var overlapX: Float = computeOverlapOnAxis(obj1, obj2, AXIS_X);
-        var overlapY: Float = computeOverlapOnAxis(obj1, obj2, AXIS_Y);
+        if (minkowskiDiff != null && minkowskiDiff.containsOrigin())
+        {
+            var minimumTranslationVector: Vector = minkowskiDiff.getClosestPointOnBoundsToOrigin();
 
-        collisionResult.addOverlap(overlapX, overlapY);
+            collisionResult.addOverlap(minimumTranslationVector.x, minimumTranslationVector.y);
+        }
+        else
+        {
+            final obj1: Collider = collisionResult.object1;
+            final obj2: Collider = collisionResult.object2;
+
+            var overlapX: Float = computeOverlapOnAxis(obj1, obj2, AXIS_X);
+            var overlapY: Float = computeOverlapOnAxis(obj1, obj2, AXIS_Y);
+
+            collisionResult.addOverlap(overlapX, overlapY);
+        }
     }
 
 
@@ -174,19 +186,18 @@ class Physics
         var overlapX: Float = collisionResult.overlapX;
         var overlapY: Float = collisionResult.overlapY;
 
-        if (!overlapX.isZero() && !overlapY.isZero())
+        if (overlapX != 0 && overlapY != 0)
         {
             // We have overlap on both axes.
             // Check if we can ignore one of them and settle for a small
             // correction on the other.
             // (for example when touching the ground, you only want to correct upwards)
-
-            if (!overlapX.isZero() && Math.abs(overlapX / overlapY) < 0.3)
+            if (overlapX != 0 && Math.abs(overlapX / overlapY) < 0.5)
             {
                 // Significantly smaller margin on the x-axis, use only that for separation.
                 overlapY = 0;
             }
-            else if (!overlapY.isZero() && Math.abs(overlapY / overlapX) < 0.3)
+            else if (overlapY != 0 && Math.abs(overlapY / overlapX) < 0.5)
             {
                 // Significantly smaller margin on the y-axis, use only that for separation.
                 overlapX = 0;

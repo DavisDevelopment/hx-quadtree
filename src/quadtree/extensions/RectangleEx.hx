@@ -145,4 +145,48 @@ class RectangleEx
 
         return result;
     }
+
+
+    public static inline function getBoundingBox(r: Rectangle): Rectangle
+    {
+        return r;
+    }
+
+
+    /**
+        Returns `true` if the rectanlge contains the point `(0, 0)`.
+    **/
+    public static inline function containsOrigin(r: Rectangle): Bool
+    {
+        return PointEx.intersectsWithRectangle(0, 0, r.x, r.y, r.width, r.height, r.angle);
+    }
+
+
+    public static function getClosestPointOnBoundsToOrigin(r: Rectangle): Vector
+    {
+        var botRightX: Float = r.x + r.width;
+        var botRightY: Float = r.y + r.height;
+        var minDist: Float = Math.abs(r.x);
+        var boundsPoint: Vector = new Vector(r.x, 0);
+
+        if (Math.abs(botRightX) < minDist)
+        {
+            minDist = Math.abs(botRightX);
+            boundsPoint.set(botRightX, 0);
+        }
+
+        if (Math.abs(botRightY) < minDist)
+        {
+            minDist = Math.abs(botRightY);
+            boundsPoint.set(0, botRightY);
+        }
+        
+        if (Math.abs(r.y) < minDist)
+        {
+            minDist = Math.abs(r.y);
+            boundsPoint.set(0, r.y);
+        }
+
+        return boundsPoint;
+    }
 }

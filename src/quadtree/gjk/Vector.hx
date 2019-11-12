@@ -122,6 +122,13 @@ class Vector
         return MathUtils.floatEquals(x, v.x) && MathUtils.floatEquals(y, v.y);
     }
 
+
+    public inline function isZero(): Bool
+    {
+        return x == 0 && y == 0;
+    }
+
+
     public function toString(): String
     {
         return '(${Math.round(x)}, ${Math.round(y)})';

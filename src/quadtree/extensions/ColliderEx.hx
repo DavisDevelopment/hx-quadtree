@@ -1,5 +1,7 @@
 package quadtree.extensions;
 
+import quadtree.types.Polygon;
+import quadtree.types.Circle;
 import quadtree.gjk.Vector.AXIS_X;
 import quadtree.gjk.Vector.AXIS_Y;
 import quadtree.types.Collider;
@@ -9,6 +11,10 @@ import quadtree.types.MovingCircle;
 import quadtree.types.MovingRectangle;
 
 using quadtree.helpers.MathUtils;
+using quadtree.extensions.CircleEx;
+using quadtree.extensions.RectangleEx;
+using quadtree.extensions.MovingRectangleEx;
+using quadtree.extensions.PolygonEx;
 
 
 class ColliderEx
@@ -47,5 +53,22 @@ class ColliderEx
     public static inline function isMovableType(obj: Collider): Bool
     {
         return obj.areaType & (CollisionAreaType.MovingPoint | CollisionAreaType.MovingRectangle | CollisionAreaType.MovingCircle | CollisionAreaType.MovingPolygon) > 0;
+    }
+
+
+    public static inline function getBoundingBox(obj: Collider): Rectangle
+    {
+        return switch obj.areaType
+        {
+            case Circle | MovingCircle: cast(obj, Circle).getBoundingBox();
+
+            case Rectangle: cast(obj, Rectangle).getBoundingBox();
+
+            case MovingRectangle: cast(obj, MovingRectangle).getBoundingBox();
+
+            case Polygon: cast(obj, Polygon).getBoundingBox();
+
+            case _: null;
+        }
     }
 }

@@ -89,6 +89,20 @@ class MathUtils
 	}
 
 
+	/**
+		Returns `true` if the two given numbers are either both positive, both negative or both zero.
+
+		A simple shortcut to checking with comparisons since `a > 0 && b > 0` takes longer to write than
+		`a * b > 0` but is slightly faster.
+	**/
+	public static inline function areParallel(a: Float, b: Float): Bool
+	{
+		return (isZero(a) && isZero(b))
+			|| (a > 0 && b > 0)
+			|| (a < 0 && b < 0);
+	}
+
+
 	public static inline function floatEquals(f1: Float, f2: Float): Bool
 	{
 		return Math.abs(f1 - f2) < EPSILON;

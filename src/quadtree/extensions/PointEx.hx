@@ -59,8 +59,8 @@ class PointEx
             pointY = rotatedY;
         }        
 
-        return pointX > x
-            && pointY > y
+        return pointX >= x
+            && pointY >= y
             && pointX < x + width
             && pointY < y + height;
     }
