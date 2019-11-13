@@ -62,9 +62,9 @@ class ColliderEx
         {
             case Circle | MovingCircle: cast(obj, Circle).getBoundingBox();
 
-            case Rectangle: cast(obj, Rectangle).getBoundingBox();
+            case Rectangle if (isAlignedRectangle(obj)): cast(obj, Rectangle).getBoundingBox();
 
-            case MovingRectangle: cast(obj, MovingRectangle).getBoundingBox();
+            case MovingRectangle if (isAlignedRectangle(obj)): cast(obj, MovingRectangle).getBoundingBox();
 
             case Polygon: cast(obj, Polygon).getBoundingBox();
 

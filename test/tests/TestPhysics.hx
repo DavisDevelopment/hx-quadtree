@@ -35,7 +35,7 @@ class TestPhysics implements ITest
 
         // Separation should have happened only on the x-axis.
         Assert.isTrue(collisionResult.separationHappened);
-        Assert.floatEquals(0, collisionResult.separationAngle);
+        Assert.floatEquals(0, collisionResult.separationAngle());
         Assert.floatEquals(0, collisionResult.overlapY);
         Assert.floatEquals(2, collisionResult.overlapX);
         Assert.floatEquals(10, box.x);
@@ -61,12 +61,13 @@ class TestPhysics implements ITest
         b1.moveTo(12, 2);
         b2.moveTo(20, 3);
 
-        var collisionResult:CollisionResult = new CollisionResult(b1, b2);
+        var collisionResult: CollisionResult = new CollisionResult(b1, b2);
 
         Physics.separate(collisionResult);
+        
         // Separation should have happened only on the x-axis.
         Assert.isTrue(collisionResult.separationHappened);
-        Assert.floatEquals(0, collisionResult.separationAngle);
+        Assert.floatEquals(0, collisionResult.separationAngle());
         Assert.floatEquals(0, collisionResult.overlapY);
         Assert.floatEquals(2, collisionResult.overlapX);
         Assert.floatEquals(11, b1.x);
@@ -95,17 +96,17 @@ class TestPhysics implements ITest
         b1.moveTo(2, 12);
         b2.moveTo(3, 20);
 
-        Assert.floatEquals(-11, Physics.computeOverlap(b1, b2, AXIS_X));
-        Assert.floatEquals(11, Physics.computeOverlap(b2, b1, AXIS_X));
-        Assert.floatEquals(2, Physics.computeOverlap(b1, b2, AXIS_Y));
-        Assert.floatEquals(-2, Physics.computeOverlap(b2, b1, AXIS_Y));
+        Assert.floatEquals(-11, Physics.computeOverlapOnAxis(b1, b2, AXIS_X));
+        Assert.floatEquals(11, Physics.computeOverlapOnAxis(b2, b1, AXIS_X));
+        Assert.floatEquals(2, Physics.computeOverlapOnAxis(b1, b2, AXIS_Y));
+        Assert.floatEquals(-2, Physics.computeOverlapOnAxis(b2, b1, AXIS_Y));
 
         var collisionResult:CollisionResult = new CollisionResult(b1, b2);
 
         Physics.separate(collisionResult);
         // Separation should have happened only on the y-axis.
         Assert.isTrue(collisionResult.separationHappened);
-        Assert.floatEquals(Math.PI / 2, collisionResult.separationAngle);
+        Assert.floatEquals(Math.PI / 2, collisionResult.separationAngle());
         Assert.floatEquals(2, collisionResult.overlapY);
         Assert.floatEquals(0, collisionResult.overlapX);
         Assert.floatEquals(2, b1.x);
@@ -133,10 +134,10 @@ class TestPhysics implements ITest
 
         c1.moveTo(12, 0);
 
-        Assert.floatEquals(2, Physics.computeOverlap(c1, c2, AXIS_X));
-        Assert.floatEquals(-2, Physics.computeOverlap(c2, c1, AXIS_X));
-        Assert.floatEquals(0, Physics.computeOverlap(c1, c2, AXIS_Y));
-        Assert.floatEquals(0, Physics.computeOverlap(c2, c1, AXIS_Y));
+        Assert.floatEquals(2, Physics.computeOverlapOnAxis(c1, c2, AXIS_X));
+        Assert.floatEquals(-2, Physics.computeOverlapOnAxis(c2, c1, AXIS_X));
+        Assert.floatEquals(0, Physics.computeOverlapOnAxis(c1, c2, AXIS_Y));
+        Assert.floatEquals(0, Physics.computeOverlapOnAxis(c2, c1, AXIS_Y));
         
         var collisionResult:CollisionResult = new CollisionResult(c1, c2);
 
@@ -144,7 +145,7 @@ class TestPhysics implements ITest
         
         // Separation should have happened only on the x-axis.
         Assert.isTrue(collisionResult.separationHappened);
-        Assert.floatEquals(0, collisionResult.separationAngle);
+        Assert.floatEquals(0, collisionResult.separationAngle());
         Assert.floatEquals(0, collisionResult.overlapY);
         Assert.floatEquals(2, collisionResult.overlapX);
         Assert.floatEquals(11, c1.centerX);
@@ -172,11 +173,11 @@ class TestPhysics implements ITest
 
         var b2 = new MovingBox(25, 25, 50, 50);
 
-        Assert.equals(25, Physics.computeOverlap(b1, b2, AXIS_X));
-        Assert.equals(25, Physics.computeOverlap(b1, b2, AXIS_Y));
+        Assert.equals(25, Physics.computeOverlapOnAxis(b1, b2, AXIS_X));
+        Assert.equals(25, Physics.computeOverlapOnAxis(b1, b2, AXIS_Y));
 
-        Assert.equals(-25, Physics.computeOverlap(b2, b1, AXIS_X));
-        Assert.equals(-25, Physics.computeOverlap(b2, b1, AXIS_Y));
+        Assert.equals(-25, Physics.computeOverlapOnAxis(b2, b1, AXIS_X));
+        Assert.equals(-25, Physics.computeOverlapOnAxis(b2, b1, AXIS_Y));
     }
 
 
@@ -186,14 +187,14 @@ class TestPhysics implements ITest
         var c2 = new Circle(100, 0, 50);
         var c3 = new Circle(200, 200, 10);
 
-        Assert.equals(50, Physics.computeOverlap(c1, c2, AXIS_X));
-        Assert.isTrue( Physics.computeOverlap(c1, c2, AXIS_Y).isZero() );
+        Assert.equals(50, Physics.computeOverlapOnAxis(c1, c2, AXIS_X));
+        Assert.isTrue( Physics.computeOverlapOnAxis(c1, c2, AXIS_Y).isZero() );
 
-        Assert.equals(-50, Physics.computeOverlap(c2, c1, AXIS_X));
-        Assert.isTrue( Physics.computeOverlap(c2, c1, AXIS_Y).isZero() );
+        Assert.equals(-50, Physics.computeOverlapOnAxis(c2, c1, AXIS_X));
+        Assert.isTrue( Physics.computeOverlapOnAxis(c2, c1, AXIS_Y).isZero() );
 
-        Assert.equals(0, Physics.computeOverlap(c1, c3, AXIS_X));
-        Assert.equals(0, Physics.computeOverlap(c1, c3, AXIS_Y));
+        Assert.equals(0, Physics.computeOverlapOnAxis(c1, c3, AXIS_X));
+        Assert.equals(0, Physics.computeOverlapOnAxis(c1, c3, AXIS_Y));
     }
 
 
@@ -203,11 +204,11 @@ class TestPhysics implements ITest
         b.moveTo(0, 0);
         var c = new Circle(100, 50, 10);
 
-        Assert.floatEquals(-10, Physics.computeOverlap(c, b, AXIS_X));
-        Assert.floatEquals(60, Physics.computeOverlap(c, b, AXIS_Y));
+        Assert.floatEquals(-10, Physics.computeOverlapOnAxis(c, b, AXIS_X));
+        Assert.floatEquals(60, Physics.computeOverlapOnAxis(c, b, AXIS_Y));
 
-        Assert.floatEquals(10, Physics.computeOverlap(b, c, AXIS_X));
-        Assert.floatEquals(-60, Physics.computeOverlap(b, c, AXIS_Y));
+        Assert.floatEquals(10, Physics.computeOverlapOnAxis(b, c, AXIS_X));
+        Assert.floatEquals(-60, Physics.computeOverlapOnAxis(b, c, AXIS_Y));
     }
 
 
@@ -225,13 +226,13 @@ class TestPhysics implements ITest
         Physics.separate(collisionResult);
 
         Assert.equals(true, collisionResult.separationHappened);
-        Assert.floatEquals(Math.PI / 4, collisionResult.separationAngle);
+        Assert.floatEquals(Math.PI, collisionResult.separationAngle());
 
         Assert.equals(25, b2.x);
         Assert.equals(25, b2.y);
         
-        Assert.equals(-25, b1.x);
-        Assert.equals(-25, b1.y);
+        Assert.equals(50, b1.x);
+        Assert.equals(0, b1.y);
     }
 
 

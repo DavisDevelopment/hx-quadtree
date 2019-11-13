@@ -164,8 +164,8 @@ class RectangleEx
 
     public static function getClosestPointOnBoundsToOrigin(r: Rectangle): Vector
     {
-        var botRightX: Float = r.x + r.width;
-        var botRightY: Float = r.y + r.height;
+        final botRightX: Float = r.x + r.width;
+        final botRightY: Float = r.y + r.height;
         var minDist: Float = Math.abs(r.x);
         var boundsPoint: Vector = new Vector(r.x, 0);
 

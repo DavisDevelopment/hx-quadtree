@@ -18,6 +18,7 @@ using quadtree.extensions.RectangleEx;
 using quadtree.helpers.MathUtils;
 
 
+@:access(quadtree.helpers.CollisionResult)
 class Physics
 {
     /**
@@ -39,7 +40,8 @@ class Physics
     {
         var minkowskiDiff: Rectangle = collisionResult.computeMinkowskiDifference();
 
-        if (minkowskiDiff != null && minkowskiDiff.containsOrigin())
+        if (minkowskiDiff != null && minkowskiDiff.containsOrigin()
+            && collisionResult.object1.isAlignedRectangle() && collisionResult.object2.isAlignedRectangle())
         {
             var minimumTranslationVector: Vector = minkowskiDiff.getClosestPointOnBoundsToOrigin();
 
@@ -195,12 +197,12 @@ class Physics
             if (overlapX != 0 && Math.abs(overlapX / overlapY) < 0.5)
             {
                 // Significantly smaller margin on the x-axis, use only that for separation.
-                overlapY = 0;
+                collisionResult.overlapY = overlapY = 0;
             }
             else if (overlapY != 0 && Math.abs(overlapY / overlapX) < 0.5)
             {
                 // Significantly smaller margin on the y-axis, use only that for separation.
-                overlapX = 0;
+                collisionResult.overlapX = overlapX = 0;
             }
         }
 
