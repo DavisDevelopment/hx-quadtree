@@ -226,13 +226,13 @@ class TestPhysics implements ITest
         Physics.separate(collisionResult);
 
         Assert.equals(true, collisionResult.separationHappened);
-        Assert.floatEquals(Math.PI, collisionResult.separationAngle());
+        Assert.floatEquals(Math.PI / 4, collisionResult.separationAngle());
 
         Assert.equals(25, b2.x);
         Assert.equals(25, b2.y);
         
-        Assert.equals(50, b1.x);
-        Assert.equals(0, b1.y);
+        Assert.equals(-25, b1.x);
+        Assert.equals(-25, b1.y);
     }
 
 

@@ -122,8 +122,8 @@ class CollisionResult
         }
 
         return new BoundingBox(
-            to.x - (to.width / 2) - from.x,
-            to.y - (to.height / 2) - from.y,
+            to.x - (to.width / 2) - from.x - from.width,
+            to.y - (to.height / 2) - from.y - from.height,
             to.width + from.width,
             to.height + from.height
         );
