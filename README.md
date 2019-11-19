@@ -93,12 +93,14 @@ Being familiar with quad-trees, you can also configure its properties.
 // The maximum depth of the tree.
 // After it is reached, leaf nodes will simply be filled with all objects added to them.
 // Quad trees with large boundaries (f.e world maps) may benefit from having a bigger maxDepth.
+// This parameter should not be changed after load() and before reset().
 qt.maxDepth = 5;
 
 // The amount of objects a node can hold before it is subdivided into quadrants.
 // The amount of collision checks that happen on each node will be equal to this number squared.
 // Quad trees with large boundaries (f.e world maps) may benefit from having less objects per node,
 // this way the tree will be split more often and objects far-away from each other won't be checked against each other as much.
+// This parameter should not be changed after load() and before reset().
 qt.objectsPerNode = 4;
 
 // Set a custom function to further handle the overlapping of two objects.
@@ -158,3 +160,37 @@ qt.setOverlapProcessCallback(function(collisionResult: CollisionResult)
     return collisionResult.separationHappened;
 });
 ```
+
+
+### Static Objects
+
+Having a group of immovable objects, for example trees, tilemaps or other parts of the environment, 
+means that time can be saved in the construction of the QuadTree, by leaving those objects loaded
+in the second group of the tree and only partially reseting it to re-construct the first group.
+This can be done with the `resetFirstGroup()` function as shown in the example below.
+
+```haxe
+// Group of characters, who are moving objects.
+var characters: Array<Collider>;
+
+// Group of static trees.
+var trees: Array<Collider>;
+
+var qt: QuadTree = new QuadTree(x, y, width, height);
+
+// Load the trees into the second group once.
+qt.load(null, trees);
+
+while (true)
+{
+    // Load characters into the first group.
+    qt.load(characters);
+
+    qt.execute();
+
+    // Reset the characters group in the tree to build it again in the next cycle.
+    qt.resetFirstGroup();
+}
+
+```
+

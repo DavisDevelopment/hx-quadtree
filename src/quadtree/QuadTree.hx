@@ -71,10 +71,20 @@ class QuadTree
     }
 
 
+    /**
+        Fully destroys the quad-tree, while maintaining the object instances so that they can be reused
+        when `load()` is called again on the tree.
+
+        @param x The new X-position of the tree. Default is it keeps its previous value.
+        @param y The new Y-position of the tree. Default is it keeps its previous value.
+        @param width The new width of the tree's bounds. Default is it keeps its previous value.
+        @param height The new height of the tree's bounds. Default is it keeps its previous value.
+    **/
     public function reset(?x: Float, ?y: Float, ?width: Float, ?height: Float)
     {
         active = true;
         hasSubdivided = false;
+        useBothLists = false;
         
         cache.destroyLinkedList(objects0);
         objects0 = null;
@@ -119,6 +129,32 @@ class QuadTree
 
 
     /**
+        Resets only the first group in the tree, removing the objects there from all nodes.
+        Meant to be used when the intent is to compare multiple groups against the second
+        without having to re-construct it.
+    **/
+    public function resetFirstGroup()
+    {
+        cache.destroyLinkedList(objects0);
+        objects0 = null;
+        objects0Length = 0;
+        
+        if (topLeftTree != null  && topLeftTree.active)     topLeftTree.resetFirstGroup();
+        if (topRightTree != null && topRightTree.active)    topRightTree.resetFirstGroup();
+        if (botLeftTree != null  && botLeftTree.active)     botLeftTree.resetFirstGroup();
+        if (botRightTree != null && botRightTree.active)    botRightTree.resetFirstGroup();
+
+        if (!topLeftTree.active && !topRightTree.active 
+         && !botLeftTree.active && !botRightTree.active
+         && objects0Length == 0 && objects1Length == 0)
+        {
+            // This part of the tree is now empty.
+            active = false;
+        }
+    }
+
+
+    /**
         Load objects into the quad tree.
 
         On collisions, objects in `objectGroup` will have their `onOverlap()` method called before
@@ -136,14 +172,17 @@ class QuadTree
     **/
     public function load(objectGroup: Array<Collider>, ?otherObjectGroup: Array<Collider> = null)
     {
-        useBothLists = (otherObjectGroup != null);
+        useBothLists = useBothLists || (otherObjectGroup != null);
 
-        for (obj in objectGroup)
+        if (objectGroup != null)
         {
-            add(obj, 0);
+            for (obj in objectGroup)
+            {
+                add(obj, 0);
+            }
         }
 
-        if (useBothLists)
+        if (otherObjectGroup != null)
         {
             for (obj in otherObjectGroup)
             {
