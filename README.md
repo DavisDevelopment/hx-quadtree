@@ -85,7 +85,7 @@ qt.execute();
 ```
 
 
-### Configurating the QuadTree
+### Configuring the QuadTree
 
 Being familiar with quad-trees, you can also configure its properties.
 
