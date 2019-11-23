@@ -1,5 +1,6 @@
 package quadtree.extensions;
 
+import quadtree.helpers.BoundingBox;
 import quadtree.types.Polygon;
 import quadtree.types.Circle;
 import quadtree.gjk.Vector.AXIS_X;
@@ -56,19 +57,26 @@ class ColliderEx
     }
 
 
-    public static inline function getBoundingBox(obj: Collider): Rectangle
+    /**
+        Calculates a rectangular bounding box around the collider, and stores it in the given `result` instance.
+
+        @return Returns `true` if a bounding box exists for the collider.
+    **/
+    public static inline function getBoundingBox(obj: Collider, result: BoundingBox): Bool
     {
-        return switch obj.areaType
+        var exists: Bool = true;
+        switch obj.areaType
         {
-            case Circle | MovingCircle: cast(obj, Circle).getBoundingBox();
+            case Circle | MovingCircle:                             cast(obj, Circle).getBoundingBox(result);
 
-            case Rectangle if (isAlignedRectangle(obj)): cast(obj, Rectangle).getBoundingBox();
+            case Rectangle if (isAlignedRectangle(obj)):            cast(obj, Rectangle).getBoundingBox(result);
 
-            case MovingRectangle if (isAlignedRectangle(obj)): cast(obj, MovingRectangle).getBoundingBox();
+            case MovingRectangle if (isAlignedRectangle(obj)):      cast(obj, MovingRectangle).getBoundingBox(result);
 
-            case Polygon: cast(obj, Polygon).getBoundingBox();
+            case Polygon if (cast(obj, Polygon).points.length > 0): cast(obj, Polygon).getBoundingBox(result);
 
-            case _: null;
+            case _: exists = false;
         }
+        return exists;
     }
 }

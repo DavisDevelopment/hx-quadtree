@@ -22,8 +22,11 @@ class CircleEx
     }
 
 
-    public static inline function getBoundingBox(c: Circle): Rectangle
+    public static inline function getBoundingBox(c: Circle, result: BoundingBox)
     {
-        return new BoundingBox(c.centerX - c.radius, c.centerY - c.radius, c.radius * 2, c.radius * 2);
+        result.x = c.centerX - c.radius;
+        result.y = c.centerY - c.radius;
+        result.width = c.radius * 2;
+        result.height = c.radius * 2;
     }
 }

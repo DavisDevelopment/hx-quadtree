@@ -1,5 +1,6 @@
 package quadtree.extensions;
 
+import quadtree.helpers.BoundingBox;
 import quadtree.gjk.Gjk;
 import quadtree.gjk.Vector;
 import quadtree.types.Collider;
@@ -147,9 +148,12 @@ class RectangleEx
     }
 
 
-    public static inline function getBoundingBox(r: Rectangle): Rectangle
+    public static inline function getBoundingBox(r: Rectangle, result: BoundingBox)
     {
-        return r;
+        result.x = r.x;
+        result.y = r.y;
+        result.width = r.width;
+        result.height = r.height;
     }
 
 

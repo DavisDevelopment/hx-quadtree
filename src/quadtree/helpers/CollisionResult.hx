@@ -6,6 +6,7 @@ import quadtree.types.Collider;
 
 using quadtree.helpers.MathUtils;
 using quadtree.extensions.ColliderEx;
+using quadtree.extensions.RectangleEx;
 
 
 @:enum
@@ -113,10 +114,12 @@ class CollisionResult
     **/
     public function computeMinkowskiDifference(): Rectangle
     {
-        var from: Rectangle = object2.getBoundingBox();
-        var to: Rectangle = object1.getBoundingBox();
+        var from: Rectangle = boundBox1_;
+        var fromExists: Bool = object2.getBoundingBox(boundBox1_);
+        var to: Rectangle = boundBox2_;
+        var toExists: Bool = object1.getBoundingBox(boundBox2_);
 
-        if (from == null || to == null)
+        if (!fromExists || !toExists || !from.intersectsWithRectangle(to))
         {
             return null;
         }
@@ -152,4 +155,11 @@ class CollisionResult
         object1 = obj1;
         object2 = obj2;
     }
+
+
+    /**
+        CACHED OBJECTS
+    **/
+    @:noCompletion var boundBox1_: BoundingBox = new BoundingBox(0, 0);
+    @:noCompletion var boundBox2_: BoundingBox = new BoundingBox(0, 0);
 }

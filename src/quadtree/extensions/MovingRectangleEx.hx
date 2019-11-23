@@ -1,5 +1,6 @@
 package quadtree.extensions;
 
+import quadtree.helpers.BoundingBox;
 import quadtree.gjk.Gjk;
 import quadtree.gjk.Vector;
 import quadtree.types.Collider;
@@ -86,8 +87,11 @@ class MovingRectangleEx
     }
 
 
-    public static inline function getBoundingBox(r: MovingRectangle): Rectangle
+    public static inline function getBoundingBox(r: MovingRectangle, result: BoundingBox)
     {
-        return r;
+        result.x = r.hullX();
+        result.y = r.hullY();
+        result.width = r.hullWidth();
+        result.height = r.hullHeight();
     }
 }

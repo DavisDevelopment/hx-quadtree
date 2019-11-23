@@ -38,25 +38,27 @@ class Physics
     **/
     public static function computeOverlap(collisionResult: CollisionResult)
     {
-        var minkowskiDiff: Rectangle = collisionResult.computeMinkowskiDifference();
-
-        if (minkowskiDiff != null && minkowskiDiff.containsOrigin()
-            && collisionResult.object1.isAlignedRectangle() && collisionResult.object2.isAlignedRectangle())
+        if (collisionResult.object1.isAlignedRectangle() && collisionResult.object2.isAlignedRectangle())
         {
-            var minimumTranslationVector: Vector = minkowskiDiff.getClosestPointOnBoundsToOrigin();
+            var minkowskiDiff: Rectangle = collisionResult.computeMinkowskiDifference();
 
-            collisionResult.addOverlap(minimumTranslationVector.x, minimumTranslationVector.y);
+            if (minkowskiDiff != null && minkowskiDiff.containsOrigin())
+            {
+                var minimumTranslationVector: Vector = minkowskiDiff.getClosestPointOnBoundsToOrigin();
+
+                collisionResult.addOverlap(minimumTranslationVector.x, minimumTranslationVector.y);
+                return;
+            }
         }
-        else
-        {
-            final obj1: Collider = collisionResult.object1;
-            final obj2: Collider = collisionResult.object2;
 
-            var overlapX: Float = computeOverlapOnAxis(obj1, obj2, AXIS_X);
-            var overlapY: Float = computeOverlapOnAxis(obj1, obj2, AXIS_Y);
+        // Default case, find overlap from movement.
+        final obj1: Collider = collisionResult.object1;
+        final obj2: Collider = collisionResult.object2;
 
-            collisionResult.addOverlap(overlapX, overlapY);
-        }
+        var overlapX: Float = computeOverlapOnAxis(obj1, obj2, AXIS_X);
+        var overlapY: Float = computeOverlapOnAxis(obj1, obj2, AXIS_Y);
+
+        collisionResult.addOverlap(overlapX, overlapY);
     }
 
 

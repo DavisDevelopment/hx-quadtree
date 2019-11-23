@@ -34,13 +34,8 @@ class PolygonEx
     }
 
 
-    public static inline function getBoundingBox(p: Polygon): Rectangle
+    public static inline function getBoundingBox(p: Polygon, result: BoundingBox)
     {
-        if (p.points.length == 0)
-        {
-            return null;
-        }
-
         var topLeftX: Float = p.points[0][0];
         var topLeftY: Float = p.points[0][1];
         var botRightX: Float = p.points[0][0];
@@ -69,6 +64,9 @@ class PolygonEx
             }
         }
 
-        return new BoundingBox(topLeftX, topLeftY, botRightX - topLeftX, botRightY - topLeftY);
+        result.x = topLeftX;
+        result.y = topLeftY;
+        result.width = botRightX - topLeftX;
+        result.height = botRightY - topLeftY;
     }
 }
