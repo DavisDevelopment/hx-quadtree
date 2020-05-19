@@ -16,12 +16,18 @@ class Circle implements quadtree.types.Circle
     public var centerY: Float;
     public var radius: Float;
 
+    public var separatedX: Float;
+    public var separatedY: Float;
+
 
     public function new(x: Float, y: Float, radius: Float)
     {
         centerX = x;
         centerY = y;
         this.radius = radius;
+
+        separatedX = 0;
+        separatedY = 0;
     }
 
 
@@ -29,12 +35,15 @@ class Circle implements quadtree.types.Circle
     {
         collisionsDetected++;
     }
-    
+
 
     public function moveToSeparate(deltaX: Float, deltaY: Float)
     {
         centerX += deltaX;
         centerY += deltaY;
+
+        separatedX += deltaX;
+        separatedY += deltaY;
     }
 }
 

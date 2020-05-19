@@ -70,7 +70,7 @@ class Overlap
 
             // |-x----- r <- c ---------
             case AXIS_X if (delta < 0): c.centerX - c.radius - r.x - r.width;
-            
+
             // No delta info, get the smallest side.
             case AXIS_X: MathUtils.minAbs(c.centerX + c.radius - r.x, c.centerX - c.radius - r.x - r.width);
 

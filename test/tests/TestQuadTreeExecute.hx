@@ -1,5 +1,7 @@
 package tests;
 
+import tests.models.MovingCircle;
+import quadtree.Physics;
 import quadtree.helpers.MathUtils;
 import tests.models.Circle;
 import tests.models.Triangle;
@@ -85,8 +87,44 @@ class TestQuadTreeExecute extends QuadTree implements ITest
         });
 
         execute();
-        
+
         Assert.equals(0, box.collisionsDetected);
+    }
+
+
+    function testCollisionTwoCircles()
+    {
+        var c1: Circle = new MovingCircle(0, 0, 10);
+        var c2: Circle = new MovingCircle(10, 0, 10);
+
+        load([c1, c2]);
+
+        setOverlapProcessCallback(collisionResult -> {
+
+            Physics.separate(collisionResult);
+
+            Assert.equals(c2, collisionResult.object1);
+            Assert.equals(c1, collisionResult.object2);
+
+            Assert.floatEquals(-10, collisionResult.overlapX);
+            Assert.floatEquals(0, collisionResult.overlapY);
+
+            Assert.isTrue(collisionResult.separationHappened);
+
+            return collisionResult.separationHappened;
+        });
+
+        execute();
+
+        // Collision should have registered.
+        Assert.equals(1, c1.collisionsDetected);
+        Assert.equals(1, c2.collisionsDetected);
+
+        // And separated by half the distance each on the X-axis.
+        Assert.floatEquals(-5, c1.separatedX);
+        Assert.floatEquals(0, c1.separatedY);
+        Assert.floatEquals(5, c2.separatedX);
+        Assert.floatEquals(0, c2.separatedY);
     }
 
 
@@ -130,7 +168,7 @@ class TestQuadTreeExecute extends QuadTree implements ITest
         load([b1, b2]);
 
         execute();
-        
+
         // Now they should have intersected.
         Assert.equals(1, b1.collisionsDetected);
         Assert.equals(1, b2.collisionsDetected);
@@ -143,7 +181,7 @@ class TestQuadTreeExecute extends QuadTree implements ITest
         load([b1, b2]);
 
         execute();
-        
+
         // Now they should not have intersected again.
         Assert.equals(1, b1.collisionsDetected);
         Assert.equals(1, b2.collisionsDetected);
@@ -214,7 +252,7 @@ class TestQuadTreeExecute extends QuadTree implements ITest
         Assert.equals(2, p1.collisionsDetected);
         Assert.equals(1, c1.collisionsDetected);
     }
-    
+
 
     function testCollisionsWithGjk()
     {

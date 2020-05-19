@@ -64,7 +64,7 @@ class Physics
 
     /**
         Similar to `Physics.separate()`, but used to separate one object from multiple others.
-        An example where this might be useful is tilemaps, where a hitbox may overlap with multiple 
+        An example where this might be useful is tilemaps, where a hitbox may overlap with multiple
         tiles at the same time. In such cases, this function will attempt to find the way to separate
         it from all the tiles at once with the minimum correction in position.
 
@@ -190,18 +190,18 @@ class Physics
         var overlapX: Float = collisionResult.overlapX;
         var overlapY: Float = collisionResult.overlapY;
 
-        if (overlapX != 0 && overlapY != 0)
+        if (overlapX.isNonZero() && overlapY.isNonZero())
         {
             // We have overlap on both axes.
             // Check if we can ignore one of them and settle for a small
             // correction on the other.
             // (for example when touching the ground, you only want to correct upwards)
-            if (overlapX != 0 && Math.abs(overlapX / overlapY) < 0.5)
+            if (overlapX.isNonZero() && Math.abs(overlapX / overlapY) < 0.5)
             {
                 // Significantly smaller margin on the x-axis, use only that for separation.
                 collisionResult.overlapY = overlapY = 0;
             }
-            else if (overlapY != 0 && Math.abs(overlapY / overlapX) < 0.5)
+            else if (overlapY.isNonZero() && Math.abs(overlapY / overlapX) < 0.5)
             {
                 // Significantly smaller margin on the y-axis, use only that for separation.
                 collisionResult.overlapX = overlapX = 0;
@@ -309,7 +309,7 @@ class Physics
         {
             overlap = Overlap.alignedRectangleInAlignedRectangle(cast obj1, cast obj2, axis, delta);
         }
-        
+
         return overlap;
     }
 }

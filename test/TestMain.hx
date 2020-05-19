@@ -14,7 +14,7 @@ class TestMain
     {
         var runner = new Runner();
         runner.onComplete.add(onComplete);
-        
+
         runner.addCases("tests", false);
 
         Report.create(runner, SuccessResultsDisplayMode.NeverShowSuccessResults, HeaderDisplayMode.AlwaysShowHeader);

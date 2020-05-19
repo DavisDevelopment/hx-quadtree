@@ -115,6 +115,12 @@ class MathUtils
 	}
 
 
+	public static inline function isNonZero(f: Float): Bool
+	{
+		return !isZero(f);
+	}
+
+
     public static inline function rotateX(cos: Float, sin: Float, x: Float, y: Float, x0: Float, y0: Float): Float
     {
         return x0 + (x - x0)*cos - (y - y0)*sin;
