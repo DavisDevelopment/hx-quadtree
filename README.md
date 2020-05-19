@@ -6,9 +6,8 @@ Quadtree
 ====================
 
 
-Fast, otpimized and configurable collision-detection library with Quad Trees.
-Efficient implementation of the GJK algorithm to support any convex polygon shape, with separate
-faster handling of specialized cases like between rectangles and points.
+Fast, optimized and configurable collision-detection library with Quad Trees.
+Efficient implementation of the GJK algorithm to support any convex polygon shape, with separate faster handling of specialized cases like between rectangles and points.
 
 
 ## Installation
@@ -82,6 +81,20 @@ To check an array of objects for collisions between them and another list of obj
 var qt: QuadTree = new QuadTree(x, y, width, height);
 qt.load(objectList1, objectList2);
 qt.execute();
+```
+
+The `load()` function only adds the objects to the tree, it does not reset it.
+Therefore if collisions are checked in a loop, for example in each frame of a game, then `reset()` has to be called as well.
+
+```haxe
+var qt: QuadTree = new QuadTree(x, y, width, height);
+
+while (gameRunning)
+{
+    qt.reset();
+    qt.load(objectList);
+    qt.execute();
+}
 ```
 
 

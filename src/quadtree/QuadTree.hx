@@ -489,6 +489,9 @@ class QuadTree
 
             objects0Iterator = objects0Iterator.next;
 
+            if (listToCheck == null)
+                continue;
+
             if (!object.collisionsEnabled)
                 continue;
 

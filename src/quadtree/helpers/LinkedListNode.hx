@@ -14,6 +14,7 @@ class LinkedListNode<T>
     }
 
 
+    #if UNIT_TEST
     @IgnoreCover
     public function getLength(): Int
     {
@@ -37,4 +38,5 @@ class LinkedListNode<T>
             return next.get(index);
         }
     }
+    #end
 }
