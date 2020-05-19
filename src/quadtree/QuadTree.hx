@@ -731,6 +731,7 @@ class QuadTree
     }
 
 
+    #if UNIT_TEST
     @IgnoreCover
     public function visualize(buf: StringBuf, space: String = "")
     {
@@ -758,6 +759,7 @@ class QuadTree
             botRightTree.visualize(buf, space + "    ");
         }
     }
+    #end
 
 
     // =============================================================================

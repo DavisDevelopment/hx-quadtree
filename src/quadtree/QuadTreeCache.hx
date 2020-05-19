@@ -78,9 +78,11 @@ class QuadTreeCache
     }
 
 
+    #if UNIT_TEST
     @IgnoreCover
     public inline function getLinkedListsCount(): Int
     {
         return linkedListPool != null ? linkedListPool.getLength() : 0;
     }
+    #end
 }
