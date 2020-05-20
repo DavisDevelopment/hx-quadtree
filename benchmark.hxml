@@ -1,0 +1,9 @@
+
+hxml/test.hxml
+
+-dce full
+
+--next
+-D BENCHMARK
+-hl build/hl/benchmark.hl
+-cmd hl build/hl/benchmark.hl

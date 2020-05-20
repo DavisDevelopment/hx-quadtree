@@ -40,8 +40,10 @@ class Benchmark
             var start: Timestamp = new Timestamp();
 
             qt.reset();
-            qt.load(objects);
+            var resetTime: Float = start.elapsed();
+            start.reset();
 
+            qt.load(objects);
             var loadTime: Float = start.elapsed();
             start.reset();
 
@@ -50,6 +52,7 @@ class Benchmark
             var executeTime: Float = start.elapsed();
 
             Sys.println('Objects: ${objects.length}');
+            Sys.println('Reset time: $resetTime');
             Sys.println('Load time: $loadTime');
             Sys.println('Execute time: $executeTime');
             Sys.stdout().flush();

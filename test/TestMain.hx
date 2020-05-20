@@ -12,8 +12,11 @@ class TestMain
 {
     static function main()
     {
-        runTests();
-        //runBenchmark();
+        #if BENCHMARK
+            runBenchmark();
+        #else
+            runTests();
+        #end
     }
 
 
