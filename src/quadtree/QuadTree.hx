@@ -46,7 +46,7 @@ class QuadTree
     var topRightBounds: BoundingBox;
     var botLeftBounds: BoundingBox;
     var botRightBounds: BoundingBox;
-    
+
     var leftEdge: Float;
     var topEdge: Float;
     var rightEdge: Float;
@@ -63,10 +63,10 @@ class QuadTree
     var overlapProcessCallback: OverlapProcessCallback;
 
 
-    public inline function new(x: Float, y: Float, width: Float, height: Float, ?cache: QuadTreeCache)
+    public inline function new(x: Float, y: Float, width: Float, height: Float)
     {
         gjk = new Gjk();
-        this.cache = cache == null ? new QuadTreeCache() : cache;
+        cache = new QuadTreeCache();
         reset(x, y, width, height);
     }
 
@@ -85,7 +85,7 @@ class QuadTree
         active = true;
         hasSubdivided = false;
         useBothLists = false;
-        
+
         cache.destroyLinkedList(objects0);
         objects0 = null;
         objects0Length = 0;
@@ -138,13 +138,13 @@ class QuadTree
         cache.destroyLinkedList(objects0);
         objects0 = null;
         objects0Length = 0;
-        
+
         if (topLeftTree != null  && topLeftTree.active)     topLeftTree.resetFirstGroup();
         if (topRightTree != null && topRightTree.active)    topRightTree.resetFirstGroup();
         if (botLeftTree != null  && botLeftTree.active)     botLeftTree.resetFirstGroup();
         if (botRightTree != null && botRightTree.active)    botRightTree.resetFirstGroup();
 
-        if (!topLeftTree.active && !topRightTree.active 
+        if (!topLeftTree.active && !topRightTree.active
          && !botLeftTree.active && !botRightTree.active
          && objects0Length == 0 && objects1Length == 0)
         {
@@ -334,12 +334,12 @@ class QuadTree
 
             Both options may be measured in the future for comparison.
         **/
-        
+
         final objLeftEdge: Float = circle.centerX - circle.radius;
         final objTopEdge: Float = circle.centerY - circle.radius;
         final objRightEdge: Float = circle.centerX + circle.radius;
         final objBottomEdge: Float = circle.centerY + circle.radius;
-        
+
         addRectBoundObject(circle, objLeftEdge, objTopEdge, objRightEdge, objBottomEdge, group);
     }
 
@@ -416,7 +416,7 @@ class QuadTree
     }
 
 
-    function addHere(object: Collider, group: Int) 
+    function addHere(object: Collider, group: Int)
     {
         if (hasSubdivided)
         {
@@ -508,7 +508,7 @@ class QuadTree
 
                 case CollisionAreaType.MovingRectangle:
                     collisionCheckMovingRectangle(cast(object, MovingRectangle), listToCheck);
-                
+
                 // Handle all other cases with the GJK algorithm.
                 case _:
                     collisionCheckGeneric(object, listToCheck);
@@ -523,8 +523,8 @@ class QuadTree
         {
             // Root node, process collision here.
 
-            _collisionResult.set(obj1, obj2);
-            if (overlapProcessCallback == null || overlapProcessCallback(_collisionResult))
+            cache.collisionResult.set(obj1, obj2);
+            if (overlapProcessCallback == null || overlapProcessCallback(cache.collisionResult))
             {
                 obj1.onOverlap(obj2);
                 obj2.onOverlap(obj1);
@@ -584,7 +584,7 @@ class QuadTree
         while (otherList != null)
         {
             var other: Collider = otherList.item;
-            
+
             if (other.collisionsEnabled && gjk.checkOverlap(collider, other))
             {
                 onDetectedCollision(collider, other);
@@ -600,7 +600,7 @@ class QuadTree
         while (otherList != null)
         {
             var other: Collider = otherList.item;
-            
+
             if (other.collisionsEnabled && point.intersectsWith(other, gjk))
             {
                 onDetectedCollision(point, other);
@@ -708,7 +708,7 @@ class QuadTree
     {
         if (tree == null)
         {
-            tree = new QuadTree(bounds.x, bounds.y, bounds.width, bounds.height, cache);
+            tree = new QuadTree(bounds.x, bounds.y, bounds.width, bounds.height);
             tree.parent = this;
             tree.maxDepth = maxDepth - 1;
             tree.gjk = gjk;
@@ -760,12 +760,4 @@ class QuadTree
         }
     }
     #end
-
-
-    // =============================================================================
-    //
-    //                       CACHED REUSABLE OBJECTS
-    //
-    // =============================================================================
-    var _collisionResult: CollisionResult = new CollisionResult();
 }

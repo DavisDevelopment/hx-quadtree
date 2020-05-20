@@ -1,5 +1,6 @@
 package quadtree.extensions;
 
+import quadtree.helpers.CollisionResult;
 import quadtree.helpers.BoundingBox;
 import quadtree.gjk.Gjk;
 import quadtree.gjk.Vector;
@@ -21,10 +22,10 @@ class RectangleEx
     {
         return switch other.areaType
         {
-            case CollisionAreaType.Point: 
+            case CollisionAreaType.Point:
                 intersectsWithPoint(rect, cast(other, Point));
 
-            case CollisionAreaType.MovingPoint: 
+            case CollisionAreaType.MovingPoint:
                 intersectsWithMovingPoint(rect, cast(other, MovingPoint));
 
             case CollisionAreaType.Rectangle if (rect.angle.isZero() && cast(other, Rectangle).angle.isZero()):
@@ -64,13 +65,13 @@ class RectangleEx
         return MovingRectangleEx.intersectsWithRectangle(other.hullX(), other.hullY(), other.hullWidth(), other.hullHeight(), rect);
     }
 
-    
+
     public static inline function getFarthestPointInDirection(rect: Rectangle, direction: Vector, result: Vector): Vector
     {
         return getFarthestPointInDirectionRect(rect.x, rect.y, rect.width, rect.height, rect.angle, direction, result);
     }
 
-    
+
     public static function getFarthestPointInDirectionRect(x: Float, y: Float, width: Float, height: Float, angle: Float, direction: Vector, result: Vector): Vector
     {
         if (angle.isZero())
@@ -116,7 +117,7 @@ class RectangleEx
             var y2: Float = MathUtils.rotateY(cos, sin, x,         y + height, centerX, centerY);
             var x3: Float = MathUtils.rotateX(cos, sin, x + width, y + height, centerX, centerY);
             var y3: Float = MathUtils.rotateY(cos, sin, x + width, y + height, centerX, centerY);
-            
+
             var distanceToTopLeft: Float  = direction.dot(x0, y0);
             var distanceToTopRight: Float = direction.dot(x1, y1);
             var distanceToBotLeft: Float  = direction.dot(x2, y2);
@@ -166,31 +167,34 @@ class RectangleEx
     }
 
 
-    public static function getClosestPointOnBoundsToOrigin(r: Rectangle): Vector
+    public static function addMinkowskiDiffOverlap(r: Rectangle, collisionResult: CollisionResult)
     {
         final botRightX: Float = r.x + r.width;
         final botRightY: Float = r.y + r.height;
         var minDist: Float = Math.abs(r.x);
-        var boundsPoint: Vector = new Vector(r.x, 0);
+        var boundsPointX: Float = r.x;
+        var boundsPointY: Float = r.y;
 
         if (Math.abs(botRightX) < minDist)
         {
             minDist = Math.abs(botRightX);
-            boundsPoint.set(botRightX, 0);
+            boundsPointX = botRightX;
         }
 
         if (Math.abs(botRightY) < minDist)
         {
             minDist = Math.abs(botRightY);
-            boundsPoint.set(0, botRightY);
+            boundsPointX = 0;
+            boundsPointY = botRightY;
         }
-        
+
         if (Math.abs(r.y) < minDist)
         {
             minDist = Math.abs(r.y);
-            boundsPoint.set(0, r.y);
+            boundsPointX = 0;
+            boundsPointY = r.y;
         }
 
-        return boundsPoint;
+        collisionResult.addOverlap(boundsPointX, boundsPointY);
     }
 }

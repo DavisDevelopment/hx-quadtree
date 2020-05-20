@@ -10,9 +10,15 @@ abstract Simplex(Array<Vector>)
     var B(get, never): Vector;
     // C is the oldest point in the simplex.
     var C(get, never): Vector;
-    
+
 
     public inline function new()
+    {
+        reset();
+    }
+
+
+    public inline function reset()
     {
         this = [];
     }
@@ -40,13 +46,13 @@ abstract Simplex(Array<Vector>)
             // point and determine a new direction in the direction
             // of the perpendicular; aiming to try to encapsulate
             // the origin that lies outside.
-            if (abPerp.dotVector(aInverted) > 0) 
+            if (abPerp.dotVector(aInverted) > 0)
             {
                 removePoint(gjk, 0);
                 gjk.destroyVector(aInverted);
                 return abPerp;
             }
-            
+
             gjk.destroyVector(abPerp);
 
             // Determine the perpendicular line to A->C.
@@ -54,7 +60,7 @@ abstract Simplex(Array<Vector>)
 
              // Check the handedness of the perpendicular, it should
             // face AWAY from the simplex
-            if (acPerp.dotVector(B) >= 0) 
+            if (acPerp.dotVector(B) >= 0)
             {
                 acPerp.invert();
             }
@@ -63,7 +69,7 @@ abstract Simplex(Array<Vector>)
             // point and determine a new direction in the direction
             // of the perpendicular; aiming to try to encapsulate
             // the origin that lies outside
-            if (acPerp.dotVector(aInverted) > 0) 
+            if (acPerp.dotVector(aInverted) > 0)
             {
                 removePoint(gjk, 1);
                 gjk.destroyVector(aInverted);
@@ -95,6 +101,7 @@ abstract Simplex(Array<Vector>)
         {
             gjk.destroyVector(point);
         }
+        this = [];
     }
 
 

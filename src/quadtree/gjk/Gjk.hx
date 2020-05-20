@@ -25,8 +25,13 @@ class Gjk
     /** Cache for reusing Vector objects. **/
     var vectorPool: VectorLinkedList;
 
+    var simplex: Simplex;
 
-    public function new() { }
+
+    public function new()
+    {
+        simplex = new Simplex();
+    }
 
 
     /**
@@ -37,7 +42,7 @@ class Gjk
     public function checkOverlap(a: Collider, b: Collider): Bool
     {
         // Build a new Simplex for determining if a collision has occurred.
-        var simplex: Simplex = new Simplex();
+        simplex.reset();
 
         // Choose an arbitrary starting direction.
         var direction: Vector = recycleVector(1, 0);
@@ -57,7 +62,7 @@ class Gjk
             // If the support point did not reach as far as the origin,
             // the simplex must not contain the origin and therefore there is no
             // intersection.
-            if (supportPoint.dotVector(direction) <= 0) 
+            if (supportPoint.dotVector(direction) <= 0)
             {
                 // No intersection
                 destroyVector(supportPoint);
@@ -82,7 +87,7 @@ class Gjk
     function getSupportVector(a: Collider, b: Collider, direction: Vector): Vector
     {
         var aFarthest: Vector = getFarthestPointInDirection(a, direction);
-        var bFarthest: Vector = getFarthestPointInDirection(b, direction.invert());        
+        var bFarthest: Vector = getFarthestPointInDirection(b, direction.invert());
         direction.invert();
         destroyVector(bFarthest);
         return aFarthest.sub(bFarthest);
@@ -129,7 +134,7 @@ class Gjk
         return v;
     }
 
-    
+
     @:allow(quadtree.gjk.Simplex)
     inline function copyVector(v: Vector): Vector
     {

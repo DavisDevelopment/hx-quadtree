@@ -52,6 +52,7 @@ class Benchmark
             Sys.println('Objects: ${objects.length}');
             Sys.println('Load time: $loadTime');
             Sys.println('Execute time: $executeTime');
+            Sys.stdout().flush();
         }
     }
 }

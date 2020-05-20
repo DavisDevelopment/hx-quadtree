@@ -1,5 +1,6 @@
 package quadtree;
 
+import quadtree.helpers.CollisionResult;
 import quadtree.types.Collider;
 import quadtree.helpers.BoundingBox;
 import quadtree.helpers.LinkedListNode;
@@ -7,11 +8,16 @@ import quadtree.helpers.LinkedListNode;
 
 class QuadTreeCache
 {
+    public var collisionResult: CollisionResult;
+
     var linkedListPool: LinkedListNode<Collider>;
     var BoundingBoxPool: BoundingBox;
 
 
-    public function new() { }
+    public function new()
+    {
+        collisionResult = new CollisionResult();
+    }
 
 
     public inline function recycleLinkedList(item: Collider, ?next: LinkedListNode<Collider>): LinkedListNode<Collider>
@@ -24,7 +30,7 @@ class QuadTreeCache
         {
             var list: LinkedListNode<Collider> = linkedListPool;
             linkedListPool = linkedListPool.next;
-            
+
             list.item = item;
             list.next = next;
             return list;

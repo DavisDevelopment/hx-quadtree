@@ -44,9 +44,7 @@ class Physics
 
             if (minkowskiDiff != null && minkowskiDiff.containsOrigin())
             {
-                var minimumTranslationVector: Vector = minkowskiDiff.getClosestPointOnBoundsToOrigin();
-
-                collisionResult.addOverlap(minimumTranslationVector.x, minimumTranslationVector.y);
+                minkowskiDiff.addMinkowskiDiffOverlap(collisionResult);
                 return;
             }
         }

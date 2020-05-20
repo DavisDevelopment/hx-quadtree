@@ -100,7 +100,7 @@ class CollisionResult
     }
 
 
-    /** 
+    /**
         The angle by which the two objects were separated. Updated by Physics.separate().
     **/
     public inline function separationAngle(): Float
@@ -124,16 +124,17 @@ class CollisionResult
             return null;
         }
 
-        return new BoundingBox(
-            to.x - (to.width / 2) - from.x - from.width,
-            to.y - (to.height / 2) - from.y - from.height,
-            to.width + from.width,
-            to.height + from.height
-        );
+        minkowskiDifference_.x = to.x - (to.width / 2) - from.x - from.width;
+        minkowskiDifference_.y = to.y - (to.height / 2) - from.y - from.height;
+        minkowskiDifference_.width = to.width + from.width;
+        minkowskiDifference_.height = to.height + from.height;
+
+        return minkowskiDifference_;
     }
 
 
     @:allow(quadtree.Physics)
+    @:allow(quadtree.extensions.RectangleEx)
     inline function addOverlap(overlapX: Float, overlapY: Float)
     {
         this.overlapX = MathUtils.maxAbs(this.overlapX, overlapX);
@@ -162,4 +163,5 @@ class CollisionResult
     **/
     @:noCompletion var boundBox1_: BoundingBox = new BoundingBox(0, 0);
     @:noCompletion var boundBox2_: BoundingBox = new BoundingBox(0, 0);
+    @:noCompletion var minkowskiDifference_: BoundingBox = new BoundingBox(0, 0);
 }
