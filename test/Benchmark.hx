@@ -21,7 +21,7 @@ class Benchmark
     {
         var objects: Array<Collider> = new Array<Collider>();
 
-        for (i in 0...10000)
+        for (_ in 0...1000)
         {
             var width: Float = rand.random() * 100;
             var height: Float = rand.random() * 100;
@@ -35,19 +35,24 @@ class Benchmark
             objects.push(box);
         }
 
-        var start: Timestamp = new Timestamp();
+        for (_ in 0...3)
+        {
+            var start: Timestamp = new Timestamp();
 
-        qt.load(objects);
+            qt.reset();
+            qt.load(objects);
 
-        var loadTime: Float = start.elapsed();
-        Sys.println(loadTime);
-        start.reset();
+            var loadTime: Float = start.elapsed();
+            start.reset();
 
-        qt.execute();
+            qt.execute();
 
-        var executeTime: Float = start.elapsed();
+            var executeTime: Float = start.elapsed();
 
-        Sys.println('$loadTime | $executeTime | ${loadTime + executeTime}');
+            Sys.println('Objects: ${objects.length}');
+            Sys.println('Load time: $loadTime');
+            Sys.println('Execute time: $executeTime');
+        }
     }
 }
 

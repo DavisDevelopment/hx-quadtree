@@ -12,6 +12,13 @@ class TestMain
 {
     static function main()
     {
+        runTests();
+        //runBenchmark();
+    }
+
+
+    static function runTests()
+    {
         var runner = new Runner();
         runner.onComplete.add(onComplete);
 
@@ -20,6 +27,13 @@ class TestMain
         Report.create(runner, SuccessResultsDisplayMode.NeverShowSuccessResults, HeaderDisplayMode.AlwaysShowHeader);
 
         runner.run();
+    }
+
+
+    static function runBenchmark()
+    {
+        var benchmark: Benchmark = new Benchmark();
+        benchmark.run();
     }
 
 
