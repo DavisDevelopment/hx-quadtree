@@ -4,3 +4,4 @@ report/
 .vscode/
 .haxelib/
 .temp/
+/dump
