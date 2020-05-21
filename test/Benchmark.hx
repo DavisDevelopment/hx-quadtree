@@ -51,11 +51,10 @@ class Benchmark
 
             var executeTime: Float = start.elapsed();
 
-            Sys.println('Objects: ${objects.length}');
-            Sys.println('Reset time: $resetTime');
-            Sys.println('Load time: $loadTime');
-            Sys.println('Execute time: $executeTime');
-            Sys.stdout().flush();
+            trace('Objects: ${objects.length}');
+            trace('Reset time: $resetTime');
+            trace('Load time: $loadTime');
+            trace('Execute time: $executeTime');
         }
     }
 }
