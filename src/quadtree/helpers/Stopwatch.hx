@@ -21,7 +21,9 @@ class Stopwatch
 
     public static inline function printElapsedAndReset(msg: String = "")
     {
+        #if sys
         Sys.println('Elapsed ($msg): ${elapsed()}');
+        #end
         start();
     }
 
