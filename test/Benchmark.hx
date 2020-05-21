@@ -9,10 +9,16 @@ class Benchmark
     var qt: QuadTree;
     var rand: Random;
 
+    var areaWidth: Float;
+    var areaHeight: Float;
 
-    public function new()
+
+    public function new(areaWidth: Float = 20000, areaHeight: Float = 20000)
     {
-        qt = new QuadTree(0, 0, 1000, 1000);
+        this.areaWidth = areaWidth;
+        this.areaHeight = areaHeight;
+
+        qt = new QuadTree(0, 0, areaWidth, areaHeight);
         rand = new Random();
     }
 
@@ -25,8 +31,8 @@ class Benchmark
         {
             var width: Float = rand.random() * 100;
             var height: Float = rand.random() * 100;
-            var x: Float = rand.random() * (1000 - width);
-            var y: Float = rand.random() * (1000 - height);
+            var x: Float = rand.random() * (areaWidth - width);
+            var y: Float = rand.random() * (areaHeight - height);
             var angle: Float = rand.random() * Math.PI * 2;
 
             var box: Box = new Box(x, y, width, height);
@@ -40,8 +46,6 @@ class Benchmark
             var start: Timestamp = new Timestamp();
 
             qt.reset();
-            var resetTime: Float = start.elapsed();
-            start.reset();
 
             qt.load(objects);
             var loadTime: Float = start.elapsed();
@@ -52,7 +56,6 @@ class Benchmark
             var executeTime: Float = start.elapsed();
 
             trace('Objects: ${objects.length}');
-            trace('Reset time: $resetTime');
             trace('Load time: $loadTime');
             trace('Execute time: $executeTime');
         }

@@ -6,17 +6,24 @@ import quadtree.helpers.BoundingBox;
 import quadtree.helpers.LinkedListNode;
 
 
+/**
+    Storage for objects and object pools, which should be shared by multiple
+**/
 class QuadTreeCache
 {
     public var collisionResult: CollisionResult;
+    public var colliderTreeNodeMap: Map<Collider, QuadTree>;
 
     var linkedListPool: LinkedListNode<Collider>;
-    var BoundingBoxPool: BoundingBox;
+    var boundingBoxPool: BoundingBox;
 
 
     public function new()
     {
         collisionResult = new CollisionResult();
+        colliderTreeNodeMap = new Map<Collider, QuadTree>();
+        linkedListPool = null;
+        boundingBoxPool = null;
     }
 
 
@@ -44,6 +51,8 @@ class QuadTreeCache
         {
             var next: LinkedListNode<Collider> = list.next;
 
+            colliderTreeNodeMap.remove(list.item);
+
             list.item = null;
             list.next = linkedListPool;
             linkedListPool = list;
@@ -55,14 +64,14 @@ class QuadTreeCache
 
     public inline function recycleBoundingBox(x: Float, y: Float, width: Float, height: Float): BoundingBox
     {
-        if (BoundingBoxPool == null)
+        if (boundingBoxPool == null)
         {
             return new BoundingBox(x, y, width, height);
         }
         else
         {
-            var bounds: BoundingBox = BoundingBoxPool;
-            BoundingBoxPool = BoundingBoxPool.next;
+            var bounds: BoundingBox = boundingBoxPool;
+            boundingBoxPool = boundingBoxPool.next;
 
             bounds.x = x;
             bounds.y = y;
@@ -78,8 +87,8 @@ class QuadTreeCache
     {
         if (bounds != null)
         {
-            bounds.next = BoundingBoxPool;
-            BoundingBoxPool = bounds;
+            bounds.next = boundingBoxPool;
+            boundingBoxPool = bounds;
         }
     }
 

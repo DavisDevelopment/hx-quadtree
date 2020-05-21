@@ -249,8 +249,33 @@ class QuadTree
     }
 
 
+    /**
+        Method to be called when an object is moved, so that it is properly repositioned in the tree.
+
+        @param object The object to be repositioned.
+    **/
+    public function objectMoved(object: Collider)
+    {
+
+    }
+
+
+    /**
+        Checks if a given object is present in this tree.
+    **/
+    public inline function contains(object: Collider): Bool
+    {
+        return cache.colliderTreeNodeMap.exists(object);
+    }
+
+
     function add(object: Collider, group: Int = 0)
     {
+        if (contains(object))
+        {
+            throw "Attemtping to add an object to this tree which has already been added.";
+        }
+
         if (!hasSubdivided)
         {
             addHere(object, group);
@@ -277,16 +302,88 @@ class QuadTree
     }
 
 
+    function remove(object: Collider)
+    {
+        var nodeContainingObject: QuadTree = cache.colliderTreeNodeMap[object];
+
+        if (nodeContainingObject == null)
+        {
+            throw "Attempting to remove object not present in the tree.";
+        }
+
+        if (nodeContainingObject != this)
+        {
+            // Object is one of the other nodes.
+            nodeContainingObject.remove(object);
+            return;
+        }
+
+        // Object is here, remove it.
+        objectRemoved_ = false;
+
+        objects0 = removeFromGroup(objects0, object);
+        if (objectRemoved_)
+        {
+            objects0Length--;
+        }
+        else
+        {
+            objects1 = removeFromGroup(objects1, object);
+            if (objectRemoved_)
+            {
+                objects1Length--;
+            }
+            else
+            {
+                throw "Attempting to remove object not present in the tree.";
+            }
+        }
+
+        cache.colliderTreeNodeMap.remove(object);
+    }
+
+
+    inline function removeFromGroup(objectList: LinkedListNode<Collider>, object: Collider): LinkedListNode<Collider>
+    {
+        if (objectList.item == object)
+        {
+            var tmp: LinkedListNode<Collider> = objectList.next;
+
+            objectList.next = null;
+            cache.destroyLinkedList(objectList);
+
+            objectRemoved_ = true;
+            return tmp;
+        }
+
+        var it: LinkedListNode<Collider> = objectList;
+        var previous: LinkedListNode<Collider> = null;
+        while (it != null)
+        {
+            if (it.item == object)
+            {
+                previous.next = it.next;
+
+                it.next = null;
+                cache.destroyLinkedList(it);
+
+                objectRemoved_ = true;
+                break;
+            }
+
+            previous = it;
+            it = it.next;
+        }
+
+        return objectList;
+    }
+
+
     function addRectangle(rect: Rectangle, group: Int)
     {
         if (rect.angle.isZero())
         {
-            final objLeftEdge: Float = rect.x;
-            final objTopEdge: Float = rect.y;
-            final objRightEdge: Float = rect.x + rect.width;
-            final objBottomEdge: Float = rect.y + rect.height;
-
-            addRectBoundObject(rect, objLeftEdge, objTopEdge, objRightEdge, objBottomEdge, group);
+            addRectBoundObject(rect, rect.x, rect.y, rect.x + rect.width, rect.y + rect.height, group);
         }
         else
         {
@@ -441,6 +538,8 @@ class QuadTree
                     throw "Invalid group.";
             }
 
+            cache.colliderTreeNodeMap.set(object, this);
+
             if (shouldSubdivide())
             {
                 subdivideTree();
@@ -577,7 +676,6 @@ class QuadTree
     //                       TYPE-SPECIFIC COLLISION CHECKS
     //
     // =============================================================================
-
 
     function collisionCheckGeneric(collider: Collider, otherList: LinkedListNode<Collider>)
     {
@@ -760,4 +858,13 @@ class QuadTree
         }
     }
     #end
+
+
+    // =============================================================================
+    //
+    //                          HELPER VARIABLES FOR FUNCTION RESULTS
+    //
+    // =============================================================================
+
+    @:noCompletion var objectRemoved_: Bool;
 }

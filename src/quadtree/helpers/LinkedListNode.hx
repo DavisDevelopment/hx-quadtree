@@ -6,8 +6,8 @@ class LinkedListNode<T>
     public var item: T;
     public var next: LinkedListNode<T>;
 
-    
-    public function new(item: T, ?next: LinkedListNode<T>)
+
+    public inline function new(item: T, ?next: LinkedListNode<T>)
     {
         this.item = item;
         this.next = next;
