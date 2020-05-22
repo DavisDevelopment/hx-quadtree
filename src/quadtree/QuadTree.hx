@@ -269,22 +269,39 @@ class QuadTree
             return;
         }
 
-        switch object.areaType
+        var quadrants: Quadrants = switch object.areaType
         {
             case Point | MovingPoint:
-                addPoint(cast(object, Point), group);
+                checkPointQuadrants(cast(object, Point));
 
             case Rectangle | MovingRectangle:
-                addRectangle(cast(object, Rectangle), group);
+                checkRectangleQuadrants(cast(object, Rectangle));
 
             case Circle | MovingCircle:
-                addCircle(cast(object, Circle), group);
+                checkCircleQuadrants(cast(object, Circle));
 
             case Polygon | MovingPolygon:
-                addGeneric(cast(object, Polygon), group);
+                checkGenericQuadrants(cast(object, Polygon));
 
             case _:
                 throw "Must specify an areaType";
+        };
+
+        if (quadrants & TopLeft)
+        {
+            addToTopLeft(object, group);
+        }
+        if (quadrants & TopRight)
+        {
+            addToTopRight(object, group);
+        }
+        if (quadrants & BotLeft)
+        {
+            addToBotLeft(object, group);
+        }
+        if (quadrants & BotRight)
+        {
+            addToBotRight(object, group);
         }
     }
 
@@ -395,7 +412,7 @@ class QuadTree
 
     function checkGenericQuadrants(collider: Collider): Quadrants
     {
-        var quadrants: Quadrants;
+        var quadrants: Quadrants = None;
 
         if (gjk.checkOverlap(topLeftBounds, collider))
         {
@@ -446,7 +463,7 @@ class QuadTree
         }
 
         // Object didn't completely fit in any quadrant, check for partial overlaps.
-        var quadrants: Quadrants;
+        var quadrants: Quadrants = None;
         if (this.intersectsTopLeft(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
         {
             quadrants |= TopLeft;
