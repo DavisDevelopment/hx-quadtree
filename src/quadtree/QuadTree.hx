@@ -269,23 +269,7 @@ class QuadTree
             return;
         }
 
-        var quadrants: Quadrants = switch object.areaType
-        {
-            case Point | MovingPoint:
-                checkPointQuadrants(cast(object, Point));
-
-            case Rectangle | MovingRectangle:
-                checkRectangleQuadrants(cast(object, Rectangle));
-
-            case Circle | MovingCircle:
-                checkCircleQuadrants(cast(object, Circle));
-
-            case Polygon | MovingPolygon:
-                checkGenericQuadrants(cast(object, Polygon));
-
-            case _:
-                throw "Must specify an areaType";
-        };
+        var quadrants: Quadrants = checkQuadrants(object);
 
         if (quadrants & TopLeft)
         {
@@ -308,7 +292,49 @@ class QuadTree
 
     function remove(object: Collider)
     {
+        if (hasSubdivided)
+        {
+            // Is an internal node, forward the removal to the necessary subtrees.
+            var quadrants: Quadrants = checkQuadrants(object);
 
+            if (quadrants & TopLeft && subtreeActive(topLeftTree))
+            {
+                topLeftTree.remove(object);
+            }
+            if (quadrants & TopRight && subtreeActive(topRightTree))
+            {
+                topRightTree.remove(object);
+            }
+            if (quadrants & BotLeft && subtreeActive(botLeftTree))
+            {
+                botLeftTree.remove(object);
+            }
+            if (quadrants & BotRight && subtreeActive(botRightTree))
+            {
+                botRightTree.remove(object);
+            }
+
+            return;
+        }
+
+        // Is a leaf node, remove the object from here.
+        objects0 = removeFromGroup(objects0, object);
+        if (objectRemoved_)
+        {
+            objects0Length--;
+        }
+        else
+        {
+            objects1 = removeFromGroup(objects1, object);
+            if (objectRemoved_)
+            {
+                objects1Length--;
+            }
+            else
+            {
+                throw "Attempting to remove object not in the tree.";
+            }
+        }
     }
 
 
@@ -345,6 +371,28 @@ class QuadTree
         }
 
         return objectList;
+    }
+
+
+    inline function checkQuadrants(object: Collider): Quadrants
+    {
+        return switch object.areaType
+        {
+            case Point | MovingPoint:
+                checkPointQuadrants(cast(object, Point));
+
+            case Rectangle | MovingRectangle:
+                checkRectangleQuadrants(cast(object, Rectangle));
+
+            case Circle | MovingCircle:
+                checkCircleQuadrants(cast(object, Circle));
+
+            case Polygon | MovingPolygon:
+                checkGenericQuadrants(cast(object, Polygon));
+
+            case _:
+                throw "Must specify an areaType";
+        };
     }
 
 
