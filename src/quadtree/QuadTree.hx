@@ -1,5 +1,6 @@
 package quadtree;
 
+import quadtree.helpers.Quadrants;
 import quadtree.gjk.Gjk;
 import quadtree.types.Polygon;
 import quadtree.types.Circle;
@@ -260,22 +261,8 @@ class QuadTree
     }
 
 
-    /**
-        Checks if a given object is present in this tree.
-    **/
-    public inline function contains(object: Collider): Bool
-    {
-        return cache.colliderTreeNodeMap.exists(object);
-    }
-
-
     function add(object: Collider, group: Int = 0)
     {
-        if (contains(object))
-        {
-            throw "Attemtping to add an object to this tree which has already been added.";
-        }
-
         if (!hasSubdivided)
         {
             addHere(object, group);
@@ -304,42 +291,7 @@ class QuadTree
 
     function remove(object: Collider)
     {
-        var nodeContainingObject: QuadTree = cache.colliderTreeNodeMap[object];
 
-        if (nodeContainingObject == null)
-        {
-            throw "Attempting to remove object not present in the tree.";
-        }
-
-        if (nodeContainingObject != this)
-        {
-            // Object is one of the other nodes.
-            nodeContainingObject.remove(object);
-            return;
-        }
-
-        // Object is here, remove it.
-        objectRemoved_ = false;
-
-        objects0 = removeFromGroup(objects0, object);
-        if (objectRemoved_)
-        {
-            objects0Length--;
-        }
-        else
-        {
-            objects1 = removeFromGroup(objects1, object);
-            if (objectRemoved_)
-            {
-                objects1Length--;
-            }
-            else
-            {
-                throw "Attempting to remove object not present in the tree.";
-            }
-        }
-
-        cache.colliderTreeNodeMap.remove(object);
     }
 
 
@@ -379,47 +331,47 @@ class QuadTree
     }
 
 
-    function addRectangle(rect: Rectangle, group: Int)
+    function checkRectangleQuadrants(rect: Rectangle)
     {
         if (rect.angle.isZero())
         {
-            addRectBoundObject(rect, rect.x, rect.y, rect.x + rect.width, rect.y + rect.height, group);
+            return checkRectBoundObjectQuadrants(rect, rect.x, rect.y, rect.x + rect.width, rect.y + rect.height);
         }
         else
         {
-            addGeneric(rect, group);
+            return checkGenericQuadrants(rect);
         }
     }
 
 
-    function addPoint(point: Point, group: Int)
+    function checkPointQuadrants(point: Point): Quadrants
     {
         if (point.x < midpointX)
         {
             if (point.y < midpointY)
             {
-                addToTopLeft(point, group);
+                return TopLeft;
             }
             else
             {
-                addToBotLeft(point, group);
+                return BotLeft;
             }
         }
         else
         {
             if (point.y < midpointY)
             {
-                addToTopRight(point, group);
+                return TopRight;
             }
             else
             {
-                addToBotRight(point, group);
+                return BotRight;
             }
         }
     }
 
 
-    function addCircle(circle: Circle, group: Int)
+    function checkCircleQuadrants(circle: Circle): Quadrants
     {
         /**
             For now, circles will be added as if they were rectangles.
@@ -437,79 +389,81 @@ class QuadTree
         final objRightEdge: Float = circle.centerX + circle.radius;
         final objBottomEdge: Float = circle.centerY + circle.radius;
 
-        addRectBoundObject(circle, objLeftEdge, objTopEdge, objRightEdge, objBottomEdge, group);
+        return checkRectBoundObjectQuadrants(circle, objLeftEdge, objTopEdge, objRightEdge, objBottomEdge);
     }
 
 
-    function addGeneric(collider: Collider, group: Int)
+    function checkGenericQuadrants(collider: Collider): Quadrants
     {
+        var quadrants: Quadrants;
+
         if (gjk.checkOverlap(topLeftBounds, collider))
         {
-            addToTopLeft(collider, group);
+            quadrants |= TopLeft;
         }
         if (gjk.checkOverlap(topRightBounds, collider))
         {
-            addToTopRight(collider, group);
+            quadrants |= TopRight;
         }
         if (gjk.checkOverlap(botLeftBounds, collider))
         {
-            addToBotLeft(collider, group);
+            quadrants |= BotLeft;
         }
         if (gjk.checkOverlap(botRightBounds, collider))
         {
-            addToBotRight(collider, group);
+            quadrants |= BotRight;
         }
+
+        return quadrants;
     }
 
 
     @:generic
-    function addRectBoundObject<T: Collider>(object: T, objLeftEdge: Float, objTopEdge: Float, objRightEdge: Float, objBottomEdge: Float, group: Int)
+    function checkRectBoundObjectQuadrants<T: Collider>(object: T, objLeftEdge: Float, objTopEdge: Float, objRightEdge: Float, objBottomEdge: Float): Quadrants
     {
         // Check if the object fits completely inside one of the quadrants.
         if (objLeftEdge > leftEdge && objRightEdge < midpointX)
         {
             if (objTopEdge > topEdge && objBottomEdge < midpointY)
             {
-                addToTopLeft(object, group);
-                return;
+                return TopLeft;
             }
             if (objTopEdge > midpointY && objBottomEdge < botEdge)
             {
-                addToBotLeft(object, group);
-                return;
+                return BotLeft;
             }
         }
         if (objLeftEdge > midpointX && objRightEdge < rightEdge)
         {
             if (objTopEdge > topEdge && objBottomEdge < midpointY)
             {
-                addToTopRight(object, group);
-                return;
+                return TopRight;
             }
             if (objTopEdge > midpointY && objBottomEdge < botEdge)
             {
-                addToBotRight(object, group);
-                return;
+                return BotRight;
             }
         }
 
         // Object didn't completely fit in any quadrant, check for partial overlaps.
+        var quadrants: Quadrants;
         if (this.intersectsTopLeft(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
         {
-            addToTopLeft(object, group);
+            quadrants |= TopLeft;
         }
         if (this.intersectsTopRight(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
         {
-            addToTopRight(object, group);
+            quadrants |= TopRight;
         }
         if (this.intersectsBotRight(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
         {
-            addToBotRight(object, group);
+            quadrants |= BotRight;
         }
         if (this.intersectsBotLeft(objLeftEdge, objTopEdge, objRightEdge, objBottomEdge))
         {
-            addToBotLeft(object, group);
+            quadrants |= BotLeft;
         }
+        return quadrants;
     }
 
 
@@ -537,8 +491,6 @@ class QuadTree
                 case _:
                     throw "Invalid group.";
             }
-
-            cache.colliderTreeNodeMap.set(object, this);
 
             if (shouldSubdivide())
             {

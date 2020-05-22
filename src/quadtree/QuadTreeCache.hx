@@ -12,7 +12,6 @@ import quadtree.helpers.LinkedListNode;
 class QuadTreeCache
 {
     public var collisionResult: CollisionResult;
-    public var colliderTreeNodeMap: Map<Collider, QuadTree>;
 
     var linkedListPool: LinkedListNode<Collider>;
     var boundingBoxPool: BoundingBox;
@@ -21,7 +20,6 @@ class QuadTreeCache
     public function new()
     {
         collisionResult = new CollisionResult();
-        colliderTreeNodeMap = new Map<Collider, QuadTree>();
         linkedListPool = null;
         boundingBoxPool = null;
     }
@@ -50,8 +48,6 @@ class QuadTreeCache
         while (list != null)
         {
             var next: LinkedListNode<Collider> = list.next;
-
-            colliderTreeNodeMap.remove(list.item);
 
             list.item = null;
             list.next = linkedListPool;
