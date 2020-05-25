@@ -251,13 +251,58 @@ class QuadTree
 
 
     /**
-        Method to be called when an object is moved, so that it is properly repositioned in the tree.
+        Removes the given object from the tree.
 
-        @param object The object to be repositioned.
+        @param object The object to remove.
     **/
-    public function objectMoved(object: Collider)
+    public function remove(object: Collider)
     {
+        if (hasSubdivided)
+        {
+            // Is an internal node, forward the removal to the necessary subtrees.
+            var quadrants: Quadrants = checkQuadrants(object);
 
+            if (quadrants & TopLeft && subtreeActive(topLeftTree))
+            {
+                topLeftTree.remove(object);
+            }
+            if (quadrants & TopRight && subtreeActive(topRightTree))
+            {
+                topRightTree.remove(object);
+            }
+            if (quadrants & BotLeft && subtreeActive(botLeftTree))
+            {
+                botLeftTree.remove(object);
+            }
+            if (quadrants & BotRight && subtreeActive(botRightTree))
+            {
+                botRightTree.remove(object);
+            }
+
+            return;
+        }
+
+        var removeSuccessful: Bool = false;
+
+        // Is a leaf node, remove the object from here.
+        objects0 = removeFromGroup(objects0, object);
+        if (objectRemoved_)
+        {
+            objects0Length--;
+            removeSuccessful = true;
+        }
+
+        objects1 = removeFromGroup(objects1, object);
+        if (objectRemoved_)
+        {
+            objects1Length--;
+            removeSuccessful = true;
+        }
+
+        if (!removeSuccessful)
+        {
+            throw "Attempting to remove object not in the tree.";
+        }
     }
 
 
@@ -290,56 +335,12 @@ class QuadTree
     }
 
 
-    function remove(object: Collider)
-    {
-        if (hasSubdivided)
-        {
-            // Is an internal node, forward the removal to the necessary subtrees.
-            var quadrants: Quadrants = checkQuadrants(object);
-
-            if (quadrants & TopLeft && subtreeActive(topLeftTree))
-            {
-                topLeftTree.remove(object);
-            }
-            if (quadrants & TopRight && subtreeActive(topRightTree))
-            {
-                topRightTree.remove(object);
-            }
-            if (quadrants & BotLeft && subtreeActive(botLeftTree))
-            {
-                botLeftTree.remove(object);
-            }
-            if (quadrants & BotRight && subtreeActive(botRightTree))
-            {
-                botRightTree.remove(object);
-            }
-
-            return;
-        }
-
-        // Is a leaf node, remove the object from here.
-        objects0 = removeFromGroup(objects0, object);
-        if (objectRemoved_)
-        {
-            objects0Length--;
-        }
-        else
-        {
-            objects1 = removeFromGroup(objects1, object);
-            if (objectRemoved_)
-            {
-                objects1Length--;
-            }
-            else
-            {
-                throw "Attempting to remove object not in the tree.";
-            }
-        }
-    }
-
-
     inline function removeFromGroup(objectList: LinkedListNode<Collider>, object: Collider): LinkedListNode<Collider>
     {
+        objectRemoved_ = false;
+
+        if (objectList == null) return null;
+
         if (objectList.item == object)
         {
             var tmp: LinkedListNode<Collider> = objectList.next;

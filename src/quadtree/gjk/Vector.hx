@@ -7,7 +7,7 @@ class Vector
 {
     public static inline var AXIS_X = 1;
     public static inline var AXIS_Y = 2;
-    
+
     public var x: Float;
     public var y: Float;
 
@@ -120,12 +120,6 @@ class Vector
     public function equals(v: Vector): Bool
     {
         return MathUtils.floatEquals(x, v.x) && MathUtils.floatEquals(y, v.y);
-    }
-
-
-    public inline function isZero(): Bool
-    {
-        return x == 0 && y == 0;
     }
 
 

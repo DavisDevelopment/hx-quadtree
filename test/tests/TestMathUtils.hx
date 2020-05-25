@@ -43,4 +43,14 @@ class TestMathUtils implements ITest
         Assert.equals(-10, MathUtils.maxAbs(5, -10));
         Assert.equals(-5, MathUtils.minAbs(10, -5));
     }
+
+
+    function testAreParallel()
+    {
+        Assert.isTrue(MathUtils.areParallel(0, 0));
+        Assert.isFalse(MathUtils.areParallel(0, 1));
+        Assert.isFalse(MathUtils.areParallel(-1, 1));
+        Assert.isTrue(MathUtils.areParallel(1, 1));
+        Assert.isTrue(MathUtils.areParallel(-1, -1));
+    }
 }

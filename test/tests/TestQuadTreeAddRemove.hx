@@ -89,6 +89,14 @@ class TestQuadTreeAddRemove extends QuadTree implements ITest
     }
 
 
+    function testRemoveFail()
+    {
+        var box: Box = new Box(0, 0, 100, 100);
+
+        Assert.raises(() -> remove(box), String);
+    }
+
+
     function testAddToWrongList()
     {
         var area: Rectangle = new Box(0, 0, 1000, 1000);

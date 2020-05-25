@@ -1,7 +1,7 @@
 package quadtree.helpers;
 
 
-
+@IgnoreCover
 class Stopwatch
 {
     static var timestamp: Float = 0;
