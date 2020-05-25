@@ -262,19 +262,19 @@ class QuadTree
             // Is an internal node, forward the removal to the necessary subtrees.
             var quadrants: Quadrants = checkQuadrants(object);
 
-            if (quadrants & TopLeft && subtreeActive(topLeftTree))
+            if ((quadrants & TopLeft) && subtreeActive(topLeftTree))
             {
                 topLeftTree.remove(object);
             }
-            if (quadrants & TopRight && subtreeActive(topRightTree))
+            if ((quadrants & TopRight) && subtreeActive(topRightTree))
             {
                 topRightTree.remove(object);
             }
-            if (quadrants & BotLeft && subtreeActive(botLeftTree))
+            if ((quadrants & BotLeft) && subtreeActive(botLeftTree))
             {
                 botLeftTree.remove(object);
             }
-            if (quadrants & BotRight && subtreeActive(botRightTree))
+            if ((quadrants & BotRight) && subtreeActive(botRightTree))
             {
                 botRightTree.remove(object);
             }
