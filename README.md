@@ -41,7 +41,7 @@ class Box implements Rectangle
     // for better performance.
     public var areaType: CollisionAreaType = CollisionAreaType.Rectangle;
 
-    // Use this to temporarily disable an object's collision 
+    // Use this to temporarily disable an object's collision
     // without removing it from whatever list it may be in.
     public var collisionsEnabled: Bool = true;
 
@@ -98,6 +98,23 @@ while (gameRunning)
 ```
 
 
+### Handle moving objects without rebuilding the tree
+
+In case object movements can be tracked, it is possible to avoid having to reset and rebuild the tree in every cycle.
+To do this, use the following method.
+
+```haxe
+// Remove the object from the tree BEFORE moving it.
+qt.remove(myObject);
+
+// Update the object's position.
+myObject.move(...);
+
+// Put the object back in the tree.
+qt.load([ myObject ]);
+```
+
+
 ### Configuring the QuadTree
 
 Being familiar with quad-trees, you can also configure its properties.
@@ -147,7 +164,7 @@ qt.setOverlapProcessCallback(function(collisionResult: CollisionResult)
 
     // First separate the objects.
     Physics.separate(collisionResult);
-    
+
     if (collisionResult.separationHappened)
     {
         // If separation actually happened, we can also update their velocities.
@@ -174,10 +191,13 @@ qt.setOverlapProcessCallback(function(collisionResult: CollisionResult)
 });
 ```
 
+**Note:** This part of the library could still use some testing and fine-tuning.
+Please open an issue on GitLab upon coming accross any separations that are not handled optimally.
+
 
 ### Static Objects
 
-Having a group of immovable objects, for example trees, tilemaps or other parts of the environment, 
+Having a group of immovable objects, for example trees, tilemaps or other parts of the environment,
 means that time can be saved in the construction of the QuadTree, by leaving those objects loaded
 in the second group of the tree and only partially reseting it to re-construct the first group.
 This can be done with the `resetFirstGroup()` function as shown in the example below.

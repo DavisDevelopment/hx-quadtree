@@ -6,7 +6,7 @@
   "description": "Fast Quad-Tree 2D collision detection library, supporting all convex polygons.",
   "version": "0.0.0",
   "classPath": "src",
-  "releasenote": "Added missing compilation checks.",
+  "releasenote": "Added support for removing objects from the tree.",
   "contributors": [ "Haath" ],
   "dependencies": {
   }
