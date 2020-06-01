@@ -1,0 +1,6 @@
+
+hxml/test.hxml
+
+--next
+--lua build/lua/test.lua
+-cmd lua build/lua/test.lua
