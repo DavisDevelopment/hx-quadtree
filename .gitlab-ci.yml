@@ -27,7 +27,7 @@ test-lua:
   - luarocks install environ
   - luarocks install luasocket
   - luarocks install luv
-  - luarocks install bit32
+  - luarocks install bit32 || true
   - luarocks install luautf8
 
   - haxelib install $HXML --always --quiet
