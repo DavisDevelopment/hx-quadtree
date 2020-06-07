@@ -12,7 +12,7 @@ class TestMovingRectangleEx implements ITest
 {
     public function new() { }
 
-    
+
     function testHull()
     {
         var movingBox: MovingBox = new MovingBox(0, 10, 100, 100);
