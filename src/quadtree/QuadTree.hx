@@ -585,7 +585,7 @@ class QuadTree
             add(it1.item, 1);
 
             it1 = it1.next;
-            objects0Length--;
+            objects1Length--;
         }
 
         cache.destroyLinkedList(objects0);
