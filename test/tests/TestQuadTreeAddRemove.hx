@@ -1,5 +1,6 @@
 package tests;
 
+import seedyrng.Seedy;
 import quadtree.helpers.LinkedListNode;
 import tests.models.Triangle;
 import quadtree.types.Collider;
@@ -312,6 +313,51 @@ class TestQuadTreeAddRemove extends QuadTree implements ITest
         var botRight: Circle = new Circle(990, 990, 2);
         add(botRight);
         Assert.equals(botRight, traverseTree(qt -> qt.botRightTree));
+    }
+
+
+    function testLargeRandom()
+    {
+        var objects: Int = 2000;
+
+        var validate = (qt: QuadTree) ->
+        {
+            if (qt.isInternalNode())
+            {
+                Assert.isNull(qt.objects0);
+                Assert.equals(0, qt.objects0Length);
+
+                Assert.isNull(qt.objects1);
+                Assert.equals(0, qt.objects1Length);
+            }
+            else
+            {
+                Assert.isTrue(qt.objects0 != null || qt.objects1 != null);
+                Assert.isTrue(qt.objects0Length > 0 || qt.objects1Length > 0);
+            }
+        };
+
+        for (_ in 0...objects)
+        {
+            var x: Float = Seedy.instance.uniform(0, 900);
+            var y: Float = Seedy.instance.uniform(0, 900);
+            var obj: Collider = null;
+
+            if (Seedy.random() < 0.5)
+            {
+                obj = new Box(x, y, 100, 100);
+            }
+            else
+            {
+                obj = new Point(x, y);
+            }
+
+            var group: Int = Seedy.instance.randomInt(0, 1);
+
+            add(obj, group);
+        }
+
+        traverseAllRecursive(this, validate);
     }
 
 

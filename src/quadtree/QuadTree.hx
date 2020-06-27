@@ -57,7 +57,6 @@ class QuadTree
     var midpointX: Float;
     var midpointY: Float;
 
-    var useBothLists: Bool;
     var active: Bool;
     var hasSubdivided: Bool;
 
@@ -85,7 +84,6 @@ class QuadTree
     {
         active = true;
         hasSubdivided = false;
-        useBothLists = false;
 
         cache.destroyLinkedList(objects0);
         objects0 = null;
@@ -173,8 +171,6 @@ class QuadTree
     **/
     public function load(objectGroup: Array<Collider>, ?otherObjectGroup: Array<Collider> = null)
     {
-        useBothLists = useBothLists || (otherObjectGroup != null);
-
         if (objectGroup != null)
         {
             for (obj in objectGroup)
@@ -571,6 +567,10 @@ class QuadTree
         hasSubdivided = true;
 
         var it0: LinkedListNode<Collider> = objects0;
+        objects0 = null;
+        var it1: LinkedListNode<Collider> = objects1;
+        objects1 = null;
+
         while (it0 != null)
         {
             add(it0.item, 0);
@@ -579,7 +579,6 @@ class QuadTree
             objects0Length--;
         }
 
-        var it1: LinkedListNode<Collider> = objects1;
         while (it1 != null)
         {
             add(it1.item, 1);
@@ -587,11 +586,6 @@ class QuadTree
             it1 = it1.next;
             objects1Length--;
         }
-
-        cache.destroyLinkedList(objects0);
-        objects0 = null;
-        cache.destroyLinkedList(objects1);
-        objects1 = null;
     }
 
 
@@ -788,7 +782,7 @@ class QuadTree
 
     inline function getListToCheck(objectBeingChecked: LinkedListNode<Collider>): LinkedListNode<Collider>
     {
-        return useBothLists ? objects1 : objectBeingChecked.next;
+        return objects1 != null ? objects1 : objectBeingChecked.next;
     }
 
 
@@ -829,14 +823,11 @@ class QuadTree
             tree.maxDepth = maxDepth - 1;
             tree.gjk = gjk;
             tree.cache = cache;
-            tree.useBothLists = useBothLists;
         }
         else if (!tree.active)
         {
             tree.reset(bounds.x, bounds.y, bounds.width, bounds.height);
-            tree.useBothLists = useBothLists;
         }
-        hasSubdivided = true;
         return tree;
     }
 
