@@ -57,7 +57,7 @@ class PointEx
 
             pointX = rotatedX;
             pointY = rotatedY;
-        }        
+        }
 
         return pointX >= x
             && pointY >= y
@@ -71,7 +71,7 @@ class PointEx
         return intersectsWithRectangle(point.x, point.y, other.hullX(), other.hullY(), other.hullWidth(), other.hullHeight(), other.angle);
     }
 
-    
+
     public static inline function getFarthestPointInDirection(point: Point, direction: Vector, result: Vector): Vector
     {
         return result.set(point.x, point.y);
